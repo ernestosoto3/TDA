@@ -1,0 +1,162 @@
+# ==================================================
+# Dependencies and package managers
+# ==================================================
+
+node_modules/
+.pnpm-store/
+.pnpm-debug.log*
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+
+# ==================================================
+# Environment variables and secrets
+# ==================================================
+
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Local EAS signing credentials
+credentials.json
+
+# Firebase service accounts
+service-account*.json
+*-firebase-adminsdk-*.json
+
+# Certificates, signing keys, and provisioning files
+*.jks
+*.keystore
+*.p8
+*.p12
+*.pem
+*.key
+*.mobileprovision
+
+# Firebase native configuration
+# Keep these ignored when supplying them through EAS file variables.
+**/google-services.json
+**/GoogleService-Info.plist
+
+
+# ==================================================
+# Expo and React Native
+# ==================================================
+
+.expo/
+.expo-shared/
+expo-env.d.ts
+.metro-health-check*
+web-build/
+.kotlin/
+*.orig.*
+
+# Expo generated native projects
+# Appropriate when using Expo Prebuild/CNG and not manually maintaining
+# the native Android and iOS projects.
+apps/*/android/
+apps/*/ios/
+
+
+# ==================================================
+# Build output and caches
+# ==================================================
+
+dist/
+build/
+out/
+
+.turbo/
+.cache/
+.parcel-cache/
+
+*.tsbuildinfo
+
+.eslintcache
+.stylelintcache
+
+coverage/
+.nyc_output/
+*.lcov
+
+logs/
+*.log
+
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+
+# ==================================================
+# Local Redis data
+# ==================================================
+
+dump.rdb
+appendonly.aof
+appendonlydir/
+
+
+# ==================================================
+# Operating systems
+# ==================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+*.icloud
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+
+# ==================================================
+# Editors and IDEs
+# ==================================================
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+!*.code-workspace
+*.vsix
+
+# JetBrains / Android Studio
+.idea/
+*.iml
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim and temporary editor files
+*.swp
+*.swo
+*~
+
+
+# ==================================================
+# Temporary files
+# ==================================================
+
+*.tmp
+*.temp
+*.bak
