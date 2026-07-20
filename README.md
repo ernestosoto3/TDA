@@ -125,7 +125,7 @@ current fragmentation across social media and multiple websites.
 ### Product Principles
 - **Simplicity:** the app must be usable by casual fans and daily 
   enthusiasts alike, with minimal friction.
-scm-history-item:c%3A%5CUsers%5Cgamer%5CDownloads%5CTuDeporte%5CTDA?%7B%22repositoryId%22%3A%22scm0%22%2C%22historyItemId%22%3A%22b898ae6c5712be164a59343b4e0f3232ba21ad6e%22%2C%22historyItemParentId%22%3A%223ec329a25f6bd27fddc4480cb3ef4f6b8ba85c89%22%2C%22historyItemDisplayId%22%3A%22b898ae6%22%7D- **Verified information:** all sports data should come from official 
+ **Verified information:** all sports data should come from official 
   or verified sources.
 - **Community:** connect fans with the communities around each sport.
 - **Safe environment:** zero tolerance for violence, explicit content, 
