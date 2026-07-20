@@ -117,8 +117,6 @@ Since the app depends on accurate and updated sports information, the admin pane
 
 ## Project Goals
 
-## Project Goals
-
 ### Core Goal
 Provide a single, centralized platform where Puerto Rico sports fans can 
 access scores, schedules, team info, news, and updates replacing the 
