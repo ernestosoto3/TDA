@@ -4,147 +4,211 @@
 
 The main problem TDA solves is the lack of a centralized sports platform for local Puerto Rico sports.
 
-Right now, local sports information is spread across different sources such as social media pages, news websites, team accounts, league pages, and older posts. This makes it difficult for users to quickly find information about their favorite teams, leagues, athletes, or recent game results.
+Right now, local sports information is spread across sources such as social media, news websites, team accounts, league pages, and older posts. This makes it difficult for users to quickly find information about their favorite teams, leagues, athletes, or recent games.
 
-For many fans, finding a final score, schedule, stat, or update requires searching through multiple platforms. This is inefficient and can discourage users from following local sports as closely as they would like.
+Finding a final score, schedule, statistic, or update often requires searching through multiple platforms. This is inefficient and can discourage users from following local sports as closely as they would like.
 
 ## Overview
 
-TDA is a centralized local sports hub application focused on Puerto Rico sports. The app fills a gap in the local sports community because, currently, there is no major local sports app dedicated to organizing Puerto Rico sports content in one place.
+TDA is a centralized local sports hub focused on Puerto Rico sports. Currently, there is no major local sports application dedicated to organizing Puerto Rico sports content in one place.
 
-Puerto Rico has a large and passionate sports fan base, especially in sports such as baseball, basketball, boxing, combat sports, and volleyball. Even though local leagues and athletes continue to grow, their digital presence is still limited compared to larger international leagues like the NBA or MLB.
+Puerto Rico has a large and passionate sports fan base, especially in baseball, basketball, boxing, combat sports, and volleyball. Although local leagues and athletes continue to grow, their digital presence remains limited compared with larger international leagues such as the NBA and MLB.
 
-The main goal of TDA is to give local sports fans a single place where they can find scores, schedules, team information, news, and updates related to Puerto Rico sports.
+The main goal of TDA is to give local sports fans one place to find scores, schedules, entity information, news, and updates related to Puerto Rico sports.
 
 ## Target Users
-The main target audience is local sports fans in Puerto Rico.
 
-More specifically, TDA focuses on the following groups:
+The main target audience is local sports fans in Puerto Rico.
 
 ### Casual Sports Fans
 
-Casual sports fans want a simple way to check final scores, schedules, and updates without having to search across multiple websites or social media pages.
+Casual sports fans want a simple way to check final scores, schedules, and updates without searching across multiple websites or social media pages.
 
 These users may not follow every game live, but they still want to stay informed about their favorite teams and leagues.
 
 ### Daily Sports Enthusiasts
 
-Daily sports enthusiasts want quick access to scores, schedules, previous game results, and stats.
+Daily sports enthusiasts want quick access to scores, schedules, previous results, statistics, and updates.
 
-These users are more active and may follow multiple sports or teams. They may currently have trouble finding older stats or game information because local sports content is often spread across social media posts or different websites.
+These users may follow multiple sports, leagues, teams, or athletes and need an organized way to find information that is currently spread across different sources.
 
 ### People Involved in Sports
 
-This includes athletes, coaches, team staff, reporters, photographers, editors, and content creators.
+This group includes athletes, coaches, team staff, reporters, photographers, editors, and content creators.
 
-These users can benefit from the app because it can provide more visibility for athletes, teams, and local leagues. It can also help reporters, photographers, and content creators reach more fans through a centralized sports platform.
-
-
+TDA can provide more visibility for athletes, teams, and local leagues. It can also help reporters, photographers, and content creators reach more local sports fans.
 
 ## Planned Features
-These are the core features needed for the first version of the app. Without these features, the app would not provide a complete basic sports experience.
 
-### 1. Home Feed
+These are the core features planned for the first version of the application.
 
-The home feed is the main screen users see when they open the app. It should show the most relevant sports content, such as scores, updates, news, and followed team information.
+### 1. Home
 
-**Why it matters:**  
-This is one of the most important parts of the user experience because it gives users a quick overview of what is happening.
-
----
-
-### 2. Search Tab
-
-The search tab allows users to search for sports, teams, players, leagues, and news.
+Home is the main screen users see when they open the application. It presents relevant sports content, including scores, updates, news, and information related to followed entities.
 
 **Why it matters:**  
-Users need a fast way to find specific content instead of only depending on the home feed.
+It gives users a quick overview of what is happening across Puerto Rico sports.
 
----
+### 2. Search
 
-### 3. Sports Tab
-
-The sports tab organizes the app by different sports. Users should be able to select a sport and view related leagues, teams, games, and news.
+Search allows users to find sports, leagues, teams, athletes, games, and articles.
 
 **Why it matters:**  
-This gives the app structure and makes navigation easier, especially if the app covers multiple sports.
+Users need a direct way to find specific information instead of depending entirely on Home.
 
----
+### 3. Community
 
-### 4. Team Pages
-
-Each team should have its own page with basic information, schedules, final scores, and related updates.
+Community allows users to discover, join, and participate in moderated public sports communities.
 
 **Why it matters:**  
-Team pages are important because many users follow specific teams and want one place to see all team-related information.
+It gives Puerto Rico sports fans a centralized place to discuss local teams, leagues, athletes, and sporting events.
 
----
+### 4. User & Settings
 
-### 5. Game Schedules
-
-The app should include schedules for upcoming games.
+User & Settings allows authenticated users to manage their profile, favorites, account information, security options, and application settings.
 
 **Why it matters:**  
-Users need to know when games are happening. This is one of the most basic features expected in a sports app.
+It provides one place for managing the user account and personalized sports preferences.
 
----
+### 5. Entity Profiles
 
-### 6. Final Scores
-
-The app should show final scores for completed games.
+Supported leagues, teams, and athletes can have Entity Profiles containing relevant information, schedules, results, and related updates.
 
 **Why it matters:**  
-Final scores are essential for users who want to quickly check game results without searching through articles or social media posts.
+Users need an organized destination for information related to the entities they follow.
 
----
+### 6. Game Schedules
 
-### 7. Notifications
-
-The app should allow users to receive notifications for important updates, such as final scores, news, and team updates.
+The application displays schedules for supported upcoming games.
 
 **Why it matters:**  
-Notifications help users stay updated without having to constantly open the app.
+Users need to know when and where games will take place.
 
----
+### 7. Game Summaries and Final Scores
 
-### 8. Admin Panel / Admin Page
-
-The admin panel should allow authorized users to update content such as scores, schedules, teams, and news.
+TDA displays verified game information and final scores. Selecting a supported game opens its Game Summary.
 
 **Why it matters:**  
-Since the app depends on accurate and updated sports information, the admin panel is necessary to manage the app’s content.
+Users can review results without searching through articles or social media posts.
 
+### 8. Notifications
+
+Authenticated users may receive notifications for supported events, including final scores, published content, community activity, and updates related to followed entities.
+
+Notifications are accessed through the bell icon in the Home header and do not require a fifth tab.
+
+**Why it matters:**  
+Notifications help users stay informed without repeatedly checking the application.
+
+### 9. Admin Dashboard
+
+Authorized administrators use a protected web dashboard to manage sports information, content, and reported community activity.
+
+The Admin Dashboard is separate from the mobile application.
+
+**Why it matters:**  
+Administrative tools are necessary to maintain accurate information and a safe community environment.
 
 ## Project Goals
 
 ### Core Goal
-Provide a single, centralized platform where Puerto Rico sports fans can 
-access scores, schedules, team info, news, and updates replacing the 
-current fragmentation across social media and multiple websites.
+
+Provide a centralized platform where Puerto Rico sports fans can access scores, schedules, entity information, news, and updates, reducing the current fragmentation across social media and other websites.
 
 ### Product Principles
-- **Simplicity:** the app must be usable by casual fans and daily 
-  enthusiasts alike, with minimal friction.
- **Verified information:** all sports data should come from official 
-  or verified sources.
-- **Community:** connect fans with the communities around each sport.
-- **Safe environment:** zero tolerance for violence, explicit content, 
-  or harassment.
+
+- **Simplicity:** The application should be accessible to casual fans and daily sports enthusiasts with minimal friction.
+- **Verified information:** Sports information should come from official or verified sources.
+- **Community:** The application should connect fans through moderated sports communities.
+- **Safe environment:** Violence, explicit content, harassment, and other prohibited behavior will not be tolerated.
 
 ### Long-Term Vision
-Expand TDA beyond content aggregation into a platform that surfaces 
-opportunities for athletes in 
-Puerto Rico and internationally.
 
+Expand TDA beyond sports information and community participation into a platform that provides greater visibility and opportunities for athletes in Puerto Rico and internationally.
 
-## Team Members
-- Ernesto Soto
-- Victor De Jesus
+## Repository Structure
 
-## Current Status
-The team is on definition of product's goal and scope , establishing baseline requirements, basic documentation and organization before start developing. Also we are brainstorming , sharing ideas, selecting what best fits for our limitations and doing a lot of research. 
+TDA uses a pnpm monorepo.
+
+```text
+apps/
+├── mobile/          # React Native and Expo application
+├── api/             # NestJS backend API
+└── admin/           # Administrative web application
+
+packages/
+├── config/          # Shared project configuration
+├── types/           # Shared TypeScript types
+├── validation/      # Shared validation schemas
+└── localization/    # Shared terminology and translations
+```
+
+Project documentation is maintained on the `documentation` branch.
+
+## Requirements
+
+- Git
+- Node.js 22 or later
+- pnpm 11 or later
+
+Confirm the installed versions:
+
+```bash
+git --version
+node --version
+pnpm --version
+```
+
+## Initial Setup
+
+1. Clone the repository:
+
+   ```bash
+   git clone <repository-url>
+   ```
+
+2. Enter the repository:
+
+   ```bash
+   cd TDA
+   ```
+
+3. Install the workspace dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+4. Create the local environment file:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+5. Replace the placeholders with the appropriate local values.
+
+Never commit `.env`, credentials, tokens, private keys, or other secrets.
+
+## Development
+
+The root workspace provides these commands:
+
+```bash
+pnpm dev
+pnpm build
+pnpm lint
+pnpm test
+pnpm typecheck
+```
+
+Application-specific commands will be documented after the mobile application, API, and Admin Dashboard are initialized.
+
+## Contributing
+
+Review [CONTRIBUTING.md](CONTRIBUTING.md) before creating a branch, committing changes, or submitting a pull request.
 
 ## Future Tech Stack
+
 The selected technology stack is:
 
 - **Mobile:** React Native, Expo, and TypeScript
@@ -152,9 +216,18 @@ The selected technology stack is:
 - **ORM:** Drizzle ORM
 - **Database:** PostgreSQL
 - **Authentication:** Clerk
-- **Admin Panel:** Protected web dashboard connected to the NestJS API
+- **Admin Dashboard:** Protected web application connected to the NestJS API
 - **Storage:** Cloudflare R2
 - **Notifications:** Expo Notifications and Firebase Cloud Messaging
 - **Hosting:** Railway
 - **Search:** PostgreSQL Full-Text Search
 - **Possible future additions:** Redis, BullMQ, and AWS
+
+## Team Members
+
+- Ernesto Soto
+- Victor De Jesus
+
+## Current Status
+
+TDA is currently in the product-planning and architecture phase. The team is defining the product’s goals and scope, establishing baseline requirements, organizing the repository and documentation, researching technical decisions, and evaluating ideas before beginning feature development.
