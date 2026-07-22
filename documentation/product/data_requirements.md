@@ -5,15 +5,17 @@
 * **Ownership & Source:** Created directly by the user upon registration.
 * **Lifecycle & Deletion:** `Active` -> `Suspended` -> `Soft-Deleted` (grace period before permanent purge).
 
-### Information to Store
-* Unique user identifier
-* Email address
-* Username
-* First and last name
-* Profile photo (optional)
-* Account status (active, suspended, etc.)
-* External authentication reference (Clerk ID)
-* Registration timestamp
+### Information to Store 
+| Field | Required/Optional | Source |
+|---|---|---|
+| Unique user identifier | Required | Internal |
+| Email address | Required | User-provided |
+| Username | Required | User-provided |
+| First and last name | Required | User-provided |
+| Profile photo | Optional | User-provided |
+| Account status (active, suspended, etc.) | Required | Internal |
+| External authentication reference (Clerk ID) | Required | External (Clerk) |
+| Registration timestamp | Required | Internal |
 
 ### Information to Display
 * **Private Account View / Settings:** Email address, username, full name, profile photo, and basic account settings.
@@ -30,12 +32,14 @@
 * **Lifecycle & Deletion:** `Draft` -> `Active` -> `Inactive` -> `Archived`.
 
 ### Information to Store
-* Unique sport identifier
-* Sport name
-* General description
-* Representative icon
-* Cover / banner image
-* Status (active/inactive)
+| Field | Required/Optional | Source |
+|---|---|---|
+| Unique sport identifier | Required | Internal |
+| Sport name | Required | Admin-entered |
+| General description | Optional | Admin-entered |
+| Representative icon | Required | Admin-entered |
+| Cover / banner image | Optional | Admin-entered |
+| Status (active/inactive) | Required | Internal |
 
 ### Information to Display
 * **Mobile App:** Sport name, icon, and banner in navigation filters and main sections.
@@ -52,13 +56,15 @@
 * **Lifecycle & Deletion:** `Upcoming` -> `Ongoing` -> `Finished` -> `Archived`.
 
 ### Information to Store
-* Unique league identifier
-* Associated sport
-* League name
-* Season or corresponding year
-* Region or category
-* Official logo
-* Description
+| Field | Required/Optional | Source |
+|---|---|---|
+| Unique league identifier | Required | Internal |
+| Associated sport | Required | Admin-entered |
+| League name | Required | Admin-entered / External |
+| Season or corresponding year | Required | Admin-entered / External |
+| Region or category | Optional | Admin-entered / External |
+| Official logo | Required | Admin-entered / External |
+| Description | Optional | Admin-entered |
 
 ### Information to Display
 * **Mobile App:** Logo, league name, current season, and associated sport in game listings.
@@ -75,13 +81,15 @@
 * **Lifecycle & Deletion:** `Active` -> `Inactive` -> `Archived`.
 
 ### Information to Store
-* Unique team identifier
-* Associated league
-* Official team name
-* Short name or abbreviation
-* City or home location
-* Home venue / stadium
-* Official logo
+| Field | Required/Optional | Source |
+|---|---|---|
+| Unique team identifier | Required | Internal |
+| Associated league | Required | Admin-entered |
+| Official team name | Required | Admin-entered / External |
+| Short name or abbreviation | Optional | Admin-entered / External |
+| City or home location | Required | Admin-entered / External |
+| Home venue / stadium | Optional | Admin-entered / External |
+| Official logo | Required | Admin-entered / External |
 
 ### Information to Display
 * **Mobile App:** Logo, full name, abbreviation, home city, and competing league.
@@ -98,12 +106,14 @@
 * **Lifecycle & Deletion:** `Active` -> `Inactive` -> `Archived`.
 
 ### Information to Store
-* Unique athlete identifier
-* First and last name
-* Currently assigned team
-* Playing position
-* Jersey number
-* Official athlete photo
+| Field | Required/Optional | Source |
+|---|---|---|
+| Unique athlete identifier | Required | Internal |
+| First and last name | Required | Admin-entered / External |
+| Currently assigned team | Required | Admin-entered / External |
+| Playing position | Required | Admin-entered / External |
+| Jersey number | Optional | Admin-entered / External |
+| Official athlete photo | Optional | Admin-entered / External |
 
 ### Information to Display
 * **Mobile App:** Photo, full name, jersey number, position, and current team in basic match rosters.
@@ -120,15 +130,17 @@
 * **Lifecycle & Deletion:** `Scheduled` -> `In Progress` -> `Finished` -> `Postponed` -> `Canceled`.
 
 ### Information to Store
-* Unique game identifier
-* Associated league
-* Home team
-* Away team
-* Scheduled start date and time
-* Current game status
-* Venue or facility location
-* Broadcast channel / streaming platform details
-* Match cover image
+| Field | Required/Optional | Source |
+|---|---|---|
+| Unique game identifier | Required | Internal |
+| Associated league | Required | Admin-entered |
+| Home team | Required | Admin-entered |
+| Away team | Required | Admin-entered |
+| Scheduled start date and time | Required | Admin-entered / External |
+| Current game status | Required | Internal |
+| Venue or facility location | Optional | Admin-entered / External |
+| Broadcast channel / streaming platform details | Optional | Admin-entered / External |
+| Match cover image | Optional | Admin-entered |
 
 ### Information to Display
 * **Mobile App:** Match card (Home Team vs. Away Team), start time, location, status, and broadcast channel.
@@ -145,13 +157,15 @@
 * **Lifecycle & Deletion:** `Pending` -> `Updated` -> `Final Result`.
 
 ### Information to Store
-* Unique score record identifier
-* Associated game
-* Home team score
-* Away team score
-* Basic score breakdown by period (e.g., quarters or halves)
-* Winning team identifier
-* Last update timestamp
+| Field | Required/Optional | Source |
+|---|---|---|
+| Unique score record identifier | Required | Internal |
+| Associated game | Required | Internal |
+| Home team score | Required | Admin-entered / External |
+| Away team score | Required | Admin-entered / External |
+| Basic score breakdown by period (e.g., quarters or halves) | Optional | Admin-entered / External |
+| Winning team identifier | Required (once final) | Internal (derived) |
+| Last update timestamp | Required | Internal |
 
 ### Information to Display
 * **Mobile App:** Latest score update, basic period breakdown, and winning team highlight.
@@ -168,13 +182,17 @@
 * **Lifecycle & Deletion:** `Draft` -> `Published` -> `Hidden` -> `Soft-Deleted`.
 
 ### Information to Store
-* Unique post identifier
-* Author user
-* Content text
-* Attached cover media (images/videos provided officially)
-* Related community or game (optional)
-* Publication date and time
-* Visibility status
+**Information to Store**
+| Field | Required/Optional | Source |
+|---|---|---|
+| Unique post identifier | Required | Internal |
+| Author user | Required | Internal |
+| Content text | Required | Author-provided |
+| Attached cover media (images/videos provided officially) | Optional | Author-provided |
+| Related community or game | Optional | Author-selected |
+| Publication date and time | Required | Internal |
+| Visibility status | Required | Internal |
+
 
 ### Information to Display
 * **Mobile App:** Post header, timestamp, post text, official cover media, and associated game/community tag.
@@ -191,12 +209,14 @@
 * **Lifecycle & Deletion:** `Active` -> `Permanently Deleted` (removed when unmarking the preference).
 
 ### Information to Store
-* Unique preference identifier
-* Associated user
-* Marked entity type (Team, League, Athlete, or Sport)
-* Preferred item identifier
-* Notification preference toggle
-* Date added
+| Field | Required/Optional | Source |
+|---|---|---|
+| Unique preference identifier | Required | Internal |
+| Associated user | Required | Internal |
+| Marked entity type (Team, League, Athlete, or Sport) | Required | User-selected |
+| Preferred item identifier | Required | User-selected |
+| Notification preference toggle | Required (defaulted) | User-configurable |
+| Date added | Required | Internal |
 
 ### Information to Display
 * **Mobile App:** Saved favorites list in settings and toggled favorite icons across the UI.
@@ -213,13 +233,15 @@
 * **Lifecycle & Deletion:** `Active` -> `Restricted` -> `Archived`.
 
 ### Information to Store
-* Unique community identifier
-* Community name
-* Short URL slug
-* Description and guidelines
-* Avatar / emblem image
-* Banner image
-* Linked team, league, or sport
+| Field | Required/Optional | Source |
+|---|---|---|
+| Unique community identifier | Required | Internal |
+| Community name | Required | Admin-entered |
+| Short URL slug | Required | Admin-entered |
+| Description and guidelines | Optional | Admin-entered |
+| Avatar / emblem image | Optional | Admin-entered |
+| Banner image | Optional | Admin-entered |
+| Linked team, league, or sport | Optional | Admin-selected |
 
 ### Information to Display
 * **Mobile App:** Community header (banner, name, description) and internal public chat feed.
@@ -236,11 +258,14 @@
 * **Lifecycle & Deletion:** `Sent` -> `Soft-Deleted`.
 
 ### Information to Store
-* Unique message identifier
-* Sender user
-* Target community
-* Message text
-* Sent timestamp
+| Field | Required/Optional | Source |
+|---|---|---|
+| Unique message identifier | Required | Internal |
+| Sender user | Required | Internal |
+| Target community | Required | Internal |
+| Message text | Required | User-provided |
+| Sent timestamp | Required | Internal |
+
 
 ### Information to Display
 * **Mobile App:** Flat chat list with sender username/avatar, message text, and sent timestamp.
@@ -257,14 +282,16 @@
 * **Lifecycle & Deletion:** `Unread` -> `Read` -> `Permanently Purged` (after expiration).
 
 ### Information to Store
-* Unique notification identifier
-* Target user
-* Notice title
-* Detailed message
-* Notification type (e.g., score update, system announcement)
-* Read status (read / unread)
-* Deep link route
-* Generation timestamp
+| Field | Required/Optional | Source |
+|---|---|---|
+| Unique notification identifier | Required | Internal |
+| Target user | Required | Internal |
+| Notice title | Required | Internal (system-generated) |
+| Detailed message | Required | Internal (system-generated) |
+| Notification type (e.g., score update, system announcement) | Required | Internal |
+| Read status (read / unread) | Required | Internal |
+| Deep link route | Optional | Internal |
+| Generation timestamp | Required | Internal |
 
 ### Information to Display
 * **Mobile App:** Notification list with title, description, time elapsed, and unread indicator.
@@ -281,15 +308,17 @@
 * **Lifecycle & Deletion:** `Pending` -> `In Review` -> `Resolved` -> `Dismissed`.
 
 ### Information to Store
-* Unique report identifier
-* Reporting user
-* Reported entity type (Post, Message, User)
-* Reported entity identifier
-* Reason for report
-* Current review status
-* Admin internal notes
-* Resolving administrator
-* Creation timestamp and resolution timestamp
+| Field | Required/Optional | Source |
+|---|---|---|
+| Unique report identifier | Required | Internal |
+| Reporting user | Required | Internal |
+| Reported entity type (Post, Message, User) | Required | User-selected |
+| Reported entity identifier | Required | Internal |
+| Reason for report | Required | User-provided |
+| Current review status | Required | Internal |
+| Admin internal notes | Optional | Admin-entered |
+| Resolving administrator | Optional (set on resolution) | Internal |
+| Creation timestamp and resolution timestamp | Required (creation) / Optional (resolution, until resolved) | Internal |
 
 ### Information to Display
 * **Web Admin Panel:** Moderation queue displaying reporter details, reported content snippet, reason, status, and action buttons.
