@@ -10,7 +10,7 @@
 
 ## 1. Objective
 
-This document converts the approved TDA Product Data Requirements and Version 1 MVP Definition into an initial relational database design for PostgreSQL and Drizzle ORM. It defines the core tables, primary and foreign keys, one-to-one, one-to-many, and many-to-many relationships, lifecycle fields, indexing requirements, PostgreSQL Full-Text Search support, user preferences, push-delivery requirements, sports-data provenance, and unresolved database decisions.
+This document converts the approved TDA Product Data Requirements and Version 1 MVP Definition into an initial relational database design for PostgreSQL and Drizzle ORM. It defines the core tables, primary and foreign keys, one-to-one, one-to-many, and many-to-many relationships, lifecycle fields, indexing requirements, PostgreSQL Full-Text Search support, user preferences, push-delivery requirements, sports-data provenance, and confirmed or deferred database decisions.
 
 The design prioritizes:
 
@@ -54,9 +54,11 @@ The following enums should be created through Drizzle `pgEnum` definitions.
 | `athlete_status` | `active`, `inactive`, `archived` |
 | `game_status` | `scheduled`, `in_progress`, `finished`, `postponed`, `canceled` |
 | `score_status` | `pending`, `updated`, `final` |
+| `score_result_type` | `home_win`, `away_win`, `draw`, `no_contest` |
 | `post_status` | `draft`, `published`, `hidden`, `soft_deleted` |
 | `post_content_type` | `post`, `article` |
 | `comment_status` | `active`, `hidden`, `soft_deleted` |
+| `message_status` | `active`, `hidden`, `soft_deleted` |
 | `community_status` | `active`, `restricted`, `archived` |
 | `membership_role` | `member`, `moderator`, `admin` |
 | `membership_status` | `active`, `muted`, `banned`, `left` |
@@ -68,7 +70,7 @@ The following enums should be created through Drizzle `pgEnum` definitions.
 | `report_entity_type` | `post`, `comment`, `message`, `user` |
 | `media_type` | `image`, `video` |
 
-A public visitor is not represented by a database user record. Every row in `users` represents an authenticated user. Elevated platform permissions are assigned through `user_roles`.
+A public visitor is not represented by a database user record. Every non-deleted row in `users` represents an authenticated user. A soft-deleted row may remain as an anonymized reference so authored content and moderation evidence can be retained. Elevated platform permissions are assigned through `user_roles`.
 
 ## 4. Core Table Design
 
@@ -79,17 +81,19 @@ Represents registered platform users. Elevated platform permissions are assigned
 | Column | Type | Null | Constraints / Notes |
 |---|---|---:|---|
 | `id` | `uuid` | No | Primary key |
-| `clerk_id` | `varchar(255)` | No | Unique external authentication reference |
-| `email` | `citext` | No | Unique |
-| `username` | `citext` | No | Unique |
-| `first_name` | `varchar(100)` | No |  |
-| `last_name` | `varchar(100)` | No |  |
-| `profile_photo_url` | `text` | Yes | Object-storage URL |
+| `clerk_id` | `varchar(255)` | Yes | Unique external authentication reference; required before anonymization |
+| `email` | `citext` | Yes | Unique; required before anonymization |
+| `username` | `citext` | Yes | Unique; required before anonymization |
+| `first_name` | `varchar(100)` | Yes | Required before anonymization |
+| `last_name` | `varchar(100)` | Yes | Required before anonymization |
+| `profile_photo_url` | `text` | Yes | Object-storage URL; cleared during anonymization |
 | `status` | `user_status` | No | Default `active` |
 | `suspended_at` | `timestamptz` | Yes | Set when account is suspended |
 | `deleted_at` | `timestamptz` | Yes | Soft-delete timestamp |
 | `created_at` | `timestamptz` | No | Registration timestamp |
 | `updated_at` | `timestamptz` | No |  |
+
+**User-deletion policy:** account deletion immediately sets `status = 'soft_deleted'` and records `deleted_at`. The `users` row and its posts, comments, and messages are retained; the application must display the author as **Deleted User**. After 30 days, a cleanup job clears `clerk_id`, `email`, `username`, `first_name`, `last_name`, and `profile_photo_url` while preserving `users.id`, lifecycle timestamps, authored-content relationships, and moderation evidence. Active and suspended users must still have all required identity fields populated. A database check or equivalent application validation should enforce that `clerk_id`, `email`, `username`, `first_name`, and `last_name` are non-null unless `status = 'soft_deleted'`.
 
 ### 4.2 `user_preferences`
 
@@ -137,7 +141,15 @@ Assigns one or more elevated platform roles to an authenticated user. A user wit
 
 **Primary key:** `(user_id, role)`.
 
-Clerk remains responsible for authentication and token issuance. PostgreSQL stores application authorization assignments so the NestJS backend can enforce moderator, content-administrator, and system-administrator permissions consistently.
+Clerk remains responsible for authentication and token issuance. PostgreSQL stores application authorization assignments so the NestJS backend can enforce the approved cumulative permission matrix consistently.
+
+| Role | Approved permissions |
+|---|---|
+| `moderator` | Hide or soft-delete comments and community messages; resolve moderation reports |
+| `content_administrator` | All moderator permissions, plus manage sports, leagues, teams, athletes, games, scores, and posts |
+| `system_administrator` | All content-administrator permissions, plus assign or revoke platform roles and manage users |
+
+Only a system administrator may create, change, or remove rows in `user_roles`, except for the initial bootstrap process.
 
 ### 4.5 `sports`
 
@@ -323,14 +335,15 @@ Stores the latest verified score state for a game.
 | `home_score` | `integer` | No | Default `0`; must be non-negative |
 | `away_score` | `integer` | No | Default `0`; must be non-negative |
 | `period_breakdown` | `jsonb` | Yes | Optional; not required for the MVP and may remain unused |
-| `winning_team_id` | `uuid` | Yes | Foreign key to `teams.id`; nullable before finalization and for a permitted tie or no-contest result |
+| `winning_team_id` | `uuid` | Yes | Foreign key to `teams.id`; nullable before finalization and for `draw` or `no_contest` |
+| `result_type` | `score_result_type` | Yes | Required when `status = 'final'` |
 | `status` | `score_status` | No | Default `pending` |
 | `last_updated_at` | `timestamptz` | No | Default `now()` |
 | `created_at` | `timestamptz` | No |  |
 
 **Relationship:** one game has zero or one score record; one score belongs to exactly one game.
 
-Application validation must confirm that `winning_team_id`, when present, matches either the game's home or away team. The MVP requires verified final scores but does not require period-by-period scoring. Therefore, `period_breakdown` must not block implementation. The team still needs to confirm the final representation of ties and no-contest outcomes.
+A database check must require `result_type` whenever `status = 'final'`. Application validation must confirm that `winning_team_id`, when present, matches either the game's home or away team. For `home_win` and `away_win`, `winning_team_id` must identify the corresponding team; for `draw` and `no_contest`, `winning_team_id` must be null. The MVP requires verified final scores but does not require period-by-period scoring, so `period_breakdown` must not block implementation.
 
 ### 4.14 `posts`
 
@@ -339,7 +352,7 @@ Stores administrator-published news, articles, official updates, and other autho
 | Column | Type | Null | Constraints / Notes |
 |---|---|---:|---|
 | `id` | `uuid` | No | Primary key |
-| `author_user_id` | `uuid` | No | Foreign key to `users.id`; author must have an authorized publishing role |
+| `author_user_id` | `uuid` | No | Foreign key to `users.id`; author must be a content administrator or system administrator |
 | `content_type` | `post_content_type` | No | Default `post` |
 | `title` | `varchar(250)` | Yes | Required for `article`; optional for short posts |
 | `excerpt` | `text` | Yes | Optional article or feed summary |
@@ -532,10 +545,11 @@ Stores text-only public messages inside communities.
 | `community_id` | `uuid` | No | Foreign key to `communities.id` |
 | `sender_user_id` | `uuid` | No | Foreign key to `users.id` |
 | `message_text` | `text` | No |  |
+| `status` | `message_status` | No | Default `active`; moderators may set `hidden` or `soft_deleted` |
 | `sent_at` | `timestamptz` | No | Default `now()` |
-| `deleted_at` | `timestamptz` | Yes | Soft deletion |
+| `deleted_at` | `timestamptz` | Yes | Required when `status = 'soft_deleted'` |
 
-A composite foreign key from `(community_id, sender_user_id)` to `community_memberships(community_id, user_id)` is recommended. It confirms that the sender has a membership record. The application must additionally verify that the membership status is `active` and that the community is not restricted for that user.
+A composite foreign key from `(community_id, sender_user_id)` to `community_memberships(community_id, user_id)` is recommended. It confirms that the sender has a membership record. The application must additionally verify that the membership status is `active` and that the community is not restricted for that user. Moderation actions must preserve the row and use `status` plus `deleted_at` rather than physical deletion.
 
 ### 4.23 `push_devices`
 
@@ -593,8 +607,8 @@ Stores moderation reports submitted against a post, comment, message, or user.
 | `reported_message_id` | `uuid` | Yes | Foreign key to `messages.id` |
 | `reason` | `text` | No |  |
 | `status` | `report_status` | No | Default `pending` |
-| `admin_notes` | `text` | Yes | Internal-only |
-| `resolving_admin_user_id` | `uuid` | Yes | Foreign key to `users.id` |
+| `moderation_notes` | `text` | Yes | Internal-only |
+| `resolved_by_user_id` | `uuid` | Yes | Foreign key to `users.id`; resolver must have moderator permissions or higher |
 | `created_at` | `timestamptz` | No |  |
 | `updated_at` | `timestamptz` | No |  |
 | `resolved_at` | `timestamptz` | Yes |  |
@@ -603,7 +617,7 @@ Stores moderation reports submitted against a post, comment, message, or user.
 
 - Exactly one of `reported_user_id`, `reported_post_id`, `reported_comment_id`, or `reported_message_id` must be non-null.
 - The populated foreign key must match `reported_entity_type`.
-- `resolving_admin_user_id` and `resolved_at` are required when status becomes `resolved` or `dismissed`.
+- `resolved_by_user_id` and `resolved_at` are required when status becomes `resolved` or `dismissed`.
 
 These rules should be enforced through PostgreSQL check constraints where possible and repeated in application validation.
 
@@ -637,7 +651,7 @@ These rules should be enforced through PostgreSQL check constraints where possib
 | `users` | `messages` | One user may send many messages |
 | `users` | `notifications` | One user receives many notifications |
 | `users` | `reports` | One user may submit many reports |
-| `users` | `reports` | One administrator may resolve many reports |
+| `users` | `reports` | One moderator, content administrator, or system administrator may resolve many reports |
 
 ### Many-to-Many
 
@@ -660,25 +674,25 @@ These rules should be enforced through PostgreSQL check constraints where possib
 
 | Relationship | Recommended action |
 |---|---|
-| Users to `user_preferences`, `notification_preferences`, `user_roles`, and `push_devices` | `ON DELETE CASCADE` after permanent user purge |
+| Users to `user_preferences`, `notification_preferences`, `user_roles`, and `push_devices` | `ON DELETE CASCADE` only as defensive hard-deletion behavior; the approved deletion flow retains the anonymized `users` row |
 | Sports to leagues | `ON DELETE RESTRICT` |
 | Leagues/teams to `league_teams` | `ON DELETE CASCADE` for hard-deletion cleanup |
 | Data sources to verification records | `ON DELETE RESTRICT` to preserve provenance |
 | Verified target records to `data_verifications` | `ON DELETE RESTRICT`; prefer lifecycle state changes |
 | Games to scores | `ON DELETE CASCADE` |
 | Parent records to post junction tables | `ON DELETE CASCADE` |
-| Users to favorites and post likes | `ON DELETE CASCADE` after permanent user purge |
+| Users to favorites and post likes | `ON DELETE CASCADE` only if a user row is ever physically removed; normal deletion retains the anonymized row |
 | Favorite targets to favorites | `ON DELETE CASCADE` |
 | Posts to post likes | `ON DELETE CASCADE` |
-| Users to blocks and mutes | `ON DELETE CASCADE` after permanent user purge |
-| Communities/users to memberships | `ON DELETE CASCADE` after permanent purge |
+| Users to blocks and mutes | `ON DELETE CASCADE` only if a user row is ever physically removed; normal deletion retains the anonymized row |
+| Communities/users to memberships | `ON DELETE CASCADE` for defensive hard-deletion cleanup |
 | Users to authored posts, comments, messages, and reports | `ON DELETE RESTRICT`; use soft deletion or anonymization |
 | Posts to comments | `ON DELETE RESTRICT`; soft-delete posts and comments to preserve discussion and moderation evidence |
 | Communities to messages | `ON DELETE RESTRICT`; archive communities instead |
 | Reported entities to reports | `ON DELETE RESTRICT` to preserve moderation evidence |
-| Users to notifications | `ON DELETE CASCADE` after permanent purge |
+| Users to notifications | `ON DELETE CASCADE` only if a user row is ever physically removed |
 
-The MVP should avoid hard deletion of sports, leagues, teams, athletes, communities, posts, comments, messages, and reported users while dependent records exist. Lifecycle state changes are preferred. The final user-deletion policy must define which authored records are anonymized, retained, or purged.
+The MVP should avoid hard deletion of sports, leagues, teams, athletes, communities, posts, comments, messages, and reported users while dependent records exist. Lifecycle state changes are preferred. User deletion is now defined as immediate soft deletion followed by personal-data anonymization after 30 days; authored posts, comments, and messages remain linked to the retained user row and are displayed under **Deleted User**.
 
 ## 7. Timestamp and Lifecycle Requirements
 
@@ -702,7 +716,7 @@ The MVP should avoid hard deletion of sports, leagues, teams, athletes, communit
 | `data_sources` | `is_approved`, `created_at`, `updated_at` |
 | `data_verifications` | `verified_at`, `created_at` |
 | `games` | `status`, `scheduled_start_at` |
-| `scores` | `status`, `last_updated_at` |
+| `scores` | `status`, `result_type`, `last_updated_at` |
 | `posts` | `status`, `published_at`, `hidden_at`, `deleted_at` |
 | `post_communities` | `pinned_at` |
 | `post_likes` | `created_at` |
@@ -711,12 +725,12 @@ The MVP should avoid hard deletion of sports, leagues, teams, athletes, communit
 | `user_mutes` | `created_at` |
 | `communities` | `status`, `archived_at` |
 | `community_memberships` | `status`, `joined_at`, `left_at` |
-| `messages` | `sent_at`, `deleted_at` |
+| `messages` | `status`, `sent_at`, `deleted_at` |
 | `push_devices` | `is_active`, `last_seen_at`, `disabled_at`, `created_at`, `updated_at` |
 | `notifications` | `is_read`, `read_at`, `expires_at` |
 | `reports` | `status`, `created_at`, `resolved_at` |
 
-`updated_at` should be maintained in application code or through a PostgreSQL trigger. Drizzle does not automatically update this field unless the application explicitly sets it.
+`updated_at` should be maintained in application code or through a PostgreSQL trigger. Drizzle does not automatically update this field unless the application explicitly sets it. A scheduled cleanup job must anonymize soft-deleted users once `deleted_at` is at least 30 days old.
 
 ## 8. Initial Indexing Requirements
 
@@ -724,8 +738,8 @@ PostgreSQL automatically indexes primary keys and unique constraints. Additional
 
 ### Identity and lookup indexes
 
-- Unique index on `users.clerk_id`.
-- Unique case-insensitive indexes on `users.email` and `users.username`.
+- Partial unique index on `users.clerk_id` where `clerk_id IS NOT NULL`.
+- Partial unique case-insensitive indexes on `users.email` and `users.username` where the indexed value is not null.
 - Unique case-insensitive index on `communities.slug`.
 - Unique index on `sports.name`.
 - Unique composite index on `leagues(sport_id, name, season_label)`.
@@ -779,7 +793,7 @@ WHERE is_pinned = true;
 
 CREATE INDEX messages_active_community_idx
 ON messages (community_id, sent_at DESC)
-WHERE deleted_at IS NULL;
+WHERE status = 'active' AND deleted_at IS NULL;
 
 CREATE INDEX notifications_unread_idx
 ON notifications (user_id, created_at DESC)
@@ -1016,6 +1030,7 @@ erDiagram
         int away_score
         jsonb period_breakdown
         uuid winning_team_id FK
+        score_result_type result_type
         score_status status
     }
 
@@ -1089,6 +1104,7 @@ erDiagram
         uuid community_id FK
         uuid sender_user_id FK
         text message_text
+        message_status status
         timestamptz sent_at
         timestamptz deleted_at
     }
@@ -1112,7 +1128,7 @@ erDiagram
         uuid reported_comment_id FK
         uuid reported_message_id FK
         report_status status
-        uuid resolving_admin_user_id FK
+        uuid resolved_by_user_id FK
     }
 ```
 
@@ -1153,17 +1169,17 @@ Recommended Drizzle features:
 
 Database constraints remain authoritative. Drizzle relations improve query ergonomics but do not replace foreign keys or NestJS authorization checks.
 
-## 12. Confirmed, Unresolved, and Deferred Database Decisions
+## 12. Confirmed and Deferred Database Decisions
 
-The Version 1 MVP resolves part of the original uncertainty. The following table distinguishes implementation blockers from decisions already settled or safely deferred.
+The three previously open MVP decisions are now confirmed. The following table records the approved implementation choices and the items that remain safely deferred.
 
 | Decision | Current MVP decision | Implementation status |
 |---|---|---|
 | External sports provider identifiers | The MVP will begin with verified manual/admin-managed data and will not depend on an unconfirmed external provider | **Deferred; not an implementation blocker** |
 | Score period structure | The MVP requires verified final scores, not period-by-period scoring, live box scores, or advanced statistics | Keep nullable `jsonb` only as an optional extension, or omit it from the first migration; **not a blocker** |
-| Tied games and no-contest results | The MVP does not define how final games without a winner should be represented | **Unresolved; team confirmation required** |
-| User deletion | Account deletion and associated-data deletion are required, but retention, anonymization, grace period, and authored-content treatment are not defined | **Unresolved; team confirmation required** |
-| Administrative authorization | MVP roles are confirmed: public visitor, authenticated user, moderator, content administrator, and system administrator | Model elevated roles through `user_roles`; the detailed permission matrix still requires approval |
+| Tied games and no-contest results | Add `score_result_type` with `home_win`, `away_win`, `draw`, and `no_contest`; require `scores.result_type` when `scores.status = 'final'` | **Confirmed and modeled** |
+| User deletion | Soft-delete immediately, retain authored posts/comments/messages under **Deleted User**, and clear personal information after 30 days | **Confirmed and modeled** |
+| Administrative authorization | Permissions are cumulative: moderators manage comment/message moderation and reports; content administrators also manage sports content and scores; system administrators also assign roles and manage users | **Confirmed and modeled** through `user_roles` and backend authorization rules |
 | Posts and articles | The MVP distinguishes short posts and image-based articles | **Now modeled** through `post_content_type`, `title`, `excerpt`, and `content` |
 | User language setting | Required in User & Settings; Spanish remains the default MVP interface | **Now modeled** through `user_preferences.preferred_language` |
 | Notification preferences and push targets | Required for controlled push notifications | **Now modeled** through `notification_preferences` and `push_devices` |
@@ -1179,22 +1195,18 @@ The Version 1 MVP resolves part of the original uncertainty. The following table
 | Audit history | Rely on lifecycle timestamps and application logs | Add append-only audit tables if administrative traceability requires them |
 | Time-zone display | Store UTC `TIMESTAMPTZ`; convert in the client | Add venue-local time-zone identifiers if schedule display requires them |
 
-### Decisions that must be confirmed before implementation
+### Confirmed implementation decisions
 
-1. **User deletion policy:** grace period, anonymization, retained moderation evidence, and permanent purge rules.
-2. **Final-game result model:** whether to add an explicit result type such as `home_win`, `away_win`, `draw`, or `no_contest`.
-3. **Role-permission matrix:** which backend actions are allowed for moderators, content administrators, and system administrators.
+1. **User deletion policy:** soft-delete immediately; retain posts, comments, and messages as **Deleted User**; anonymize the listed personal fields after 30 days.
+2. **Final-game result model:** use `score_result_type` with `home_win`, `away_win`, `draw`, and `no_contest`; require it for final scores.
+3. **Role-permission matrix:** enforce the approved cumulative moderator, content-administrator, and system-administrator permissions.
 
 
 ## 13. Approval Criteria
 
 The schema now reflects the original Product Data Requirements and the additional Version 1 MVP features that affect the database, including posts and articles, likes, comments, same-post basic replies, comment reports, user blocking and muting, pinned community announcements, user language preferences, notification-category controls, push-delivery devices, approved data sources, verification records, and elevated platform roles.
 
-The design is ready for implementation after the team confirms the three remaining MVP decisions that directly affect schema behavior:
-
-1. User deletion, anonymization, retention, and permanent purge rules.
-2. Tied-game and no-contest result representation.
-3. The role-permission matrix for moderators, content administrators, and system administrators.
+The design is ready for implementation. The three previously open MVP decisions are now incorporated into the schema: immediate user soft deletion with 30-day personal-data anonymization, an explicit final-game result type, and the approved cumulative role-permission matrix.
 
 External-provider identifiers are intentionally deferred until an approved provider exists. Period-by-period score data is optional and must not block the MVP implementation.
 
