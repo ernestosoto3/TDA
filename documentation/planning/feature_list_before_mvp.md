@@ -10,6 +10,7 @@ The purpose of this document is to organize possible features for the sports app
 
 This will help the team decide which features are necessary for version 1 and which features can be saved for later versions.
 
+> **Document status:** Historical pre-MVP planning document. This file has been superseded by `documentation/product/navigation_structure.md` and `documentation/product/mvp_scope_v1.md`. The approved navigation is Home, Community, Search, and User & Settings.
 ---
 
 # Feature Categories
@@ -36,7 +37,9 @@ Users need a fast way to find specific content instead of only depending on the 
 
 ---
 
-### 3. Sports Tab
+### 3. Sports Tab 
+
+This recommendation is superseded, and will be replaced by the Community Tab.
 
 The sports tab organizes the app by different sports. Users should be able to select a sport and view related leagues, teams, games, and news.
 
@@ -109,7 +112,9 @@ This would make the app feel more personalized and organized.
 
 ---
 
-### 2. Community Tab
+### 2. Community Tab 
+
+The Community Tab is now one of the four approved tabs (replacing the Sports Tab).
 
 The community tab would allow users to create or join groups based on their favorite teams, leagues, or sports.
 
@@ -226,7 +231,7 @@ This could increase engagement, but it also requires moderation, reporting tools
 The most important features for the user experience are:
 
 1. **Home Feed**
-2. **Sports Tab**
+2. **Sports Tab** -> Superseded by **Community Tab**
 3. **Team Pages**
 4. **Game Schedules**
 5. **Final Scores**
@@ -245,7 +250,7 @@ The recommended MVP should include:
 
 - **Home Feed**
 - **Search Tab**
-- **Sports Tab**
+- **Sports Tab** -> Superseded by **Community Tab**
 - **Team Pages**
 - **Game Schedules**
 - **Final Scores**
@@ -267,7 +272,6 @@ The following features should probably be saved for later versions:
 - Rankings
 - Advanced stats
 - User-created posts
-- Community groups
 - Comments
 
 These features are valuable, but they may require more development time, better moderation, more data, or stronger backend support.
@@ -278,5 +282,5 @@ These features are valuable, but they may require more development time, better 
 
 The first version of the app should focus on the core sports experience: helping users quickly find scores, schedules, teams, and updates.
 
-More advanced features like live scoring, community groups, rankings, and athlete profiles can be added later once the basic app experience is stable.
+More advanced features like live scoring, rankings, and athlete profiles can be added later. Community is included by the approved MVP navigation.
 ```
