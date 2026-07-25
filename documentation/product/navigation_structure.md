@@ -18,7 +18,7 @@ flowchart TD
     Navigation --> Search["Search"]
     Navigation --> UserSettings["User & Settings"]
 
-    Home --> Following["Siguiendo"]
+    Home --> Following["Favoritos"]
     Home --> Discover["Descubre"]
     Home --> Notifications["Notifications"]
     Home --> GameSummary["Game Summary"]
@@ -51,7 +51,7 @@ Users will also see scores for their favorite teams and results from the leagues
 
 The Home tab will include two sub-tabs:
 
-- **Siguiendo:** Content related to the entities the user follows.
+- **Favoritos:** Content related to the entities the user follows.
 - **Descubre:** Broader content that is not limited to the entities the user follows.
 
 When users are viewing one sub-tab, they will not see content from the other sub-tab.
@@ -215,7 +215,7 @@ Notifications do not require a fifth tab because they are accessible directly fr
 ## Terminology
 
 - **Tab:** One of the four primary navigation destinations: Home, Community, Search, or User & Settings.
-- **Sub-tab:** A content section within a tab, such as Siguiendo or Descubre.
+- **Sub-tab:** A content section within a tab, such as Favoritos or Descubre.
 - **Sub-page:** Any dedicated page that is not one of the four main tabs.
 - **Entity Profile:** A sub-page belonging to a sport, league, team, player, athlete, author, or another entity.
 - **Community Chat:** The conversation area belonging to a community.

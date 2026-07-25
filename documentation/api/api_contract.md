@@ -580,7 +580,7 @@ Every protected staff mutation records:
 | Register or log in | Clerk SDK; `POST /webhooks/clerk`; `GET /users/me` |
 | Complete onboarding | `GET /onboarding/entities`; `PUT /users/me/onboarding` |
 | Select favorites | `GET /favorites`; `POST /favorites`; `DELETE /favorites/{favoriteId}` |
-| `Siguiendo` feed | `GET /feeds/following` |
+| `Favoritos` feed | `GET /feeds/following` |
 | `Descubre` feed | `GET /feeds/discover` |
 | Search | `GET /search` |
 | Entity profile | Detail endpoint for sport, league, team, or athlete plus related collection endpoints |

@@ -21,7 +21,7 @@ Each flow identifies:
 | Register or log in | Yes | Not applicable | Not applicable |
 | Complete onboarding | Limited | Yes | Not applicable |
 | Select favorites | View only | Yes | Not applicable |
-| Browse `Siguiendo` | No | Yes | Not applicable |
+| Browse `Favoritos` | No | Yes | Not applicable |
 | Browse `Descubre` | Yes | Yes | Not applicable |
 | Search for a sports entity | Yes | Yes | Not applicable |
 | Add or remove a favorite | No | Yes | Not applicable |
@@ -35,7 +35,7 @@ Each flow identifies:
 | Create and publish content | No | No | Authorized administrator |
 | Moderate reported content | No | No | Authorized moderator or administrator |
 
-Public visitors may browse public sports information whenever possible. Authentication is required for personalized or protected actions such as selecting favorites, accessing `Siguiendo`, receiving notifications, joining communities, sending messages, reporting content, and managing an account.
+Public visitors may browse public sports information whenever possible. Authentication is required for personalized or protected actions such as selecting favorites, accessing `Favoritos`, receiving notifications, joining communities, sending messages, reporting content, and managing an account.
 
 ---
 
@@ -105,7 +105,7 @@ Public visitors may browse public sports information whenever possible. Authenti
 4. Select favorite sports, leagues, teams, and athletes when available.
 5. Confirm the selections.
 6. Complete onboarding.
-7. Open the Home tab with `Siguiendo` selected.
+7. Open the Home tab with `Favoritos` selected.
 
 **Completion point:** Onboarding is marked as complete and the user reaches the Home tab.
 
@@ -134,7 +134,7 @@ If favorites are optional, the user may skip the selection step and complete onb
 4. Confirm the selections.
 5. TDA saves the favorites.
 
-**Completion point:** The selections are saved and used to populate `Siguiendo`, the favorite-team game carousel, and relevant notification options.
+**Completion point:** The selections are saved and used to populate `Favoritos`, the favorite-team game carousel, and relevant notification options.
 
 ### From User & Settings
 
@@ -158,7 +158,7 @@ If favorites are optional, the user may skip the selection step and complete onb
 
 ---
 
-## 4. Browse the `Siguiendo` Feed
+## 4. Browse the `Favoritos` Feed
 
 **Starting point:** Home tab.
 
@@ -168,7 +168,7 @@ If favorites are optional, the user may skip the selection step and complete onb
 
 1. Open TDA.
 2. The Home tab opens.
-3. Select the `Siguiendo` sub-tab.
+3. Select the `Favoritos` sub-tab.
 4. View content related to favorite sports, leagues, teams, and athletes.
 5. Scroll through the available content.
 6. Optionally open a post, article, game, or Entity Profile.
@@ -610,7 +610,7 @@ Permanent account deletion should only be available to authorized administrators
 
 - Home, Community, Search, and User & Settings are the only primary tabs.
 - Notifications open through the bell icon in the Home header.
-- `Siguiendo` and `Descubre` are sub-tabs within Home.
+- `Favoritos` and `Descubre` are sub-tabs within Home.
 - Dedicated destinations such as Notifications, Game Summary, Article, Settings, Community Chat, and Entity Profile are sub-pages.
 - Opening a sub-page displays a back button in the header.
 - Back navigation returns the user through the navigation path one sub-page at a time.

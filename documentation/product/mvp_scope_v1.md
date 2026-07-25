@@ -102,7 +102,7 @@ Onboarding gives TDA the information needed to create a relevant experience with
 
 It supports:
 
-* The `Siguiendo` feed
+* The `Favoritos` feed
 * Favorite-team score cards
 * Notification preferences
 * Faster access to followed teams and leagues
@@ -122,16 +122,16 @@ It will include:
 * Favorite-team game carousel
 * Scheduled-game cards
 * Final-score cards
-* `Siguiendo` and `Descubre` feed selector
+* `Favoritos` and `Descubre` feed selector
 * Text-only posts
 * Image-based articles
 * Post and article detail pages
 * Links to teams, leagues, athletes, and games
 * Native article sharing
 
-### `Siguiendo`
+### `Favoritos`
 
-The `Siguiendo` feed will show posts and updates connected to the sports, leagues, teams, and athletes followed by the user.
+The `Favoritos` feed will show posts and updates connected to the sports, leagues, teams, and athletes followed by the user.
 
 ### `Descubre`
 
@@ -367,7 +367,7 @@ Authenticated users will be able to follow or unfollow supported:
 
 Favorite selections will affect:
 
-* The `Siguiendo` feed
+* The `Favoritos` feed
 * The Home game carousel
 * Notification preferences
 * The User & Settings tab
@@ -693,7 +693,7 @@ The minimum flow for an authenticated user is:
 ```mermaid
 flowchart TD
     A["Create account or log in"] --> B["Select favorites"]
-    B --> C["Open Siguiendo feed"]
+    B --> C["Open Favoritos feed"]
     C --> D["View favorite-team games and news"]
     D --> E["Receive selected notifications"]
     D --> F["Like, comment, or share"]

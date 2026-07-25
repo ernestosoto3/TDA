@@ -58,7 +58,7 @@ Dark mode could be considered during future development.
 
 Possible references include:
 
-- **Instagram:** Feed structure and the “Para ti” and “Siguiendo” selector
+- **Instagram:** Feed structure and the “Descubre” and “Favoritos” selector
 - **Apple Music:** Search categories and image-based tiles
 - **ESPN or FotMob:** Scores, game previews, and box scores
 - **Reddit or Discord:** Public communities and reactions

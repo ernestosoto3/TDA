@@ -33,7 +33,7 @@ It should include:
 * Final scores
 * Upcoming game information
 * Notification bell
-* **Para ti** and **Siguiendo** selector
+* **Descubre** and **Favoritos** selector
 * Sports news and posts
 * Access to game details
 * Access to team pages
