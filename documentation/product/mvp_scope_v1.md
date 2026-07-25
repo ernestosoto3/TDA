@@ -264,7 +264,7 @@ Version 1 will not require play-by-play information, live statistics, advanced b
 
 ### Why It Was Selected
 
-The game-detail page gives schedules and final scores a complete destination. It also creates a foundation for adding statistics, highlights, and live information in future versions.
+The game-detail page gives schedules and final scores a complete destination, includes basic game statistics, and creates a foundation for adding advanced statistics, highlights, and live information in future versions.
 
 ---
 
@@ -400,7 +400,6 @@ Version 1 comments will include:
 * View comments
 * Delete the user's own comment
 * Report a comment
-* Basic reply support
 * Administrator moderation
 
 ### Why It Was Selected
@@ -430,7 +429,6 @@ It may include:
 * Final-score notifications
 * Schedule changes
 * Breaking sports news
-* Comment and reply activity
 * Community activity
 * Previous notifications
 
@@ -449,7 +447,6 @@ Version 1 will support controlled push notifications for:
 * Final scores
 * Schedule changes
 * Breaking news
-* Comment replies
 * Selected community activity
 
 Users will be able to manage notification preferences.
@@ -746,7 +743,6 @@ flowchart TD
 ## Product Improvement Release
 
 * Live scoring
-* Basic team and player statistics
 * Full athlete profiles
 * League standings and rankings
 * Digital-media and publisher pages

@@ -132,27 +132,28 @@ Live scoring is reserved for a future version. A scheduled notification stating 
 
 # 5. Posts, Articles, and Engagement
 
-| Element or action | Approved term |
-|---|---|
-| Post | **Publicación** |
-| Article | **Artículo** |
-| News | **Noticias** |
-| Breaking news | **Última hora** |
-| Read article | **Leer artículo** |
-| View details | **Ver detalles** |
-| Like | **Me gusta** |
-| Comments | **Comentarios** |
-| Add comment | **Comentar** |
-| Reply | **Responder** |
-| View comments | **Ver comentarios** |
-| View replies | **Ver respuestas** |
-| Delete own comment | **Eliminar comentario** |
-| Share | **Compartir** |
-| Related posts | **Publicaciones relacionadas** |
-| Related articles | **Artículos relacionados** |
-| Saved posts | **Publicaciones guardadas** |
-| Highlights | **Jugadas destacadas** |
-| Box score | **Estadísticas del juego** |
+| Element or action | Approved term | MVP status |
+|---|---|---|
+| Post | **Publicación** | Included |
+| Article | **Artículo** | Included |
+| News | **Noticias** | Included |
+| Breaking news | **Última hora** | Included |
+| Read article | **Leer artículo** | Included |
+| View details | **Ver detalles** | Included |
+| Like | **Me gusta** | Included |
+| Comments | **Comentarios** | Included |
+| Add comment | **Comentar** | Included |
+| Reply | **Responder** | Post-MVP |
+| View comments | **Ver comentarios** | Included |
+| View replies | **Ver respuestas** | Post-MVP |
+| Delete own comment | **Eliminar comentario** | Included |
+| Share | **Compartir** | Included |
+| Related posts | **Publicaciones relacionadas** | Included |
+| Related articles | **Artículos relacionados** | Included |
+| Saved posts | **Publicaciones guardadas** | Post-MVP |
+| Highlights | **Jugadas destacadas** | Post-MVP |
+| Basic game statistics | **Estadísticas del juego** | Included |
+| Advanced box score | **Estadísticas avanzadas del juego** | Post-MVP |
 
 ---
 

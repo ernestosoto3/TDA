@@ -68,11 +68,10 @@ It may include:
 * Date and location
 * Team names and logos
 * Final score
-* Game highlights
 * Written recap
-* Box score
-* Player statistics
-* Video highlights when available
+* Basic game statistics
+* Advanced box score — **Post-MVP**
+* Game and video highlights — **Post-MVP**
 
 Only final scores should be displayed. Partial or live scores should not be shown.
 
@@ -109,8 +108,8 @@ The screen may include:
 * Follow or join button
 * Pinned announcements
 * Public messages
-* Replies
-* Reactions
+* Replies -> This feature is excluded from the approved MVP and is retained only for future planning.
+* Reactions -> This feature is excluded from the approved MVP and is retained only for future planning.
 * Message input
 * Reporting and moderation options
 
@@ -145,7 +144,7 @@ The default Search screen may include image-based categories for the main sports
 When the user selects the search field, the screen may display:
 
 * Recent searches
-* Popular searches
+* Popular searches -> This feature is excluded from the approved MVP and is retained only for future planning.
 * Trending teams
 * Trending athletes
 * Popular leagues
@@ -166,7 +165,7 @@ It may include:
 * Edit-profile button
 * Favorite teams
 * Followed leagues
-* Saved posts
+* Saved posts -> This feature is excluded from the approved MVP and is retained only for future planning.
 * Community memberships
 * Account information
 * Notification settings
@@ -191,7 +190,8 @@ The Team Page may include:
 * Upcoming schedule
 * Previous results
 * Roster
-* Player statistics
+* Basic player statistics
+* Advanced player statistics — **Post-MVP**
 * Team news
 * Related posts
 * Link to the team’s community
@@ -225,7 +225,7 @@ flowchart TD
     L --> M[Edit Profile]
     L --> N[Favorite Teams]
     L --> O[Followed Leagues]
-    L --> P[Saved Posts]
+    L --> P["Saved Posts (Post-MVP)"]
     L --> Q[My Communities]
     L --> R[Settings]
 ```

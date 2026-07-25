@@ -168,7 +168,7 @@
 | Last update timestamp | Required | Internal |
 
 ### Information to Display
-* **Mobile App:** Latest score update, basic period breakdown, and winning team highlight.
+* **Mobile App:** Latest score update, basic period breakdown, and winning team highlight (**Post-MVP concept:** This feature is excluded from the approved MVP and is retained only for future planning.).
 
 ### Data Attributes
 * **Searchable Fields:** N/A (queried via the associated game).
@@ -188,7 +188,7 @@
 | Unique post identifier | Required | Internal |
 | Author user | Required | Internal |
 | Content text | Required | Author-provided |
-| Attached cover media (images/videos provided officially) | Optional | Author-provided |
+| Attached cover media (images provided officially) | Optional | Author-provided |
 | Related community or game | Optional | Author-selected |
 | Publication date and time | Required | Internal |
 | Visibility status | Required | Internal |

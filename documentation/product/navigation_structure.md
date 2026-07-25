@@ -45,7 +45,7 @@ flowchart TD
 
 ## Purpose
 
-The Home tab is where users will find most of the platform’s content, especially vertically scrollable content such as posts, articles, future videos, and similar content.
+The Home tab is where users will find most of the platform’s content, especially vertically scrollable content such as posts, articles, videos (**Post-MVP concept:** This feature is excluded from the approved MVP and is retained only for future planning.), and similar content.
 
 Users will also see scores for their favorite teams and results from the leagues they follow. Notifications will be accessible through a bell icon in the header. These notifications may include updates about teams, leagues, and players.
 
@@ -60,7 +60,7 @@ When users are viewing one sub-tab, they will not see content from the other sub
 
 - **Notifications:** Selecting the bell icon in the header will open the Notifications sub-page.
 
-- **Game Summary:** Selecting a game score from the score carousel will open the Game Summary sub-page. Users can view the game summary, a description of what happened, the box score, and video highlights when supported.
+- **Game Summary:** Selecting a game score from the score carousel will open the Game Summary sub-page. Users can view the game summary, a written recap, and basic game statistics. Advanced box scores and video highlights are **Post-MVP**.
 
 - **Article:** Selecting an article, such as a post displaying “Ver más...,” will open the Article sub-page. It may include a headline or title, subheading, byline, main text, and conclusion when available.
 
