@@ -161,6 +161,10 @@ pnpm test
 pnpm build
 ```
 
+The current `pnpm check` command validates formatting, linting, type checking, and the temporary test command. Build validation is not yet part of `pnpm check` or the pull-request workflow because the application source projects have not been initialized.
+
+Once application development begins, every application must define a real `build` script. `pnpm build` must then be added to the automated validation process. A successful build is mandatory before the first deployment or release.
+
 Some commands may become available only after the applications are initialized.
 
 Documentation-only changes do not require application validation unless they affect commands, configuration, or code examples.
