@@ -47,7 +47,7 @@ The following enums should be created through Drizzle `pgEnum` definitions.
 | Enum | Values |
 |---|---|
 | `user_status` | `active`, `suspended`, `soft_deleted` |
-| `platform_role` | `moderator`, `content_administrator`, `system_administrator` |
+| `platform_role` | `moderator`, `editor`, `administrator` |
 | `sport_status` | `draft`, `active`, `inactive`, `archived` |
 | `league_status` | `upcoming`, `ongoing`, `finished`, `archived` |
 | `team_status` | `active`, `inactive`, `archived` |
@@ -55,7 +55,7 @@ The following enums should be created through Drizzle `pgEnum` definitions.
 | `game_status` | `scheduled`, `in_progress`, `finished`, `postponed`, `canceled` |
 | `score_status` | `pending`, `updated`, `final` |
 | `score_result_type` | `home_win`, `away_win`, `draw`, `no_contest` |
-| `post_status` | `draft`, `published`, `hidden`, `soft_deleted` |
+| `post_status` | `draft`, `scheduled`, `published`, `archived`, `hidden`, `soft_deleted` |
 | `post_content_type` | `post`, `article` |
 | `comment_status` | `active`, `hidden`, `soft_deleted` |
 | `message_status` | `active`, `hidden`, `soft_deleted` |
@@ -69,6 +69,10 @@ The following enums should be created through Drizzle `pgEnum` definitions.
 | `report_status` | `pending`, `in_review`, `resolved`, `dismissed` |
 | `report_entity_type` | `post`, `comment`, `message`, `user` |
 | `media_type` | `image`, `video` |
+| `deletion_request_status` | `pending_verification`, `verified`, `scheduled`, `completed`, `cancelled`, `rejected` |
+| `report_action_type` | `assignment`, `review`, `warning`, `hide`, `restore`, `mute`, `escalate`, `resolve`, `dismiss`, `reopen` |
+| `escalation_status` | `open`, `reviewing`, `resolved`, `cancelled` |
+| `audit_result` | `succeeded`, `denied`, `failed` |
 
 A public visitor is not represented by a database user record. Every non-deleted row in `users` represents an authenticated user. A soft-deleted row may remain as an anonymized reference so authored content and moderation evidence can be retained. Elevated platform permissions are assigned through `user_roles`.
 
@@ -94,6 +98,7 @@ Represents registered platform users. Elevated platform permissions are assigned
 | `deleted_at` | `timestamptz` | Yes | Soft-delete timestamp |
 | `created_at` | `timestamptz` | No | Registration timestamp |
 | `updated_at` | `timestamptz` | No |  |
+| `onboarding_completed_at` | `timestamptz` | Yes | Set when the user completes onboarding; null while onboarding remains incomplete |
 
 **User-deletion policy:** account deletion immediately sets `status = 'soft_deleted'` and records `deleted_at`. The `users` row and its posts, comments, and messages are retained; the application must display the author as **Deleted User**. After 30 days, a cleanup job clears `clerk_id`, `email`, `username`, `first_name`, `last_name`, and `profile_photo_url` while preserving `users.id`, lifecycle timestamps, authored-content relationships, and moderation evidence. Active and suspended users must still have all required identity fields populated. A database check or equivalent application validation should enforce that `clerk_id`, `email`, `username`, `first_name`, and `last_name` are non-null unless `status = 'soft_deleted'`.
 
@@ -132,26 +137,70 @@ Stores global notification-category preferences for an authenticated user. Entit
 
 ### 4.4 `user_roles`
 
-Assigns one or more elevated platform roles to an authenticated user. A user without a row in this table remains a standard authenticated user.
+Stores current and historical staff-role assignments. A user without an active assignment remains a standard registered user.
 
 | Column | Type | Null | Constraints / Notes |
 |---|---|---:|---|
+| `id` | `uuid` | No | Primary key |
 | `user_id` | `uuid` | No | Foreign key to `users.id` |
-| `role` | `platform_role` | No | Elevated platform role |
-| `assigned_by_user_id` | `uuid` | Yes | Foreign key to `users.id`; nullable for initial bootstrap |
+| `role` | `platform_role` | No | `moderator`, `editor`, or `administrator` |
+| `assigned_by_user_id` | `uuid` | Yes | Foreign key to `users.id`; nullable only for the initial bootstrap |
+| `approved_by_user_id` | `uuid` | Yes | Foreign key to `users.id`; required when the restricted-approval workflow applies |
+| `assignment_reason` | `text` | No | Business reason for the assignment |
 | `assigned_at` | `timestamptz` | No | Default `now()` |
+| `revoked_by_user_id` | `uuid` | Yes | Foreign key to `users.id` |
+| `revoked_at` | `timestamptz` | Yes | Null while the assignment is active |
+| `revocation_reason` | `text` | Yes | Required when the assignment is revoked |
 
-**Primary key:** `(user_id, role)`.
+A partial unique index on `user_id` where `revoked_at IS NULL` enforces one active staff role per account.
 
-Clerk remains responsible for authentication and token issuance. PostgreSQL stores application authorization assignments so the NestJS backend can enforce the approved cumulative permission matrix consistently.
+`assigned_by_user_id` must differ from `user_id`. When `approved_by_user_id` is required, it must differ from both `user_id` and `assigned_by_user_id`. The previous active role must be revoked before another role is activated. Administrator-role changes require the restricted approval process documented in `roles_and_permissions.md`.
+
+Clerk remains responsible for authentication and token issuance. PostgreSQL is the source of truth for application authorization. Role changes must invalidate or reevaluate active sessions.
+
+#### `moderator_community_scopes`
+
+Stores the communities in which an active Moderator may perform moderation actions.
+
+| Column | Type | Null | Constraints / Notes |
+|---|---|---:|---|
+| `id` | `uuid` | No | Primary key |
+| `user_role_id` | `uuid` | No | Foreign key to `user_roles.id`; must reference an active Moderator assignment |
+| `community_id` | `uuid` | No | Foreign key to `communities.id` |
+| `assigned_by_user_id` | `uuid` | No | Foreign key to `users.id`; must differ from the scoped staff member |
+| `approved_by_user_id` | `uuid` | No | Foreign key to `users.id`; must differ from the scoped staff member and `assigned_by_user_id` |
+| `assignment_reason` | `text` | No | Required business reason |
+| `assigned_at` | `timestamptz` | No | Default `now()` |
+| `revoked_at` | `timestamptz` | Yes | Null while active |
+
+A partial unique index on `(user_role_id, community_id)` where `revoked_at IS NULL` prevents duplicate active assignments while preserving revoked assignment history.
+
+#### `editor_entity_scopes`
+
+Stores the sports entities in which an active Editor may publish content or modify operational sports data.
+
+| Column | Type | Null | Constraints / Notes |
+|---|---|---:|---|
+| `id` | `uuid` | No | Primary key |
+| `user_role_id` | `uuid` | No | Foreign key to `user_roles.id`; must reference an active Editor assignment |
+| `sport_id` | `uuid` | Yes | Foreign key to `sports.id` |
+| `league_id` | `uuid` | Yes | Foreign key to `leagues.id` |
+| `team_id` | `uuid` | Yes | Foreign key to `teams.id` |
+| `assigned_by_user_id` | `uuid` | No | Foreign key to `users.id`; must differ from the scoped staff member |
+| `approved_by_user_id` | `uuid` | No | Foreign key to `users.id`; must differ from the scoped staff member and `assigned_by_user_id` |
+| `assignment_reason` | `text` | No | Required business reason |
+| `assigned_at` | `timestamptz` | No | Default `now()` |
+| `revoked_at` | `timestamptz` | Yes | Null while active |
+
+Exactly one of `sport_id`, `league_id`, or `team_id` must be non-null. Partial unique indexes for each entity type must prevent duplicate active assignments while preserving revoked assignment history.
 
 | Role | Approved permissions |
 |---|---|
-| `moderator` | Hide or soft-delete comments and community messages; resolve moderation reports |
-| `content_administrator` | All moderator permissions, plus manage sports, leagues, teams, athletes, games, scores, and posts |
-| `system_administrator` | All content-administrator permissions, plus assign or revoke platform roles and manage users |
+| `moderator` | Moderate comments and community messages and resolve reports only within assigned community scopes |
+| `editor` | Manage sports, leagues, teams, athletes, games, scores, and posts only within assigned entity scopes |
+| `administrator` | Perform platform-wide administration and manage staff roles and scopes, subject to restricted-approval requirements |
 
-Only a system administrator may create, change, or remove rows in `user_roles`, except for the initial bootstrap process.
+Only an authorized Administrator may create, change, approve, or revoke staff roles and scopes, except for the documented initial bootstrap process.
 
 ### 4.5 `sports`
 
@@ -349,12 +398,12 @@ A database check must require `result_type` whenever `status = 'final'`. Applica
 
 ### 4.14 `posts`
 
-Stores administrator-published news, articles, official updates, and other authorized content.
+Stores authorized news, articles, official updates, and other official content.
 
 | Column | Type | Null | Constraints / Notes |
 |---|---|---:|---|
 | `id` | `uuid` | No | Primary key |
-| `author_user_id` | `uuid` | No | Foreign key to `users.id`; author must be a content administrator or system administrator |
+| `author_user_id` | `uuid` | No | Foreign key to `users.id`; author must be an authorized Editor within the assigned entity scope or an Administrator |
 | `content_type` | `post_content_type` | No | Default `post` |
 | `title` | `varchar(250)` | Yes | Required for `article`; optional for short posts |
 | `excerpt` | `text` | Yes | Optional article or feed summary |
@@ -367,12 +416,17 @@ Stores administrator-published news, articles, official updates, and other autho
 | `deleted_at` | `timestamptz` | Yes | Soft deletion |
 | `created_at` | `timestamptz` | No |  |
 | `updated_at` | `timestamptz` | No |  |
+| `scheduled_for` | `timestamptz` | Yes | Required when publication is scheduled |
+| `scheduled_by_user_id` | `uuid` | Yes | Foreign key to `users.id`; required when `scheduled_for` is present |
 
 **Checks:**
 
 - `content_type = 'article'` requires a non-empty `title`.
 - `cover_media_type` is required when `cover_media_url` is present and must be null when no cover media is stored.
+- `status = 'scheduled'` requires `scheduled_for` and `scheduled_by_user_id`.
 - `published_at` is required when `status = 'published'`.
+- `scheduled_for` must be later than `created_at` when the post is scheduled.
+- The author and scheduling user must have permission for every assigned sports-entity scope.
 
 A post or article may be connected to multiple sports-domain entities through explicit junction tables:
 
@@ -623,6 +677,97 @@ Stores moderation reports submitted against a post, comment, message, or user.
 
 These rules should be enforced through PostgreSQL check constraints where possible and repeated in application validation.
 
+
+### 4.26 `account_deletion_requests`
+
+| Column | Type | Null | Constraints / Notes |
+|---|---|---:|---|
+| `id` | `uuid` | No | Primary key |
+| `user_id` | `uuid` | No | Foreign key to `users.id` |
+| `status` | `deletion_request_status` | No | `pending_verification`, `verified`, `scheduled`, `completed`, `cancelled`, or `rejected` |
+| `requested_at` | `timestamptz` | No | Default `now()` |
+| `identity_verified_at` | `timestamptz` | Yes | Set after successful verification |
+| `scheduled_for` | `timestamptz` | Yes | Planned deletion or anonymization time |
+| `processed_by_user_id` | `uuid` | Yes | Foreign key to `users.id`; Administrator or approved automated process |
+| `processing_reason` | `text` | Yes | Internal processing or retention explanation |
+| `completed_at` | `timestamptz` | Yes | Required when completed |
+| `cancelled_at` | `timestamptz` | Yes | Required when cancelled |
+| `created_at` | `timestamptz` | No | Default `now()` |
+| `updated_at` | `timestamptz` | No | |
+
+Only one active deletion request may exist per user. Creating the deletion request immediately ends active sessions, changes the user to `soft_deleted`, sets `deleted_at`, revokes active staff roles and scopes, and schedules personal-data anonymization for 30 days later. Completion records that the required Clerk-account deletion, internal processing, and anonymization have finished.
+
+### 4.27 `user_warnings`
+
+| Column | Type | Null | Constraints / Notes |
+|---|---|---:|---|
+| `id` | `uuid` | No | Primary key |
+| `user_id` | `uuid` | No | Foreign key to `users.id` |
+| `community_id` | `uuid` | Yes | Foreign key to `communities.id`; required for community-scoped warnings |
+| `issued_by_user_id` | `uuid` | No | Foreign key to `users.id` |
+| `report_id` | `uuid` | Yes | Foreign key to `reports.id` |
+| `reason` | `text` | No | Documented policy reason |
+| `created_at` | `timestamptz` | No | Default `now()` |
+| `revoked_at` | `timestamptz` | Yes | Set if the warning is reversed |
+| `revoked_by_user_id` | `uuid` | Yes | Foreign key to `users.id` |
+
+Warnings are policy-based moderation records. They do not create an automatic strike or account-deletion rule.
+
+### 4.28 `report_actions`
+
+Stores the complete action history for a moderation report.
+
+| Column | Type | Null | Constraints / Notes |
+|---|---|---:|---|
+| `id` | `uuid` | No | Primary key |
+| `report_id` | `uuid` | No | Foreign key to `reports.id` |
+| `actor_user_id` | `uuid` | No | Foreign key to `users.id` |
+| `action` | `report_action_type` | No | Assignment, review, warning, hide, restore, mute, escalate, resolve, dismiss, or reopen |
+| `previous_status` | `report_status` | Yes | Status before the action |
+| `new_status` | `report_status` | No | Status after the action |
+| `reason` | `text` | No | Required internal reason |
+| `created_at` | `timestamptz` | No | Default `now()` |
+
+Rows preserve report history and must not be updated or deleted through normal staff controls.
+
+### 4.29 `moderation_escalations`
+
+| Column | Type | Null | Constraints / Notes |
+|---|---|---:|---|
+| `id` | `uuid` | No | Primary key |
+| `report_id` | `uuid` | No | Foreign key to `reports.id` |
+| `escalated_by_user_id` | `uuid` | No | Foreign key to `users.id` |
+| `assigned_to_user_id` | `uuid` | Yes | Foreign key to `users.id` |
+| `reason` | `text` | No | Escalation reason |
+| `status` | `escalation_status` | No | `open`, `reviewing`, `resolved`, or `cancelled` |
+| `created_at` | `timestamptz` | No | Default `now()` |
+| `resolved_at` | `timestamptz` | Yes | Required when resolved |
+| `resolved_by_user_id` | `uuid` | Yes | Foreign key to `users.id` |
+
+A staff member cannot approve or resolve an escalation involving their own report, content, or previous moderation decision.
+
+### 4.30 `audit_events`
+
+Stores immutable security, authorization, publishing, data-management, and moderation events.
+
+| Column | Type | Null | Constraints / Notes |
+|---|---|---:|---|
+| `id` | `uuid` | No | Primary key |
+| `actor_user_id` | `uuid` | Yes | Foreign key to `users.id`; nullable for an approved automated process |
+| `action` | `varchar(150)` | No | Stable action identifier |
+| `target_type` | `varchar(100)` | No | Type of affected record |
+| `target_id` | `uuid` | Yes | Identifier of the affected record |
+| `scope_type` | `varchar(100)` | Yes | Community or sports-entity scope type |
+| `scope_id` | `uuid` | Yes | Identifier of the affected scope |
+| `reason` | `text` | Yes | Required when the action requires justification |
+| `result` | `audit_result` | No | `succeeded`, `denied`, or `failed` |
+| `metadata` | `jsonb` | No | Default `{}`; non-secret supporting context |
+| `occurred_at` | `timestamptz` | No | Default `now()` |
+
+Audit events are append-only. Ordinary application and staff operations may insert events but may not update or delete them. Database permissions must enforce this rule.
+
+Audit events must cover publishing and editing official content, sports-data changes, moderation actions, report resolution and escalation, warnings, protected-information access, deletion-request processing, role changes, and scope changes.
+
 ## 5. Relationship Summary
 
 ### One-to-One
@@ -637,7 +782,20 @@ These rules should be enforced through PostgreSQL check constraints where possib
 
 | Parent | Child | Relationship |
 |---|---|---|
-| `users` | `user_roles` | One user may have multiple elevated platform roles |
+| `users` | `user_roles` | One user may have multiple historical assignments but only one active staff role |
+| `user_roles` | `moderator_community_scopes` | One Moderator-role assignment may have many historical community scopes |
+| `user_roles` | `editor_entity_scopes` | One Editor-role assignment may have many historical sports-entity scopes |
+| `communities` | `moderator_community_scopes` | One community may be assigned to many Moderator-role records |
+| `sports` | `editor_entity_scopes` | One sport may be assigned to many Editor-role records |
+| `leagues` | `editor_entity_scopes` | One league may be assigned to many Editor-role records |
+| `teams` | `editor_entity_scopes` | One team may be assigned to many Editor-role records |
+| `users` | `account_deletion_requests` | One user may have historical deletion requests but only one active request |
+| `users` | `user_warnings` | One user may receive many warnings |
+| `reports` | `user_warnings` | One report may support multiple warning records |
+| `reports` | `report_actions` | One report may have many immutable action-history records |
+| `reports` | `moderation_escalations` | One report may have many escalation records |
+| `users` | `audit_events` | One user may generate many immutable audit events |
+| `users` | `posts` | One authorized user may schedule many posts |
 | `users` | `push_devices` | One user may register multiple push-delivery devices |
 | `data_sources` | `data_verifications` | One approved source may support many verification records |
 | `users` | `data_verifications` | One authorized user may verify many records |
@@ -653,7 +811,7 @@ These rules should be enforced through PostgreSQL check constraints where possib
 | `users` | `messages` | One user may send many messages |
 | `users` | `notifications` | One user receives many notifications |
 | `users` | `reports` | One user may submit many reports |
-| `users` | `reports` | One moderator, content administrator, or system administrator may resolve many reports |
+| `users` | `reports` | One authorized Moderator, Editor, or Administrator may resolve many reports |
 
 ### Many-to-Many
 
@@ -693,6 +851,12 @@ These rules should be enforced through PostgreSQL check constraints where possib
 | Communities to messages | `ON DELETE RESTRICT`; archive communities instead |
 | Reported entities to reports | `ON DELETE RESTRICT` to preserve moderation evidence |
 | Users to notifications | `ON DELETE CASCADE` only if a user row is ever physically removed |
+| Users to staff-role, scope-assignment, warning, report-action, escalation, deletion-request, and audit records | `ON DELETE RESTRICT`; retain the anonymized user row to preserve administrative and audit evidence |
+| `user_roles` to Moderator and Editor scope assignments | `ON DELETE RESTRICT`; revoke assignments instead of deleting their history |
+| Communities to `moderator_community_scopes` | `ON DELETE RESTRICT`; archive the community or revoke the scope |
+| Sports, leagues, and teams to `editor_entity_scopes` | `ON DELETE RESTRICT`; archive the entity or revoke the scope |
+| Reports to `user_warnings`, `report_actions`, and `moderation_escalations` | `ON DELETE RESTRICT` to preserve moderation history |
+| Users to scheduled posts through `scheduled_by_user_id` | `ON DELETE RESTRICT`; the approved deletion flow retains the anonymized user row |
 
 The MVP should avoid hard deletion of sports, leagues, teams, athletes, communities, posts, comments, messages, and reported users while dependent records exist. Lifecycle state changes are preferred. User deletion is now defined as immediate soft deletion followed by personal-data anonymization after 30 days; authored posts, comments, and messages remain linked to the retained user row and are displayed under **Deleted User**.
 
@@ -707,10 +871,10 @@ The MVP should avoid hard deletion of sports, leagues, teams, athletes, communit
 
 | Table | Lifecycle fields |
 |---|---|
-| `users` | `status`, `suspended_at`, `deleted_at` |
+| `users` | `status`, `onboarding_completed_at`, `suspended_at`, `deleted_at` |
 | `user_preferences` | `created_at`, `updated_at` |
 | `notification_preferences` | `created_at`, `updated_at` |
-| `user_roles` | `assigned_at` |
+| `user_roles` | `assigned_at`, `revoked_at` |
 | `sports` | `status`, `archived_at` |
 | `leagues` | `status`, `archived_at` |
 | `teams` | `status`, `archived_at` |
@@ -719,18 +883,25 @@ The MVP should avoid hard deletion of sports, leagues, teams, athletes, communit
 | `data_verifications` | `verified_at`, `created_at` |
 | `games` | `status`, `scheduled_start_at` |
 | `scores` | `status`, `result_type`, `last_updated_at` |
-| `posts` | `status`, `published_at`, `hidden_at`, `deleted_at` |
+| `posts` | `status`, `scheduled_for`, `published_at`, `hidden_at`, `deleted_at` |
 | `post_communities` | `pinned_at` |
 | `post_likes` | `created_at` |
 | `comments` | `status`, `created_at`, `updated_at`, `deleted_at` |
 | `user_blocks` | `created_at` |
 | `user_mutes` | `created_at` |
+| `user_warnings` | `created_at`, `revoked_at` |
 | `communities` | `status`, `archived_at` |
 | `community_memberships` | `status`, `joined_at`, `left_at` |
 | `messages` | `status`, `sent_at`, `deleted_at` |
 | `push_devices` | `is_active`, `last_seen_at`, `disabled_at`, `created_at`, `updated_at` |
 | `notifications` | `is_read`, `read_at`, `expires_at` |
 | `reports` | `status`, `created_at`, `resolved_at` |
+| `report_actions` | `created_at` |
+| `moderator_community_scopes` | `assigned_at`, `revoked_at` |
+| `moderation_escalations` | `status`, `created_at`, `resolved_at` |
+| `editor_entity_scopes` | `assigned_at`, `revoked_at` |
+| `account_deletion_requests` | `status`, `requested_at`, `identity_verified_at`, `scheduled_for`, `completed_at`, `cancelled_at` |
+| `audit_events` | `occurred_at` |
 
 `updated_at` should be maintained in application code or through a PostgreSQL trigger. Drizzle does not automatically update this field unless the application explicitly sets it. A scheduled cleanup job must anonymize soft-deleted users once `deleted_at` is at least 30 days old.
 
@@ -750,6 +921,18 @@ PostgreSQL automatically indexes primary keys and unique constraints. Additional
 - `push_devices(user_id, is_active)`.
 - `data_sources(is_approved, name)`.
 - `data_verifications(source_id, verified_at DESC)` and `data_verifications(verified_by_user_id, verified_at DESC)`.
+- Partial unique index on `user_roles(user_id)` where `revoked_at IS NULL`.
+- Partial unique index on `moderator_community_scopes(user_role_id, community_id)` where `revoked_at IS NULL`.
+- Partial unique index on `editor_entity_scopes(user_role_id, sport_id)` where `sport_id IS NOT NULL AND revoked_at IS NULL`.
+- Partial unique index on `editor_entity_scopes(user_role_id, league_id)` where `league_id IS NOT NULL AND revoked_at IS NULL`.
+- Partial unique index on `editor_entity_scopes(user_role_id, team_id)` where `team_id IS NOT NULL AND revoked_at IS NULL`.
+- Partial unique index on `account_deletion_requests(user_id)` where `status IN ('pending_verification', 'verified', 'scheduled')`.
+- `posts(status, scheduled_for)` for scheduled publication.
+- `user_warnings(user_id, created_at DESC)`.
+- `report_actions(report_id, created_at ASC)`.
+- `moderation_escalations(status, created_at ASC)`.
+- `audit_events(actor_user_id, occurred_at DESC)`.
+- `audit_events(target_type, target_id, occurred_at DESC)`.
 
 ### Foreign-key and relationship indexes
 
@@ -860,6 +1043,20 @@ erDiagram
     USERS ||--o| USER_PREFERENCES : configures
     USERS ||--o| NOTIFICATION_PREFERENCES : configures
     USERS ||--o{ USER_ROLES : receives
+    USER_ROLES ||--o{ MODERATOR_COMMUNITY_SCOPES : receives
+    USER_ROLES ||--o{ EDITOR_ENTITY_SCOPES : receives
+    COMMUNITIES ||--o{ MODERATOR_COMMUNITY_SCOPES : defines
+    SPORTS o|--o{ EDITOR_ENTITY_SCOPES : scopes
+    LEAGUES o|--o{ EDITOR_ENTITY_SCOPES : scopes
+    TEAMS o|--o{ EDITOR_ENTITY_SCOPES : scopes
+    USERS ||--o{ ACCOUNT_DELETION_REQUESTS : requests
+    USERS ||--o{ USER_WARNINGS : receives
+    USERS ||--o{ REPORT_ACTIONS : performs
+    USERS ||--o{ MODERATION_ESCALATIONS : handles
+    USERS ||--o{ AUDIT_EVENTS : generates
+    REPORTS ||--o{ USER_WARNINGS : supports
+    REPORTS ||--o{ REPORT_ACTIONS : records
+    REPORTS ||--o{ MODERATION_ESCALATIONS : escalates
     USERS ||--o{ PUSH_DEVICES : registers
     USERS ||--o{ POSTS : authors
     USERS ||--o{ FAVORITES : creates
@@ -928,6 +1125,7 @@ erDiagram
         citext email UK
         citext username UK
         user_status status
+        timestamptz onboarding_completed_at
         timestamptz deleted_at
     }
 
@@ -954,9 +1152,35 @@ erDiagram
     }
 
     USER_ROLES {
-        uuid user_id PK, FK
-        platform_role role PK
+        uuid id PK
+        uuid user_id FK
+        platform_role role
         uuid assigned_by_user_id FK
+        uuid approved_by_user_id FK
+        timestamptz assigned_at
+        timestamptz revoked_at
+    }
+
+    MODERATOR_COMMUNITY_SCOPES {
+        uuid id PK
+        uuid user_role_id FK
+        uuid community_id FK
+        uuid assigned_by_user_id FK
+        uuid approved_by_user_id FK
+        timestamptz assigned_at
+        timestamptz revoked_at
+    }
+
+    EDITOR_ENTITY_SCOPES {
+        uuid id PK
+        uuid user_role_id FK
+        uuid sport_id FK
+        uuid league_id FK
+        uuid team_id FK
+        uuid assigned_by_user_id FK
+        uuid approved_by_user_id FK
+        timestamptz assigned_at
+        timestamptz revoked_at
     }
 
     SPORTS {
@@ -1044,6 +1268,8 @@ erDiagram
         text excerpt
         text content
         post_status status
+        timestamptz scheduled_for
+        uuid scheduled_by_user_id FK
         timestamptz published_at
         timestamptz deleted_at
     }
@@ -1132,6 +1358,61 @@ erDiagram
         report_status status
         uuid resolved_by_user_id FK
     }
+
+    ACCOUNT_DELETION_REQUESTS {
+        uuid id PK
+        uuid user_id FK
+        deletion_request_status status
+        timestamptz requested_at
+        timestamptz scheduled_for
+        uuid processed_by_user_id FK
+        timestamptz completed_at
+        timestamptz cancelled_at
+    }
+
+    USER_WARNINGS {
+        uuid id PK
+        uuid user_id FK
+        uuid community_id FK
+        uuid issued_by_user_id FK
+        uuid report_id FK
+        timestamptz created_at
+        timestamptz revoked_at
+    }
+
+    REPORT_ACTIONS {
+        uuid id PK
+        uuid report_id FK
+        uuid actor_user_id FK
+        report_action_type action
+        report_status previous_status
+        report_status new_status
+        timestamptz created_at
+    }
+
+    MODERATION_ESCALATIONS {
+        uuid id PK
+        uuid report_id FK
+        uuid escalated_by_user_id FK
+        uuid assigned_to_user_id FK
+        escalation_status status
+        uuid resolved_by_user_id FK
+        timestamptz created_at
+        timestamptz resolved_at
+    }
+
+    AUDIT_EVENTS {
+        uuid id PK
+        uuid actor_user_id FK
+        varchar action
+        varchar target_type
+        uuid target_id
+        varchar scope_type
+        uuid scope_id
+        audit_result result
+        jsonb metadata
+        timestamptz occurred_at
+    }
 ```
 
 ## 11. Drizzle ORM Implementation Guidance
@@ -1181,7 +1462,7 @@ The three previously open MVP decisions are now confirmed. The following table r
 | Score period structure | The MVP requires verified final scores, not period-by-period scoring, live box scores, or advanced statistics | Keep nullable `jsonb` only as an optional extension, or omit it from the first migration; **not a blocker** |
 | Tied games and no-contest results | Add `score_result_type` with `home_win`, `away_win`, `draw`, and `no_contest`; require `scores.result_type` when `scores.status = 'final'` | **Confirmed and modeled** |
 | User deletion | Soft-delete immediately, retain authored posts/comments/messages under **Deleted User**, and clear personal information after 30 days | **Confirmed and modeled** |
-| Administrative authorization | Permissions are cumulative: moderators manage comment/message moderation and reports; content administrators also manage sports content and scores; system administrators also assign roles and manage users | **Confirmed and modeled** through `user_roles` and backend authorization rules |
+| Administrative authorization | Each staff user has one active role: Moderators operate within assigned communities, Editors operate within assigned sports-entity scopes, and Administrators perform platform-wide administration subject to restricted-approval requirements | **Confirmed and modeled** through `user_roles`, scope-assignment tables, approval fields, and backend authorization rules |
 | Posts and articles | The MVP distinguishes short posts and image-based articles | **Now modeled** through `post_content_type`, `title`, `excerpt`, and `content` |
 | User language setting | Required in User & Settings; Spanish remains the default MVP interface | **Now modeled** through `user_preferences.preferred_language` |
 | Notification preferences and push targets | Required for controlled push notifications | **Now modeled** through `notification_preferences` and `push_devices` |
@@ -1194,14 +1475,14 @@ The three previously open MVP decisions are now confirmed. The following table r
 | Athlete roster history | Store only `current_team_id` | Add `athlete_team_assignments` later if historical rosters are required |
 | Game schedule history | Keep one authoritative scheduled timestamp | Add `game_schedule_revisions` later if change history must be audited |
 | Media model | Store one URL per required media field | Add a reusable `media_assets` table later for variants, ownership, captions, and moderation |
-| Audit history | Rely on lifecycle timestamps and application logs | Add append-only audit tables if administrative traceability requires them |
+| Audit history | Store immutable administrative and security events in the append-only `audit_events` table | Implemented as required persistence |
 | Time-zone display | Store UTC `TIMESTAMPTZ`; convert in the client | Add venue-local time-zone identifiers if schedule display requires them |
 
 ### Confirmed implementation decisions
 
 1. **User deletion policy:** soft-delete immediately; retain posts, comments, and messages as **Deleted User**; anonymize the listed personal fields after 30 days.
 2. **Final-game result model:** use `score_result_type` with `home_win`, `away_win`, `draw`, and `no_contest`; require it for final scores.
-3. **Role-permission matrix:** enforce the approved cumulative moderator, content-administrator, and system-administrator permissions.
+3. **Role-permission model:** enforce one active staff role per user, assigned Moderator and Editor scopes, restricted second approval, and the standardized Moderator, Editor, and Administrator role names.
 
 
 ## 13. Approval Criteria
