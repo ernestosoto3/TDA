@@ -5,7 +5,8 @@ Our platform exclusively accepts **sports-related content**.
 
 ### Allowed Content:
 - Sports news and official league announcements
-- Live scoreboards and match results
+- Scheduled-game information and verified final results
+- Live scoreboards — **Post-MVP**
 - Team updates, rosters, and trade news
 - Game and player highlights
 - Official schedules and event calendars

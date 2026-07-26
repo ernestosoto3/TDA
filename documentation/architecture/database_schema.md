@@ -72,6 +72,8 @@ The following enums should be created through Drizzle `pgEnum` definitions.
 
 A public visitor is not represented by a database user record. Every non-deleted row in `users` represents an authenticated user. A soft-deleted row may remain as an anonymized reference so authored content and moderation evidence can be retained. Elevated platform permissions are assigned through `user_roles`.
 
+For the MVP, `in_progress` is internal only and is not exposed in the user interface. The `score_update` notification type is reserved for Post-MVP live scoring. Mobile clients display scheduled games and verified final scores only.
+
 ## 4. Core Table Design
 
 ### 4.1 `users`

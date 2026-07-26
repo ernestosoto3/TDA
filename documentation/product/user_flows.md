@@ -345,7 +345,7 @@ If a public visitor selects the follow control, TDA must request registration or
 - **Success:** The available schedule information or verified final score appears.
 - **Error:** The game information cannot be retrieved.
 
-An in-progress status may be displayed when verified, but Version 1 does not promise continuously updating live scores, live box scores, or play-by-play information.
+The MVP displays scheduled games and verified final scores only. An internal `in_progress` status may be retained for future compatibility but will not be displayed to users.
 
 ---
 

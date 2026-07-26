@@ -187,12 +187,11 @@ A game card may display:
 Supported game states will include:
 
 * Scheduled
-* In progress
 * Postponed
 * Cancelled
 * Final
 
-An in-progress status may be displayed when verified, but Version 1 will not promise continuously updating partial scores.
+The internal system may retain an `in_progress` status for future compatibility, but the MVP interface will not display **En vivo**, **En curso**, partial scores, or continuously updating scores.
 
 ### Why It Was Selected
 

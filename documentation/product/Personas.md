@@ -8,7 +8,7 @@ The following personas represent realistic users within the Puerto Rican sports 
 Alfredo is a 20 year old Mechanical Engineering student at the University of Puerto Rico at Mayagüez. He is rarely seen without his favorite BSN team cap, a pair of worn-out sneakers, and a water bottle covered with stickers. He is constantly active in three different WhatsApp group chats arguing about basketball trades and game plays. He loves *Empanadillas de camarones* on weekends, follows BSN, Liga de Béisbol Superior Doble A,and never misses a high-stakes rivalry game. However, he gets constantly frustrated having to jump between obscure Facebook pages, Instagram stories, and outdated league websites just to figure out what time a game starts or where to stream it.
 
 **Goals:**
-* Quickly check live scores, game schedules, and broadcast/streaming details for local Puerto Rican leagues.
+* Quickly check game schedules and verified final scores; live scores remain a Post-MVP need.
 * Receive reliable notifications for game tip-offs, delays, or venue updates.
 * Track standings and player statistics across multiple local sports in one centralized place.
 

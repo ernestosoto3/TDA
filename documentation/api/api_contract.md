@@ -424,7 +424,7 @@ Private `email` is returned only from `/users/me`. Public user responses omit em
 }
 ```
 
-`score` is `null` when no verified score record exists. `resultType` is one of `home_win`, `away_win`, `draw`, or `no_contest`. Version 1 may display `in_progress` when verified, but does not promise continuously updating live scores, box scores, or play-by-play.
+`score` is `null` when no verified score record exists. `resultType` is one of `home_win`, `away_win`, `draw`, or `no_contest`. Version 1 displays scheduled games and verified final scores only.
 
 ### Post
 
@@ -697,7 +697,7 @@ Device tokens are write-only and are never returned by the API.
 | `GET /games/{gameId}` | `gameId` | Public | `200` → `Game` with verified score when available |
 | `GET /games/{gameId}/posts` | pagination, `sort=-publishedAt` | Public | `200` → `Paginated<PostSummary>` |
 
-Allowed public game statuses are `scheduled`, `in_progress`, `finished`, `postponed`, and `canceled`. The Spanish interface maps these values to the approved labels without changing the API enum.
+Allowed public MVP game statuses are `scheduled`, `finished`, `postponed`, and `canceled`. The internal `in_progress` value is reserved for future compatibility and is not exposed in the MVP interface.
 
 ### Feeds, Posts, Likes, and Comments
 
@@ -1112,12 +1112,12 @@ WebSockets are appropriate for community chat because the server must deliver ne
 | Receive new community messages | Reconnect fallback | Yes |
 | Receive message edits or removals | Reconnect fallback | Yes |
 | Load a game or final score | Yes | No |
-| Receive a verified score/status update | Reconnect fallback | Optional event |
+| Receive a verified score/status update - Post MVP | Reconnect fallback | Optional event |
 | Notification history and read state | Yes | No |
 | Device push notification | Push provider | No |
 | Moderation and admin actions | Yes | Broadcast visible result only |
 
-Version 1 requires real-time community-message delivery. Verified game/score events are optional and do not create a promise of continuous live scoring.
+Version 1 requires real-time delivery only for community messages. Real-time game and score events are Post-MVP.
 
 ### Connection
 
@@ -1171,7 +1171,7 @@ Supported server event types:
 | `community.message.updated` | Delivers an eligible edit |
 | `community.message.removed` | Removes a soft-deleted or moderated message from public view |
 | `game.status.updated` | Optional verified game-status change |
-| `game.score.updated` | Optional verified score change |
+| `game.score.updated` - Post MVP| Optional verified score change |
 | `pong` | Connection-health response |
 | `error` | Socket-specific safe error |
 
