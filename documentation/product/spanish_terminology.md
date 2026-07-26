@@ -2,7 +2,9 @@
 
 ## Purpose
 
-This document defines the approved Spanish terminology for the TDA Version 1 mobile application, administrative interface, API documentation, notifications, and product documentation.
+This document defines the standardized Spanish terminology proposed for the TDA Version 1 mobile application, administrative interface, API documentation, notifications, and product documentation.
+
+**Approval status:** Approved
 
 The goal is to ensure that the same feature, action, status, or interface element is always described with the same term. This glossary standardizes product language only; it does not change the approved MVP scope.
 
@@ -548,7 +550,7 @@ The main inconsistencies found were:
 
 # 19. Confirmed Product Decisions
 
-The following terminology decisions are approved for Version 1:
+The following terminology decisions are proposed for Version 1 and pending final team approval:
 
 1. Use **Favoritos** instead of **Siguiendo**.
 2. Use **Descubre** instead of **Descubrir** or **Para ti**.

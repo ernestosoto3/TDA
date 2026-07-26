@@ -134,7 +134,7 @@ Authentication proves identity; authorization determines whether that identity m
 
 ### Contract Roles and Database Mapping
 
-The API uses the approved product-role names. Existing internal database values map as follows:
+The API uses the documented product-role names. Existing internal database values map as follows:
 
 | Contract role | Internal database value | Scope |
 |---|---|---|
@@ -143,7 +143,7 @@ The API uses the approved product-role names. Existing internal database values 
 | Editor | `content_administrator` | Assigned sports entities and content only |
 | Administrator | `system_administrator` | Platform-wide administrative authority |
 
-The API follows the approved roles-and-permissions document:
+The API follows the documented roles-and-permissions document:
 
 - One staff role per account.
 - Moderator and Editor permissions are separate, not cumulative.
@@ -1231,7 +1231,7 @@ Clear requirements reduce ambiguity, rework, and inconsistent implementation acr
 
 ## OpenAPI Implementation Requirements
 
-This Markdown document is the approved human-readable contract. During implementation, the backend should generate or maintain an OpenAPI 3 specification containing:
+This Markdown document is the documented human-readable contract pending final team approval. During implementation, the backend should generate or maintain an OpenAPI 3 specification containing:
 
 - Every route and method in this document
 - Path and query parameter schemas
