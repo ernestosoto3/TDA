@@ -116,7 +116,7 @@ Branch names must be lowercase, concise, and use hyphens between words.
 Use the following format:
 
 ```text
-type: short description
+[type]: short description #issue (initial)
 ```
 
 Approved commit types:
@@ -129,13 +129,18 @@ Approved commit types:
 - `test`
 - `chore`
 
+Contributor initials:
+
+- `(E)`: Ernesto
+- `(V)`: Victor
+- 
 Examples:
 
 ```text
-feat: add user authentication
-fix: correct notification navigation
-docs: document development standards
-chore: configure automated checks
+[feat]: add user authentication #21 (V)
+[fix]: correct notification navigation #13 (E)
+[docs]: document development standards #17 (E)
+[chore]: configure automated checks #8 (V)
 ```
 
 Commit messages must:
