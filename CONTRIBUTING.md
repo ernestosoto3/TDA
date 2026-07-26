@@ -42,12 +42,6 @@ git switch documentation
 git pull origin documentation
 ```
 
-Before starting documentation work, make sure the branch includes any relevant updates from `main`.
-
-```bash
-git merge main
-```
-
 ## Branch Names
 
 Use lowercase words separated by hyphens.
@@ -120,7 +114,7 @@ Include an example only when it helps explain the expected result.
 Use the following format:
 
 ```text
-type: short description #issue-number (initial)
+[type]: short description #issue-number (initial)
 ```
 
 Accepted commit types:
@@ -128,7 +122,7 @@ Accepted commit types:
 - `feat`: Adds a feature or new planned section
 - `fix`: Corrects a problem
 - `docs`: Changes documentation, planning, research, or written content
-- `style`: Changes branding, layout, or visual presentation
+- `design`: Changes branding, layout, or visual presentation
 - `test`: Adds or changes tests
 - `refactor`: Reorganizes code without changing its behavior
 - `chore`: Changes setup, tooling, configuration, or maintenance files
@@ -141,12 +135,12 @@ Contributor initials:
 Examples:
 
 ```text
-docs: add problem statement draft #1 (E)
-docs: update competitor research notes #2 (V)
-feat: define initial sports feed concept #3 (E)
-style: add branding direction options #4 (V)
-fix: correct wording in user stories #5 (E)
-chore: configure initial monorepo #15 (E)
+[docs]: add problem statement draft #1 (E)
+[docs]: update competitor research notes #2 (V)
+[feat]: define initial sports feed concept #3 (E)
+[design]: add branding direction options #4 (V)
+[fix]: correct wording in user stories #5 (E)
+[chore]: configure initial monorepo #15 (E)
 ```
 
 Keep commit messages short and clear. Every commit should identify:
