@@ -17,7 +17,7 @@ Each environment must use isolated configuration, databases, credentials, storag
 | Environment | Purpose | Data | Access |
 | --- | --- | --- | --- |
 | Local | Build features and run tests without affecting shared systems | Local or fictional seed data | Individual contributors |
-| Pull-request validation | Run formatting, linting, type checking, tests, and builds | Temporary or mocked test data | Automated workflow |
+| Pull-request validation | Run the currently available formatting, linting, type-checking, and testing checks; build validation becomes mandatory after application initialization | Temporary or mocked test data | Automated workflow |
 | Staging | Test complete user flows before release | Stable fictional data | Project team and approved testers |
 | Production | Serve real users | Real, approved data | Public users and authorized administrators |
 
@@ -153,6 +153,8 @@ Because the MVP uses manual sports-data entry, it will not include scraping or a
 - Do not deploy the Expo mobile application through Railway.
 - Staging deploys approved development changes.
 - Production deploys only from the approved stable branch.
+
+Build validation is deferred only while the repository contains placeholder application projects. Each application must define a real build script after initialization, and the automated workflow must require a successful build before the first deployment or release.
 
 A production deployment requires successful formatting, linting, type checking, tests, build, migration review, and staging verification.
 

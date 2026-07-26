@@ -57,6 +57,7 @@ Run all required validations before opening or updating a pull request:
 ```bash
 pnpm check
 ```
+During the placeholder-project phase, `pnpm check` does not include build validation. Once the application source projects are initialized, each application must define a real `build` script, and `pnpm build` must be added to the automated pull-request checks. A successful build is required before the first deployment or release.
 
 This command verifies formatting, linting, type checking, and testing.
 
