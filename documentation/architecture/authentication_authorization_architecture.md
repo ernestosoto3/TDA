@@ -168,31 +168,29 @@ flowchart TD
 
 ## Login
 
-### Mobile application login steps
+### Mobile Application
 
-1. The user opens the login screen in the React Native mobile application.
-2. The user enters an email address and password.
-3. The mobile application submits the credentials to Clerk through the Clerk React Native SDK.
-4. If the credentials are invalid, the application displays a generic login error that does not reveal whether the email exists.
-5. If the email is not verified, the application returns the user to Clerk’s email-verification flow.
-6. After successful authentication, the mobile application activates the Clerk session.
-7. The mobile application obtains the current short-lived Clerk session token and sends it to the NestJS API.
-8. NestJS validates the token, resolves or reconciles the internal `users` record, and verifies that `users.status = 'active'`.
-9. If the internal account is valid, the application loads the authenticated mobile experience. Otherwise, it ends the local session and displays the corresponding account-status error.
+1. The unauthenticated user opens the TDA authentication screen.
+2. The user enters their email address and password.
+3. Clerk validates the credentials and completes any required verification or multifactor-authentication step.
+4. Clerk creates the user session and provides a short-lived session token.
+5. The mobile application sends the token to the NestJS API in the `Authorization: Bearer <token>` header.
+6. The API validates the token and maps the Clerk user identifier to `users.clerk_id`.
+7. The API checks the internal account status, onboarding status, active staff role, and applicable assignment scope.
+8. If the account is active, the application opens the appropriate authenticated screen. A user who has not completed onboarding is redirected to onboarding.
+9. Suspended, disabled, soft-deleted, or unrecognized accounts are denied access.
 
-### Administrative web-application login steps
+### Administrative Interface
 
-1. The staff member opens the administrative login route.
-2. The administrative web application checks for an existing Clerk session. If none exists, it displays the Clerk email-and-password login form.
-3. The staff member enters an email address and password, and the web application submits the credentials through Clerk’s supported web SDK.
-4. If the credentials are invalid, the dashboard displays a generic login error.
-5. If the email is not verified, access is blocked and the staff member is returned to the verification flow.
-6. Clerk requires the staff member to complete MFA before staff access is granted.
-7. After successful authentication and MFA, the web application activates the Clerk session and sends the current session token to NestJS.
-8. NestJS validates the token and loads the internal `users` record from PostgreSQL.
-9. NestJS verifies that the account is active and that the nullable `users.staff_role` field contains `moderator`, `editor`, or `administrator`.
-10. If no staff role is assigned, the person remains a normal Registered User and is denied access to the administrative application.
-11. If a staff role is assigned, NestJS loads the applicable assignment scopes and the dashboard opens only the routes authorized for that role and scope.
+1. A staff user opens the protected administrative interface.
+2. An unauthenticated user is redirected to the Clerk login screen.
+3. Clerk validates the credentials and requires multifactor authentication for staff access.
+4. Clerk creates the session and provides a short-lived session token.
+5. The administrative interface sends the token to the NestJS API.
+6. The API validates the token, maps the Clerk identifier to the internal user, and loads the user’s active staff role and assigned scopes from PostgreSQL.
+7. The backend authorizes each requested route and operation according to the active role, account status, and assigned scope.
+8. A Moderator or Editor without the required scope receives `403 Forbidden`. A user without an active staff role cannot enter the administrative interface.
+9. Authentication failures return the user to login without exposing whether a particular account or staff role exists.
 
 ```mermaid
 flowchart TD
@@ -223,6 +221,12 @@ flowchart TD
 ## Password change
 
 An authenticated user may change the password through a Clerk-managed account-security flow. Sensitive credential changes may require recent authentication. When a password change is completed as a security reset, the same all-session revocation rule applies.
+
+### Password-Reset Session Policy
+
+A successful password reset revokes every existing Clerk session for the account on all devices. The password-reset flow does not preserve the session used to complete the reset. After the reset succeeds, the user must authenticate again using the new password.
+
+If session revocation fails, the reset is not treated as fully completed. The failure must be logged as a security event and retried or escalated. This policy applies to registered users and staff accounts.
 
 ---
 
@@ -385,46 +389,45 @@ The fallback must:
 
 ---
 
-# 10. Role Storage and Synchronization
+# 10. Role Storage and Authorization Synchronization
+
+Clerk is responsible for authentication, identity verification, session management, and token issuance. PostgreSQL is the authoritative source for TDA account status, staff roles, assignment scopes, and application permissions.
+
+Registered-user capabilities are inherent. A standard registered user does not require a row in `user_roles`.
+
+Staff authorization uses the following persistence model:
+
+- `user_roles` stores current and historical Moderator, Editor, and Administrator assignments.
+- A partial unique index permits only one active staff role per user.
+- `moderator_community_scopes` limits Moderators to assigned communities.
+- `editor_entity_scopes` limits Editors to assigned sports, leagues, or teams.
+- Administrator permissions are platform-wide but remain subject to restricted role-management and audit requirements.
+- The previous staff role must be revoked before another role becomes active.
+- Role or scope assignments must record the assigning user, approving user, business reason, assignment time, and any later revocation.
+- Self-assignment, self-approval, and self-expansion of roles or scopes are prohibited.
+- Administrator-role changes require the restricted process and an independent authorized approver.
+- The initial Administrator bootstrap is the only permitted exception and must be separately documented and audited.
+
+## Assignment-Scope Tables
+
+| Table | Applicable role | Scope stored | Enforcement |
+|---|---|---|---|
+| `moderator_community_scopes` | Moderator | One assigned community per active scope record | The Moderator may act only within communities having an active, non-revoked scope |
+| `editor_entity_scopes` | Editor | One assigned sport, league, or team per active scope record | The Editor may manage content and sports data only within an active, non-revoked entity scope |
+
+Each scope record must reference its corresponding active `user_roles` assignment and record the assigning user, independent approving user, business reason, assignment time, and optional revocation time.
+
+An `editor_entity_scopes` record must identify exactly one scope target: a sport, league, or team. Revoked scopes remain stored for audit history but grant no authorization.
+
+Application roles must not use Clerk public or private metadata as their authoritative storage location. If a role or scope appears in a token or client-side session state, it is only a temporary cache. The NestJS API must verify current authorization against PostgreSQL before performing protected actions.
+
+After a role, scope, or account-status change, active sessions must be revoked or forced to reevaluate authorization. Clerk and PostgreSQL identifiers are connected through `users.clerk_id`; application roles are not independently synchronized back into Clerk.
 
 ## Source of truth
 
 PostgreSQL is the only authoritative source for TDA roles and assignment scopes.
 
 Roles must not be trusted from editable client data or user-controlled Clerk metadata.
-
-## Final storage decision
-
-The `users` table will contain a nullable `staff_role` field because each account may have only one staff role.
-
-- `staff_role = NULL` means the account is a normal Registered User with no staff access.
-- The only non-null values are:
-  - `moderator`
-  - `editor`
-  - `administrator`
-- The database schema must enforce the allowed values through an enum or equivalent check constraint.
-- A separate `user_roles` table is not required for Version 1.
-
-## Assignment scopes
-
-The authorization model requires explicit scope records.
-
-Recommended scope tables include:
-
-- `moderator_community_assignments`
-- `editor_sport_assignments`
-- `editor_league_assignments`
-- `editor_team_assignments`
-
-Each assignment should store:
-
-- Staff user ID
-- Assigned entity ID
-- Assigning Administrator
-- Assignment timestamp
-- Optional revocation timestamp
-
-Administrators do not require entity-scope rows because their approved access is platform-wide.
 
 ## Role-change behavior
 
@@ -569,9 +572,7 @@ The exact frontend framework for the administrative web application is outside t
 
 # 13. Account-Deletion Behavior
 
-TDA uses immediate soft deletion, immediate deletion of the Clerk identity, and delayed anonymization of remaining TDA-owned personal data.
-
-The Clerk account is deleted during the immediate deletion workflow, after the internal account has been marked `soft_deleted` and all active Clerk sessions have been revoked. The 30-day period applies only to anonymizing the remaining personal fields stored by TDA; it does not delay deletion of the Clerk account.
+The Clerk account is permanently deleted at the scheduled execution time, 30 days after the verified deletion request. During the waiting period, the internal account remains `soft_deleted`, all active Clerk sessions remain revoked, and the user cannot authenticate or access protected features.
 
 ```mermaid
 flowchart TD
@@ -579,11 +580,25 @@ flowchart TD
     B --> C[Set internal status to soft_deleted]
     C --> D[Block protected access immediately]
     D --> E[Revoke all Clerk sessions and disable push devices]
-    E --> F[Delete Clerk user through the Clerk Backend API]
-    F --> G[Retain authored content as Deleted User]
-    G --> H[Wait 30 days]
-    H --> I[Anonymize remaining TDA personal fields]
+    E --> F[Retain blocked account for 30 days]
+    F --> G[Delete Clerk user]
+    G --> H[Delete or anonymize approved personal data]
+    H --> I[Mark deletion request completed]
 ```
+
+## Account Deletion
+
+1. The authenticated user selects **Delete Account** and completes identity verification.
+2. After verification succeeds, the NestJS API creates the deletion request in `account_deletion_requests`.
+3. The request immediately revokes all active Clerk sessions, changes the internal user to `soft_deleted`, sets `deleted_at`, and revokes active staff roles and scopes.
+4. The account can no longer authenticate or perform protected actions.
+5. Personal-data deletion or anonymization is scheduled for 30 days after the verified request, subject to the approved privacy and retention policy.
+6. At the scheduled execution time, the backend permanently deletes the corresponding Clerk user account through the Clerk Backend API and deletes or anonymizes internal personal data that is not subject to an approved retention exception.
+7. Required moderation, security, financial, or audit records are retained only as permitted by the approved retention policy and must no longer expose unnecessary personal information.
+8. The deletion request becomes `completed` only after Clerk deletion and the required internal deletion or anonymization operations both succeed.
+9. If Clerk deletion or internal processing fails, the request remains incomplete, the failure is recorded in `audit_events`, and processing must be retried or escalated.
+
+Deleting the internal database record alone does not constitute completed account deletion. The corresponding Clerk account must be explicitly and permanently deleted at the scheduled execution time.
 
 ## Immediate actions
 
@@ -595,7 +610,6 @@ flowchart TD
 - Disable active push-device records.
 - Remove active staff role and scope assignments.
 - Prevent the account from being used as a moderation or publishing identity.
-- After the internal account is blocked and its sessions are revoked, delete the Clerk user through the Clerk Backend API during the same deletion workflow.
 - Retain the internal `clerk_id` temporarily only as needed to complete or retry the external deletion step; it is cleared during the 30-day anonymization cleanup.
 
 ## Retained records
@@ -707,20 +721,13 @@ The approved authentication model requires a small alignment with the current in
 
 ## Required changes
 
-1. Replace the cumulative role names with:
-   - `moderator`
-   - `editor`
-   - `administrator`
-
-2. Add a nullable `staff_role` field to `users` and enforce only one allowed staff role per user.
-
-3. Add explicit assignment-scope tables for Moderators and Editors.
-
-4. Preserve PostgreSQL as the authorization source of truth.
-
-5. Ensure that account deletion removes active role and scope assignments immediately while retaining required audit evidence.
-
-These changes align authentication, authorization, the roles-and-permissions document, and backend enforcement before implementation begins.
+1. Store current and historical staff-role assignments in `user_roles`.
+2. Permit only one active staff role per user through a partial unique index.
+3. Store Moderator scopes in `moderator_community_scopes`.
+4. Store Editor scopes in `editor_entity_scopes`.
+5. Record assigning and approving users for restricted role and scope changes.
+6. Preserve PostgreSQL as the authoritative source for authorization.
+7. Revoke active role and scope assignments when an account is deleted while retaining required audit evidence.
 
 ---
 
@@ -755,11 +762,13 @@ These changes align authentication, authorization, the roles-and-permissions doc
 
 ## PostgreSQL and Drizzle ORM
 
--  Enforce unique `clerk_id` for active identities.
--  Add the nullable `users.staff_role` field and enforce one staff role per account.
--  Add Moderator and Editor scope-assignment tables.
--  Preserve the approved soft-deletion and 30-day anonymization policy.
--  Add constraints and indexes required for role and scope checks.
+- Enforce unique `clerk_id` for active identities.
+- Implement current and historical staff assignments through `user_roles`.
+- Enforce only one active staff role per user.
+- Implement `moderator_community_scopes` and `editor_entity_scopes`.
+- Record required independent approvals and audit events.
+- Preserve the approved soft-deletion and 30-day deletion policy.
+- Add constraints and indexes required for role and scope checks.
 
 ---
 
@@ -787,4 +796,4 @@ Users will register with email and password, verify their email, and may use mul
 
 Public registration creates only Registered Users. Staff access is granted through controlled administrative processes. Each staff account may hold only one role: Moderator, Editor, or Administrator. Moderators and Editors are limited to assigned scopes; Administrators have approved platform-wide authority.
 
-Clerk webhooks will provide the primary user-synchronization mechanism, supported by safe first-request reconciliation. A successful password reset will revoke every existing Clerk session and require login again on every device. Account deletion will block access immediately, revoke all sessions, delete the Clerk identity during the immediate deletion workflow, retain necessary authored and moderation records under **Deleted User**, and anonymize approved TDA personal fields after 30 days.
+Clerk webhooks will provide the primary user-synchronization mechanism, supported by safe first-request reconciliation. A successful password reset will revoke every existing Clerk session and require login again on every device. Account deletion will block access immediately, revoke all sessions, permanently delete the Clerk identity at the scheduled 30-day execution time, retain necessary authored and moderation records under **Deleted User**, and anonymize approved TDA personal fields after 30 days.
