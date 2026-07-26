@@ -9,8 +9,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "typecheck": "pnpm --recursive --if-present run typecheck",
-    "test": "echo \"Tests will be added when application source code is initialized\"",
+    "typecheck": "node -e \"console.log('[TEMPORARY] No projects are available for type checking because the applications and packages have not been initialized.')\"",
+    "test": "node -e \"console.log('[TEMPORARY] No tests are configured because the applications and packages have not been initialized.')\"",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test"
   },
   "engines": {
