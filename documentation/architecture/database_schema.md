@@ -1489,7 +1489,7 @@ The three previously open MVP decisions are now confirmed. The following table r
 
 The schema now reflects the original Product Data Requirements and the additional Version 1 MVP features that affect the database, including posts and articles, likes, comments, same-post basic replies, comment reports, user blocking and muting, pinned community announcements, user language preferences, notification-category controls, push-delivery devices, approved data sources, verification records, and elevated platform roles.
 
-The design is ready for implementation. The three previously open MVP decisions are now incorporated into the schema: immediate user soft deletion with 30-day personal-data anonymization, an explicit final-game result type, and the approved cumulative role-permission matrix.
+The design is ready for implementation. The three previously open MVP decisions are now incorporated into the schema: immediate user soft deletion with 30-day personal-data anonymization, an explicit final-game result type, and the approved exclusive staff-role and assignment-scope model.
 
 External-provider identifiers are intentionally deferred until an approved provider exists. Period-by-period score data is optional and must not block the MVP implementation.
 

@@ -178,7 +178,7 @@ flowchart TD
 6. The API validates the token and maps the Clerk user identifier to `users.clerk_id`.
 7. The API checks the internal account status, onboarding status, active staff role, and applicable assignment scope.
 8. If the account is active, the application opens the appropriate authenticated screen. A user who has not completed onboarding is redirected to onboarding.
-9. Suspended, disabled, soft-deleted, or unrecognized accounts are denied access.
+9. Suspended, disabled, or unrecognized accounts are denied access. A soft-deleted account is denied ordinary application access but may complete recent identity verification only to view or cancel its deletion request during the 30-day grace period.
 
 ### Administrative Interface
 
@@ -259,7 +259,7 @@ When a user logs out from a mobile device:
 
 ## Suspensions and role changes
 
-- A suspended or deleted internal account must be denied access even if the Clerk session token is still cryptographically valid.
+- A suspended account must be denied protected access even if its Clerk session token remains cryptographically valid. A soft-deleted account is denied ordinary protected access but may use the limited deletion-request status and cancellation flow during the 30-day grace period after recent identity verification.
 - Role and scope authorization must be evaluated against PostgreSQL on protected requests.
 - Security-sensitive staff changes should revoke or force reevaluation of active sessions.
 
@@ -292,7 +292,7 @@ Every protected request must pass the following checks:
 4. The token is intended for an approved TDA client or authorized party.
 5. The token identifies a Clerk user.
 6. A matching internal `users` record exists or can be safely reconciled.
-7. The internal account status is `active`.
+7. The internal account status is `active`, except that deletion-request status and cancellation endpoints may accept a `soft_deleted` account during the 30-day grace period after recent identity verification.
 8. The required role is present.
 9. The staff member is assigned to the required scope when applicable.
 10. The authenticated user owns the resource when ownership is required.
@@ -572,18 +572,22 @@ The exact frontend framework for the administrative web application is outside t
 
 # 13. Account-Deletion Behavior
 
-The Clerk account is permanently deleted at the scheduled execution time, 30 days after the verified deletion request. During the waiting period, the internal account remains `soft_deleted`, all active Clerk sessions remain revoked, and the user cannot authenticate or access protected features.
+The Clerk account is permanently deleted at the scheduled execution time, 30 days after the verified deletion request. During the grace period, the internal account remains `soft_deleted`, existing sessions remain revoked, and ordinary protected access remains blocked. The owner may complete recent Clerk identity verification only to view or cancel the deletion request before anonymization or permanent Clerk-account deletion begins.
 
 ```mermaid
 flowchart TD
-    A[User requests account deletion] --> B[Require confirmation and recent authentication]
-    B --> C[Set internal status to soft_deleted]
-    C --> D[Block protected access immediately]
-    D --> E[Revoke all Clerk sessions and disable push devices]
-    E --> F[Retain blocked account for 30 days]
-    F --> G[Delete Clerk user]
-    G --> H[Delete or anonymize approved personal data]
-    H --> I[Mark deletion request completed]
+    A[User requests account deletion] --> B[Require confirmation and recent identity verification]
+    B --> C[Create deletion request]
+    C --> D[Set internal status to soft_deleted]
+    D --> E[Revoke sessions, staff assignments, and disable push devices]
+    E --> F[Begin 30-day grace period]
+    F --> G{Request cancelled before processing begins?}
+    G -->|Yes| H[Mark request cancelled]
+    H --> I[Restore internal account status to active]
+    G -->|No| J[Permanently delete Clerk user]
+    J --> K[Anonymize approved personal identity fields]
+    K --> L[Retain approved records under Deleted User]
+    L --> M[Mark deletion request completed]
 ```
 
 ## Account Deletion
@@ -591,12 +595,14 @@ flowchart TD
 1. The authenticated user selects **Delete Account** and completes identity verification.
 2. After verification succeeds, the NestJS API creates the deletion request in `account_deletion_requests`.
 3. The request immediately revokes all active Clerk sessions, changes the internal user to `soft_deleted`, sets `deleted_at`, and revokes active staff roles and scopes.
-4. The account can no longer authenticate or perform protected actions.
-5. Personal-data deletion or anonymization is scheduled for 30 days after the verified request, subject to the approved privacy and retention policy.
-6. At the scheduled execution time, the backend permanently deletes the corresponding Clerk user account through the Clerk Backend API and deletes or anonymizes internal personal data that is not subject to an approved retention exception.
-7. Required moderation, security, financial, or audit records are retained only as permitted by the approved retention policy and must no longer expose unnecessary personal information.
-8. The deletion request becomes `completed` only after Clerk deletion and the required internal deletion or anonymization operations both succeed.
-9. If Clerk deletion or internal processing fails, the request remains incomplete, the failure is recorded in `audit_events`, and processing must be retried or escalated.
+4. The account is denied ordinary mobile, administrative, and protected API access.
+5. Personal-data anonymization and permanent Clerk-account deletion are scheduled for 30 days after the verified request.
+6. During the grace period, the owner may complete recent Clerk identity verification only to view or cancel the deletion request.
+7. Cancellation is permitted only before anonymization or permanent Clerk-account deletion begins. When cancellation succeeds, the request becomes `cancelled`, the internal account returns to `active`, and the user must establish a new authenticated session. Previously revoked staff roles, assignment scopes, and push-device registrations are not restored automatically.
+8. If the request is not cancelled, the backend permanently deletes the corresponding Clerk user account at the scheduled execution time and deletes or anonymizes internal personal data that is not subject to an approved retention exception.
+9. Required moderation, security, financial, or audit records are retained only as permitted by the approved retention policy and must no longer expose unnecessary personal information.
+10. The deletion request becomes `completed` only after Clerk deletion and the required internal anonymization operations both succeed.
+11. If Clerk deletion or internal processing fails, the request remains incomplete, the failure is recorded in `audit_events`, and processing must be retried or escalated.
 
 Deleting the internal database record alone does not constitute completed account deletion. The corresponding Clerk account must be explicitly and permanently deleted at the scheduled execution time.
 
@@ -605,7 +611,8 @@ Deleting the internal database record alone does not constitute completed accoun
 - Require explicit confirmation.
 - Require recent identity verification.
 - Set `users.status = 'soft_deleted'` and record `deleted_at`.
-- Deny all protected actions immediately.
+- Deny all ordinary protected actions immediately.
+- Permit only the deletion-request status and cancellation flow during the 30-day grace period after recent identity verification.
 - Revoke all active Clerk sessions.
 - Disable active push-device records.
 - Remove active staff role and scope assignments.
@@ -667,7 +674,7 @@ Internal logs may contain diagnostic details, but user-facing responses must not
 | Email not verified | `403` | `AUTH_EMAIL_UNVERIFIED` | Return to email-verification flow |
 | Internal user temporarily missing | `503` after failed reconciliation | `AUTH_USER_SYNC_PENDING` | Show retry message; do not create duplicate accounts |
 | Suspended account | `403` | `ACCOUNT_SUSPENDED` | Block protected use and show support guidance |
-| Soft-deleted account | `403` | `ACCOUNT_DELETED` | End local session and block access |
+| Soft-deleted account | `403` | `ACCOUNT_DELETED` | Block ordinary access. During the 30-day grace period, direct the verified owner only to the deletion-request status or cancellation flow. |
 | Insufficient role | `403` | `AUTH_ROLE_REQUIRED` | Show generic no-permission message |
 | Outside assigned scope | `403` | `AUTH_SCOPE_REQUIRED` | Show generic no-permission message |
 | Resource not found | `404` | `RESOURCE_NOT_FOUND` | Show normal not-found state |
@@ -715,11 +722,11 @@ Each audit record identifies the actor, action, target, scope, reason, timestamp
 
 ---
 
-# 16. Required Database-Schema Alignment
+# 16. Implemented Database-Schema Alignment
 
-The approved authentication model requires a small alignment with the current initial database design.
+The initial database design has been aligned with the approved authentication and authorization model.
 
-## Required changes
+## Confirmed implementation
 
 1. Store current and historical staff-role assignments in `user_roles`.
 2. Permit only one active staff role per user through a partial unique index.
@@ -796,4 +803,4 @@ Users will register with email and password, verify their email, and may use mul
 
 Public registration creates only Registered Users. Staff access is granted through controlled administrative processes. Each staff account may hold only one role: Moderator, Editor, or Administrator. Moderators and Editors are limited to assigned scopes; Administrators have approved platform-wide authority.
 
-Clerk webhooks will provide the primary user-synchronization mechanism, supported by safe first-request reconciliation. A successful password reset will revoke every existing Clerk session and require login again on every device. Account deletion will block access immediately, revoke all sessions, permanently delete the Clerk identity at the scheduled 30-day execution time, retain necessary authored and moderation records under **Deleted User**, and anonymize approved TDA personal fields after 30 days.
+Clerk webhooks will provide the primary user-synchronization mechanism, supported by safe first-request reconciliation. A successful password reset will revoke every existing Clerk session and require login again on every device. Account deletion will block ordinary access immediately, revoke all existing sessions and staff assignments, provide a 30-day grace period during which the verified owner may view or cancel the request, permanently delete the Clerk identity if the request is not cancelled, retain necessary authored and moderation records under **Deleted User**, and anonymize the approved TDA personal fields after 30 days.

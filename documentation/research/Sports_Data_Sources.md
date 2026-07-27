@@ -1,42 +1,129 @@
 # Sports Data Sources & Ingestion Strategy
 
-## Sources List:
-- https://www.fiba.basketball/en/players (FIBA - International Basketball Federation)
-- https://beisboldobleapr.com (Beisbol Doble A - Puerto Rico Amateur Baseball League)
-- https://bsnpr.com (BSN - Baloncesto Superior Nacional)
-- https://fedpurvoli.com (FPV - Puerto Rican Volleyball Federation)
-- https://developers.facebook.com (Meta Graph API)
+## Status
 
+- **Decision status:** Approved for Version 1 / MVP
+- **MVP ingestion method:** Manual-first administrative entry
+- **Future integration strategy:** Licensed and authorized hybrid ingestion
 
-## Suggestions & Technical Notes:
-- Build a custom API using Python libraries like BeautifulSoup4 (BS4) and requests to extract static standings tables, or Selenium / Playwright to capture dynamic content from active seasons.
-- Research the Selenium package via PyPI for automated browser interaction as a secondary alternative to Playwright.
+---
 
+## 1. Candidate Sources
 
-## Data Extraction Methods Comparison
+The following official organizations and platforms may be used as verification references or future authorized integration candidates:
 
-| Method | Performance | Stability | Server Resource Usage | Ideal Use Case in Your List |
-| :--- | :--- | :--- | :--- | :--- |
-| **1. Hidden API (XHR/JSON)** | Extremely Fast | Medium (Breaks if internal API changes) | Minimal | **FIBA** and **BSN** |
-| **2. Static Scraping (`requests` + `BS4`)** | Fast | Low (HTML/CSS changes break selectors) | Low | **Beisbol Doble A** and **FPV** |
-| **3. Dynamic Scraping (`Playwright` / `Selenium`)** | Slow | Low (Depends on selectors and load times) | High | Fallback for JavaScript-heavy or protected pages |
-| **4. Official API (Meta Graph API)** | Fast | High (Officially supported by provider) | Minimal | **Meta Graph API** |
+- [FIBA](https://www.fiba.basketball/en/players)
+- [Béisbol Doble A](https://beisboldobleapr.com)
+- [Baloncesto Superior Nacional](https://bsnpr.com)
+- [Federación Puertorriqueña de Voleibol](https://fedpurvoli.com)
+- [Meta Graph API](https://developers.facebook.com)
 
+A source appearing in this list does not automatically authorize TDA to extract, store, or redistribute its information.
 
-## Proposed Extraction Strategy by Source
+---
 
-1. **Hidden Endpoints (Network / Fetch / XHR):**
-   - **Strategy:** Inspect internal JSON requests made by the browser using Browser DevTools (`F12`).
-   - **Priority for:** **BSN** and **FIBA**.
+## 2. Approved MVP Strategy — Manual-First Ingestion
 
-2. **Static Scraping (`requests` + `BeautifulSoup4`):**
-   - **Strategy:** Download raw HTML and parse standings tables and direct statistics.
-   - **Priority for:** **Beisbol Doble A** and **FPV**.
+Version 1 will use the protected administrative dashboard to enter and verify supported sports data manually.
 
-3. **Dynamic Scraping (`Playwright` / `Selenium`):**
-   - **Strategy:** Headless browser execution to handle dynamic JavaScript rendering or interactive UI elements.
-   - **Priority for:** Backup fallback for **BSN**, **FIBA**, **Beisbol Doble A**, or **FPV** if static requests fail or require client-side execution.
+Authorized staff may:
 
-4. **Official API (`Meta Graph API`):**
-   - **Strategy:** Consume via developer tokens for legal extraction of official page posts and announcements.
-   - **Priority for:** **Meta Graph API**.
+- Create and update supported sports entities.
+- Enter schedules and game-status changes.
+- Publish verified final scores.
+- Correct inaccurate records.
+- Record the official source used for verification.
+- Preserve the person, reason, date, and result of each material change.
+
+The MVP does not depend on an external sports-data provider, scraping process, hidden endpoint, browser-automation service, ingestion worker, or continuously running data pipeline.
+
+---
+
+## 3. Future Strategy — Licensed and Authorized Hybrid Ingestion
+
+After the MVP, TDA may add automated ingestion through:
+
+1. A licensed official API.
+2. A direct league or federation feed.
+3. A structured export supplied by the data owner.
+4. An explicitly authorized official-site importer.
+5. The Meta Graph API for approved official announcements and change signals.
+
+Potential future source assignments include:
+
+| Competition or use case | Preferred future source | MVP fallback |
+|---|---|---|
+| FIBA competitions | Licensed FIBA GDAP access | Manual verification from official FIBA information |
+| BSN | Licensed BSN or approved provider feed | Manual entry from official BSN records |
+| Béisbol Doble A | Direct federation feed or authorized importer | Manual entry from official schedules and results |
+| FPV competitions | Direct FPV/DataFPV agreement or authorized feed | Manual entry from official FPV records |
+| Postponements, venue changes, and urgent announcements | Approved official social or league feed | Manual verification |
+
+Each future integration requires separate approval before implementation.
+
+---
+
+## 4. Methods Not Approved for Production
+
+The following are not approved Version 1 production-ingestion methods:
+
+- Treating hidden XHR or JSON endpoints as public APIs.
+- Scraping an official website without written permission.
+- Using `requests`, BeautifulSoup, Selenium, or Playwright against a source without authorization.
+- Bypassing access controls, rate limits, authentication, or anti-automation protections.
+- Using social-media posts as the canonical source for scores or standings.
+- Depending on an unconfirmed provider for MVP operation.
+
+A technically accessible endpoint does not establish permission to use or redistribute its data.
+
+BeautifulSoup, Selenium, Playwright, or similar tools may only be evaluated after the data owner authorizes the exact access method, frequency, storage, and public-display use.
+
+---
+
+## 5. MVP Data Workflow
+
+The Version 1 workflow is:
+
+1. Identify an official or approved source.
+2. Confirm the information relevant to the supported MVP feature.
+3. Enter the data through the administrative dashboard.
+4. Record the source and direct reference when available.
+5. Review the information before public display.
+6. Publish it through the NestJS API.
+7. Record material changes in the audit history.
+
+Only scheduled games and verified final scores are required for Version 1. Continuously updating live scores remain Post-MVP.
+
+---
+
+## 6. Required Provenance
+
+Sports-data records and material corrections must preserve, when applicable:
+
+- Source organization.
+- Source URL or official reference.
+- Staff member who entered or verified the information.
+- Verification timestamp.
+- Internal notes or correction reason.
+- Result of the administrative action.
+
+Source records represent provenance and verification. They do not imply that an automated integration exists.
+
+---
+
+## 7. Requirements for a Future Automated Integration
+
+Before adding an automated source, the team must confirm:
+
+- Written authorization or a valid commercial license.
+- Public mobile-application display rights.
+- Rights to store, cache, and redistribute the data.
+- Allowed fields and historical retention.
+- Attribution requirements.
+- Rate limits and update frequency.
+- Media, logo, and athlete-image rights.
+- Correction and dispute procedures.
+- Technical documentation and provider support.
+- Required environment variables, credentials, monitoring, and operational ownership.
+
+The related integration must be proposed and approved through a separate issue before implementation.

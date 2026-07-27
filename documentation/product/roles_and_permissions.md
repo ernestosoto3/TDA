@@ -280,17 +280,18 @@ Every moderation action must record the actor, target, reason, time, scope, and 
 | View own report status | Yes | Yes | Yes | Yes |
 | Review and classify a report | No | Assigned communities | No | All |
 | Request additional review | No | Yes | No | Yes |
-| Close a community report | No | Assigned communities | No | All |
+| Resolve or dismiss a community report | No | Assigned communities | No | All |
 | Escalate a serious case | No | Yes | No | Yes |
 | Decide an appeal | No | No | No | Yes |
 | View platform-wide report analytics | No | No | No | Yes |
 
-Reports move through the following statuses:
+Reports use one shared lifecycle:
 
-1. `Open`
-2. `Under Review`
-3. `Actioned` or `Dismissed`
-4. `Closed`
+1. `pending`
+2. `in_review`
+3. `resolved` or `dismissed`
+
+`resolved` and `dismissed` are terminal states. An authorized reopen action may return a report to `in_review`, and that action must be preserved in the report history.
 
 The reviewer must record a reason for the decision.
 
@@ -443,12 +444,12 @@ Administrator-role changes must not be available through ordinary role-managemen
 
 ## 18. Delete an Account
 
-- **Allowed roles:** The account owner may request deletion. An Administrator or approved automated process may execute the request.
-- **Conditions:** The account owner’s identity and confirmation must be verified. Applicable retention requirements must also be reviewed.
-- **Result:** Personal data is deleted or anonymized, and the account can no longer be used.
-- **Restrictions:** Account deletion cannot replace suspension. Protected records must be handled under the approved retention policy.
-- **Authentication:** Required. Recent identity verification may also be required.
-
+- **Allowed roles:** The account owner may request deletion and may cancel the request during the approved grace period. An Administrator or approved automated process may complete the request.
+- **Conditions:** Recent identity verification and explicit confirmation are required. Creating the request immediately soft-deletes the internal account, revokes active sessions, revokes active staff roles and scopes, and schedules personal-data anonymization for 30 days later.
+- **Grace period:** The owner may cancel the request only during the 30-day grace period and before anonymization or Clerk-account deletion begins.
+- **Result:** If the request is not cancelled, the approved personal identity fields are anonymized after 30 days and the Clerk user is permanently deleted. Approved authored content, moderation evidence, and audit records remain linked to the retained internal user identifier and are displayed publicly under **Deleted User** where applicable.
+- **Restrictions:** Account deletion cannot replace suspension and must not be used as a moderation punishment. Protected retained records must follow the approved privacy, security, legal, moderation, and audit-retention requirements.
+- **Authentication:** Required. Recent Clerk identity verification is required for requesting or cancelling deletion.
 ---
 
 # Authentication Requirements
@@ -495,15 +496,16 @@ Before allowing a staff action, the backend must verify:
 # Account Deletion and Personal Data
 
 - Authenticated users may request deletion of their own account and personal data.
-- The request requires confirmation and identity verification because it is destructive.
-- Only an Administrator or an approved automated process may execute the request.
-- Staff cannot delete an account merely as a moderation action.
-- Suspension and deletion are separate actions.
-- Personal data must be deleted or anonymized according to the approved privacy and retention policy.
-- Records required for security, fraud prevention, legal obligations, moderation review, or auditing may be retained with restricted access.
-- Personal identifiers in retained records should be minimized when possible.
-- Public community content retained after account deletion must no longer expose the deleted user’s personal identity unless legally required.
-- The system must record the request, verification, status, and completion date without retaining unnecessary deleted data.
+- Recent identity verification and explicit confirmation are required because the action is destructive.
+- Creating the request immediately changes the internal account to `soft_deleted`, records the deletion timestamp, revokes active sessions, and revokes active staff-role and scope assignments.
+- The deletion request enters a 30-day grace period.
+- The account owner may cancel only during that grace period and before anonymization or Clerk-account deletion begins.
+- If the request is not cancelled, the system permanently deletes the Clerk user after 30 days and anonymizes the approved personal identity fields.
+- The retained internal user identifier may continue linking approved posts, comments, messages, moderation evidence, deletion records, and audit records.
+- Retained public content must identify the author as **Deleted User** and must not expose the deleted user’s former personal identity.
+- Staff cannot delete an account as a moderation action. Suspension and deletion remain separate processes.
+- Records retained for security, fraud prevention, legal obligations, moderation review, or auditing must use restricted access and contain only the minimum necessary identifying information.
+- The system must record the request, identity verification, lifecycle status, cancellation or completion date, and responsible process without retaining unnecessary deleted data.
 
 ---
 

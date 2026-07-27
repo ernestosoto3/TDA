@@ -31,8 +31,7 @@ The MVP begins with verified manual or administrator-managed sports data. It doe
 - `database_schema.md`
 - `roles_and_permissions.md`
 
-Where the database schema and the later roles-and-permissions document differ, this contract follows the roles-and-permissions document and identifies the required alignment before implementation.
-
+The database schema, this API contract, and the roles-and-permissions document use the same approved authorization model: one active staff role per account, separate Moderator and Editor permissions, scoped assignments for those roles, and platform-wide Administrator authority.
 ## Status
 
 - **Document type:** REST and real-time API contract
@@ -127,7 +126,7 @@ The backend must:
 
 1. Validate the token signature, issuer, audience, and expiration.
 2. Resolve the Clerk subject to an active TDA user.
-3. reject suspended or soft-deleted accounts.
+3. Reject suspended accounts and reject soft-deleted accounts from ordinary protected endpoints. During the 30-day deletion grace period, a soft-deleted account may access only the deletion-request status and cancellation flow after recent Clerk identity verification.
 4. Authorize the requested action using the server-side role and assignment scope.
 
 Authentication proves identity; authorization determines whether that identity may perform the action ([authentication guide](https://medium.com/@raphyabak/authentication-a-developers-complete-guide-efa42b429569)).
@@ -138,10 +137,10 @@ The API uses the documented product-role names. Existing internal database value
 
 | Contract role | Internal database value | Scope |
 |---|---|---|
-| Registered User | No `user_roles` row | Own account and ordinary authenticated features |
+| Registered User | No active `user_roles` row | Own account and ordinary authenticated features |
 | Moderator | `moderator` | Assigned communities only |
-| Editor | `content_administrator` | Assigned sports entities and content only |
-| Administrator | `system_administrator` | Platform-wide administrative authority |
+| Editor | `editor` | Assigned sports entities and content only |
+| Administrator | `administrator` | Platform-wide administrative authority |
 
 The API follows the documented roles-and-permissions document:
 
@@ -152,7 +151,7 @@ The API follows the documented roles-and-permissions document:
 - Every staff mutation must verify role, assignment scope, account status, and applicable conflict-of-interest rules.
 - Sensitive staff actions may require recent authentication and MFA.
 
-The database authorization model must be aligned with these rules before implementation if it still permits multiple or cumulative staff roles.
+PostgreSQL is the source of truth for application authorization and must enforce one active staff role per account together with the applicable active Moderator or Editor scope assignments.
 
 ### Authorization Labels Used in Endpoint Tables
 
@@ -615,11 +614,13 @@ In the tables below, `Paginated<T>` means the standard collection response conta
 | `PUT /users/me/onboarding` | `{ favoriteTargets: [{ entityType, entityId }], skippedFavorites: boolean }` | Owner | `200` → `{ onboardingCompleted, favorites }` |
 | `POST /users/me/deletion-requests` | `{ confirmation, reason? }`; recent verification token when required | Owner | `202` → `{ id, status, requestedAt, scheduledAnonymizationAt }` |
 | `GET /users/me/deletion-request` | None | Owner | `200` → current deletion-request status |
-| `DELETE /users/me/deletion-request` | None; allowed only before processing begins | Owner | `204` |
+| `DELETE /users/me/deletion-request` | None; recent identity verification required; allowed only during the 30-day grace period before anonymization or Clerk-account deletion begins | Owner | `204` |
 
-Creating a deletion request immediately ends active application sessions and starts the approved soft-deletion workflow. Personal identity fields are anonymized after 30 days, subject to approved retention requirements.
+Creating a deletion request immediately revokes active sessions, changes the internal user status to `soft_deleted`, records the deletion timestamp, revokes active staff roles and scopes, and schedules anonymization for 30 days later.
 
-Credential, email verification, password, MFA, and session operations remain Clerk responsibilities.
+During that grace period, the owner may reauthenticate only to view or cancel the deletion request. Cancellation is no longer allowed once anonymization or Clerk-account deletion begins. If the request is not cancelled, the system anonymizes the approved identity fields after 30 days, permanently deletes the Clerk user, and retains approved authored content, moderation evidence, and audit records under **Deleted User**.
+
+Credential, email verification, password, MFA, and ordinary session operations remain Clerk responsibilities.
 
 ### User Preferences and Devices
 

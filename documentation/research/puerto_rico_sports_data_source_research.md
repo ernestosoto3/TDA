@@ -1,8 +1,8 @@
 # Puerto Rico Sports Data Sources and Ingestion Strategy
 
 **Research date:** July 23, 2026  
-**Decision status:** Pending team approval  
-**Scope:** Puerto Rican sports schedules, results, live scores, teams, athletes, standings, statistics, and historical information
+**Decision status:** Approved for Version 1 planning  
+**Scope:** Research covering current MVP requirements and possible future sports-data capabilities. Version 1 requires scheduled games and verified final scores; live scores, standings, advanced statistics, and historical expansion remain Post-MVP unless separately approved.
 
 ---
 
@@ -31,7 +31,12 @@ A hidden JSON/XHR endpoint is only a technical transport mechanism. It is **not 
 
 ### Recommendation
 
-Proceed with **Option A: Licensed and authorized hybrid ingestion**. Use a manual-first pilot while commercial and federation agreements are negotiated. Do not make unauthorized scraping a production dependency.
+The approved strategy has two stages:
+
+- **Version 1 implementation:** Option C — Manual-First Pilot.
+- **Future production automation:** Option A — Licensed and Authorized Hybrid Ingestion.
+
+Version 1 will operate through verified manual administrative entry and will not depend on scraping, hidden endpoints, or an external provider. Option A may be implemented later after the applicable licenses, written authorizations, technical access, and redistribution rights are confirmed.
 
 ---
 
@@ -619,6 +624,8 @@ Enter schedules, teams, standings, and final results through an admin panel whil
 
 ## 10. Recommended Technical Architecture
 
+The architecture below is the target for a future authorized integration phase. It is not required for the Version 1 MVP. The MVP uses the `manual_admin` path through the existing administrative dashboard, validation rules, PostgreSQL database, and audit records; it does not require source adapters, an event queue, an ingestion scheduler, or automated polling.
+
 ```text
 Official APIs / Authorized Feeds / Approved Website Importers / Admin Entries
                                 |
@@ -708,7 +715,7 @@ Final official records should override earlier live values while preserving the 
 
 ## 11. Proposed Update Frequencies
 
-These are implementation targets, not provider guarantees.
+These are Post-MVP planning targets for future authorized integrations, not Version 1 requirements or provider guarantees. They do not authorize polling or automated extraction from any source.
 
 | Data type | Target frequency |
 |---|---|
@@ -878,35 +885,21 @@ Scale: 1 = poor/high difficulty, 5 = excellent/low difficulty.
 
 ## 17. Decisions Required from the Team
 
-The issue can be closed after the team records decisions for the following:
-
-1. Which leagues are required in the MVP?
-2. Is true live scoring required in the MVP, or are final results sufficient for Doble A and FPV?
-3. What annual or monthly data budget is acceptable?
-4. Will the public product expose data through its own API, or only display it in the application?
-5. How much historical depth is required at launch?
-6. Are team logos and athlete images required?
-7. Who will contact FIBA, BSN/Sportradar, Doble A, and FPV?
-8. Who is authorized to perform and approve manual corrections?
-9. What freshness threshold will the product use before labeling a live source as delayed?
-10. Does the team approve the partner-first hybrid recommendation?
-
-### Proposed approval record
+The team approves the following planning decision:
 
 ```text
-Selected strategy: Option A — Licensed and Authorized Hybrid Ingestion
-Temporary MVP fallback: Option C — Manual-First Pilot
-Approved by:
-Approval date:
-Conditions or budget limits:
-Provider contacts assigned to:
+Selected future strategy: Option A — Licensed and Authorized Hybrid Ingestion
+Version 1 implementation: Option C — Manual-First Pilot
+Unauthorized production scraping: Not approved
+Hidden endpoints without owner authorization: Not approved
+Automated live-data ingestion in Version 1: Not included
 ```
 
 ---
 
 ## 18. Final Recommendation
 
-Adopt a **multi-source, partner-first architecture**.
+Adopt a two-stage strategy: **manual-first administration for Version 1** and a **multi-source, partner-first authorized architecture for future automation**.
 
 - Use **FIBA GDAP** for Puerto Rico's FIBA basketball competitions.
 - Pursue a **licensed BSN or Sportradar feed** for BSN.

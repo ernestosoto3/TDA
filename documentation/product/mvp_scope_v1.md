@@ -147,7 +147,7 @@ The Home feed provides an immediate summary of what is happening in Puerto Rico 
 
 ## 4. Local Sports News and Posts
 
-Version 1 will support administrator-published content such as:
+Version 1 will support official content published by an authorized Editor within an assigned sports-entity scope or by an Administrator, including:
 
 * Local sports articles
 * Breaking-news updates
@@ -165,7 +165,7 @@ Content may be published with or without an image. This allows TDA to publish im
 
 Scores and schedules provide facts, but articles and posts provide context. Curated news helps TDA become a daily sports destination instead of only functioning as a scoreboard.
 
-Restricting publishing to authorized administrators during Version 1 also reduces misinformation, spam, and content-moderation risks.
+Restricting publishing to authorized Editors within their assigned scopes and Administrators during Version 1 reduces misinformation, spam, and content-moderation risks.
 
 ---
 
@@ -396,10 +396,11 @@ Authenticated users will be able to comment on supported posts and articles.
 Version 1 comments will include:
 
 * Create a comment
+* Reply to a comment using one basic reply level
 * View comments
 * Delete the user's own comment
 * Report a comment
-* Administrator moderation
+* Manual moderation by an assigned Moderator or an Administrator
 
 ### Why It Was Selected
 
@@ -498,7 +499,7 @@ Version 1 will include:
 * Pinned administrator announcements
 * Report messages
 * Block and mute users
-* Administrator moderation
+* Manual moderation by an assigned Moderator or an Administrator
 * Basic community notifications
 
 Version 1 will not include:
@@ -521,7 +522,7 @@ The first Community release will remain intentionally limited because real-time 
 
 ## 21. Admin Dashboard
 
-A protected web-based admin dashboard will allow authorized administrators to:
+A protected web-based admin dashboard will allow authorized Moderators, Editors, and Administrators to access only the tools permitted by their role and assigned scope. Through this dashboard, authorized staff will be able to:
 
 * Manage sports
 * Manage leagues
@@ -553,12 +554,12 @@ The admin dashboard provides a controlled way to maintain the application's info
 Version 1 will define at least the following roles:
 
 * Public visitor
-* Authenticated user
+* Registered User
 * Moderator
-* Content administrator
-* System administrator
+* Editor
+* Administrator
 
-Protected actions will be verified by the backend.
+Each staff account may have only one active staff role. Moderators operate within assigned communities, Editors operate within assigned sports-entity scopes, and Administrators have platform-wide authority subject to restricted approval and conflict-of-interest rules.Protected actions will be verified by the backend.
 
 ### Why It Was Selected
 
@@ -570,18 +571,20 @@ Different permissions are required for publishing content, managing sports infor
 
 Version 1 will include operational controls for:
 
-* Recording the source of sports information
-* Restricting publishing permissions
-* Reviewing reported posts, comments, and messages
-* Removing prohibited content
-* Blocking or restricting abusive users
-* Maintaining basic moderation records
+* Recording the source of official sports information
+* Restricting official publishing to authorized Editors and Administrators
+* Allowing users to create text comments, basic comment replies, and text-only community messages
+* Allowing users to report posts, comments, messages, and users
+* Reviewing reports manually
+* Hiding or restoring prohibited content
+* Warning or temporarily restricting abusive users
+* Maintaining report-action, moderation, and audit records
 
-Sports information should come from official leagues, teams, federations, or other approved and verified sources.
+Sports information should come from official leagues, teams, federations, or other approved and verified sources. Automated AI moderation, user-created posts, user-uploaded community media, and automated approval or rejection are not part of Version 1.
 
 ### Why It Was Selected
 
-Accuracy and safety are core product principles. Users must be able to trust schedules and final scores, while comments and communities must have moderation before they become publicly available.
+Accuracy and safety are core product principles. Users must be able to trust schedules and final scores, while comments and community messages must have reporting, manual-review, and moderation controls. Eligible comments and text-only messages do not require automatic AI approval before publication.
 
 ---
 
@@ -831,7 +834,7 @@ Version 1 will be considered usable when a user can:
 * Manage account and privacy settings
 * Delete their account and associated data
 
-Administrators must be able to:
+Authorized staff must be able to perform the following actions according to their role and assigned scope:
 
 * Manage supported sports, leagues, teams, and athletes
 * Add and update schedules

@@ -3,7 +3,7 @@
 ## 1. Users
 * **Purpose:** Represent registered users on the platform (fans, community members, and administrators).
 * **Ownership & Source:** Created directly by the user upon registration.
-* **Lifecycle & Deletion:** `Active` -> `Suspended` -> `Soft-Deleted` (grace period before permanent purge).
+* **Lifecycle & Deletion:** `Active` -> `Suspended` or `Soft-Deleted`. A verified deletion request immediately soft-deletes the account and starts a 30-day grace period. If the request is not cancelled before processing begins, approved personal identity fields are anonymized and the Clerk identity is permanently deleted. The internal user record may remain to preserve approved authored content, moderation evidence, and audit relationships.
 
 ### Information to Store 
 | Field | Required/Optional | Source |
@@ -24,6 +24,15 @@
 * **Searchable Fields:** Username, email address, full name.
 * **Media / File Attachments:** Profile photo.
 
+### Approved Account-Deletion Behavior
+
+- A deletion request immediately blocks ordinary account access and revokes active sessions.
+- The owner may view or cancel the request during the 30-day grace period after recent identity verification.
+- Cancellation is no longer permitted once anonymization or permanent Clerk-account deletion begins.
+- If the request is completed, email, username, first and last name, profile photo, and the Clerk reference are cleared.
+- The retained internal user identifier may continue linking approved posts, comments, messages, moderation evidence, and audit records.
+- Retained public content must display the author as **Deleted User**.
+- Account deletion must not be used as a moderation punishment.
 ---
 
 ## 2. Sports
@@ -177,29 +186,67 @@
 ---
 
 ## 8. Posts
-* **Purpose:** Admin-curated news, official updates, or moderated community discussions.
-* **Ownership & Source:** System administrators / Authorized users.
-* **Lifecycle & Deletion:** `Draft` -> `Published` -> `Hidden` -> `Soft-Deleted`.
+
+* **Purpose:** Store official news, articles, announcements, and sports updates published on behalf of TDA or an approved sports entity.
+* **Ownership & Source:** Created by an authorized Editor within an assigned sports-entity scope or by an Administrator. Registered Users and Moderators cannot create general posts or articles.
+* **Lifecycle & Deletion:** `Draft` -> `Scheduled` or `Published` -> `Archived`, `Hidden`, or `Soft-Deleted`.
 
 ### Information to Store
-**Information to Store**
+
 | Field | Required/Optional | Source |
 |---|---|---|
 | Unique post identifier | Required | Internal |
-| Author user | Required | Internal |
-| Content text | Required | Author-provided |
-| Attached cover media (images provided officially) | Optional | Author-provided |
-| Related community or game | Optional | Author-selected |
-| Publication date and time | Required | Internal |
-| Visibility status | Required | Internal |
-
+| Authorized staff author | Required | Internal |
+| Content type (`post` or `article`) | Required | Staff-selected |
+| Title | Required for articles / Optional for short posts | Staff-entered |
+| Excerpt | Optional | Staff-entered |
+| Content body | Required | Staff-entered |
+| Official cover media | Optional | Authorized staff-provided |
+| Related sports entities, game, or community | Optional | Staff-selected |
+| Publication or scheduled-publication date and time | Required when applicable | Internal / Staff-selected |
+| Visibility and lifecycle status | Required | Internal |
 
 ### Information to Display
-* **Mobile App:** Post header, timestamp, post text, official cover media, and associated game/community tag.
+
+* **Mobile App:** Official author information, publication timestamp, title or excerpt when applicable, content body, official cover media, and related sports-entity, game, or community tags.
 
 ### Data Attributes
-* **Searchable Fields:** Content text.
-* **Media / File Attachments:** Cover media.
+
+* **Searchable Fields:** Title, excerpt, and content.
+* **Media / File Attachments:** Official cover media only.
+* **MVP Exclusion:** General user-created posts, user-created articles, and user-uploaded community media are not supported.
+
+
+## 8.1 Comments and Replies
+
+* **Purpose:** Allow authenticated users to participate through text comments and basic replies on supported published content.
+* **Ownership & Source:** Created by the authenticated user who submits the comment or reply.
+* **Lifecycle & Deletion:** `Active` -> `Hidden` or `Soft-Deleted`.
+
+### Information to Store
+
+| Field | Required/Optional | Source |
+|---|---|---|
+| Unique comment identifier | Required | Internal |
+| Associated post or article | Required | Internal |
+| Author user | Required | Internal |
+| Parent comment identifier | Optional | User-selected when submitting a reply |
+| Comment text | Required | User-provided |
+| Status | Required | Internal |
+| Creation and update timestamps | Required | Internal |
+| Soft-deletion timestamp | Optional | Internal |
+
+### Information to Display
+
+* **Mobile App:** Author display information, comment text, timestamp, and basic reply relationship.
+* After account deletion, retained comments or replies display the author as **Deleted User**.
+
+### Data Attributes
+
+* **Searchable Fields:** Excluded from public MVP search.
+* **Media / File Attachments:** None.
+* **Reply Depth:** Version 1 supports one basic reply level.
+* **Moderation:** Comments and replies may be reported and reviewed manually by an assigned Moderator or an Administrator.
 
 ---
 
@@ -274,6 +321,13 @@
 * **Searchable Fields:** N/A (message history search is excluded for V1).
 * **Media / File Attachments:** None (media uploads in community chat are excluded for V1).
 
+### Moderation Behavior
+
+- Eligible authenticated community members may create text-only messages.
+- Messages may be hidden or soft-deleted while the underlying record is preserved for review.
+- Moderation is performed manually by a Moderator assigned to the community or by an Administrator.
+- Automated AI moderation is not included in Version 1 and remains Post-MVP.
+
 ---
 
 ## 12. Notifications
@@ -303,21 +357,21 @@
 ---
 
 ## 13. Reports
-* **Purpose:** Manage user reports for offensive messages or content moderation.
-* **Ownership & Source:** Submitted by users; processed manually by administrators.
-* **Lifecycle & Deletion:** `Pending` -> `In Review` -> `Resolved` -> `Dismissed`.
+* **Purpose:** Manage user-submitted reports involving posts, comments, community messages, or users.
+* **Ownership & Source:** Submitted by authenticated users and processed manually by a Moderator within an assigned community or by an Administrator.
+* **Lifecycle & Deletion:** `Pending` -> `In Review` -> `Resolved` or `Dismissed`.
 
 ### Information to Store
 | Field | Required/Optional | Source |
 |---|---|---|
 | Unique report identifier | Required | Internal |
 | Reporting user | Required | Internal |
-| Reported entity type (Post, Message, User) | Required | User-selected |
+| Reported entity type (Post, Comment, Message, or User) | Required | User-selected |
 | Reported entity identifier | Required | Internal |
 | Reason for report | Required | User-provided |
 | Current review status | Required | Internal |
 | Admin internal notes | Optional | Admin-entered |
-| Resolving administrator | Optional (set on resolution) | Internal |
+| Resolving staff user | Optional (required when resolved or dismissed) | Internal |
 | Creation timestamp and resolution timestamp | Required (creation) / Optional (resolution, until resolved) | Internal |
 
 ### Information to Display

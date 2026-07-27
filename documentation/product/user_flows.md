@@ -502,33 +502,67 @@ Version 1 does not include community message reactions, threaded replies, or use
 
 ---
 
-## 14. Delete an Account
+## 14. Delete or Cancel an Account-Deletion Request
 
 **Starting point:** Settings sub-page.
 
-**Authentication required:** Yes. Recent identity verification may be required.
+**Authentication required:** Yes. Recent identity verification is required when requesting or cancelling deletion.
 
-### Flow
+### Request Account Deletion
 
 1. Open the User & Settings tab.
 2. Select the gear icon.
 3. Open the account or privacy settings.
 4. Select **Delete Account**.
-5. Review the deletion warning and its consequences.
+5. Review the consequences of deletion, the 30-day grace period, the retained-record policy, and the cancellation deadline.
 6. Confirm the deletion request.
-7. Complete identity verification when required.
-8. TDA deletes or schedules deletion of the account and associated data.
-9. The user is logged out.
-10. The authentication screen opens.
+7. Complete recent identity verification.
+8. TDA creates the deletion request.
+9. TDA immediately:
+   - Changes the internal account status to `soft_deleted`.
+   - Revokes active sessions.
+   - Revokes active staff roles and scopes when applicable.
+   - Disables active push-device records.
+   - Blocks ordinary application access.
+10. TDA schedules personal-data anonymization and permanent Clerk-account deletion for 30 days later.
+11. The authentication screen opens.
 
-**Completion point:** The account is deleted or scheduled for deletion, the session ends, and the authentication screen appears.
+**Completion point:** The account enters the 30-day grace period, ordinary access is blocked, and deletion processing is scheduled.
+
+### View or Cancel the Request During the Grace Period
+
+1. Open TDA during the 30-day grace period.
+2. Select the account-deletion recovery or cancellation option.
+3. Complete recent identity verification with Clerk.
+4. Review the deletion-request status and scheduled processing date.
+5. Select **Cancel Account Deletion**.
+6. Confirm the cancellation.
+7. TDA verifies that anonymization and permanent Clerk-account deletion have not begun.
+8. TDA marks the deletion request as `cancelled`.
+9. The internal account returns to `active`.
+10. The user logs in again and re-registers notification devices when applicable.
+
+Previously revoked staff roles and scopes are not restored automatically. A new authorized assignment is required.
+
+**Completion point:** The deletion request is cancelled and ordinary account access is restored.
+
+### Completed Deletion
+
+If the request is not cancelled before processing begins:
+
+1. TDA permanently deletes the Clerk account.
+2. TDA anonymizes the approved personal identity fields.
+3. Approved authored content and required moderation or audit records remain linked to the retained internal identifier.
+4. Retained public content displays the author as **Deleted User**.
+5. The deletion request becomes `completed`.
+6. Cancellation is no longer available.
 
 ### States
 
-- **Loading:** The deletion request is being processed.
-- **Empty:** Not applicable.
-- **Success:** The account is deleted or scheduled for deletion.
-- **Error:** Verification fails or the deletion request cannot be completed.
+- **Loading:** The request, identity verification, cancellation, or final deletion operation is being processed.
+- **Empty:** No active deletion request exists.
+- **Success:** The request is scheduled, cancelled, or completed.
+- **Error:** Identity verification fails, processing cannot be completed, or cancellation is attempted after anonymization or permanent Clerk-account deletion has begun.
 
 ---
 

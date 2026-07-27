@@ -140,7 +140,7 @@ Seed scripts must be repeatable and must not create duplicates.
 
 Production seeding must be a deliberate command and must not run automatically on every deployment. Never seed fake public scores, users, or news in production.
 
-Because the MVP uses manual sports-data entry, it will not include scraping or automated data ingestion unless TDA obtains written permission or uses an approved API.
+Version 1 uses manual, administrator-managed sports-data entry. Hidden endpoints, scraping, Selenium, Playwright, and other automated website-extraction methods are not approved production dependencies. Future automation may use only a licensed API, an owner-authorized feed, or another explicitly permitted access method approved through a separate issue.The MVP therefore does not require provider polling credentials, scraping workers, headless-browser services, ingestion queues, or source-specific automated jobs in Local, Staging, or Production. Provider-specific secrets and infrastructure must be introduced only when an authorized integration is approved and implemented.
 
 ## Railway Strategy
 
@@ -242,7 +242,7 @@ Rollback decisions must consider the API and database together. Restoring an ear
 * Which error-monitoring provider will be used in production?
 * Where and how will the admin dashboard be hosted?
 * How frequently will production backups occur, and how long will they be retained?
-* Which method is approved for accessing sports data?
+* The sports-data access decision is already confirmed: Version 1 uses manual administrative entry, while future automation must follow the licensed and authorized hybrid strategy.
 * Which production domains and application identifiers will be used?
 * Who will be authorized to manage production secrets and deployments?
 

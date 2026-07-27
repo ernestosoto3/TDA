@@ -145,9 +145,8 @@ Live scoring is reserved for a future version. A scheduled notification stating 
 | Like | **Me gusta** | Included |
 | Comments | **Comentarios** | Included |
 | Add comment | **Comentar** | Included |
-| Reply | **Responder** | Post-MVP |
-| View comments | **Ver comentarios** | Included |
-| View replies | **Ver respuestas** | Post-MVP |
+| Reply to a comment | **Responder** | Included; one basic reply level |
+| View comment replies | **Ver respuestas** | Included; one basic reply level |
 | Delete own comment | **Eliminar comentario** | Included |
 | Share | **Compartir** | Included |
 | Related posts | **Publicaciones relacionadas** | Included |
@@ -156,6 +155,8 @@ Live scoring is reserved for a future version. A scheduled notification stating 
 | Highlights | **Jugadas destacadas** | Post-MVP |
 | Basic game statistics | **Estadísticas del juego** | Included |
 | Advanced box score | **Estadísticas avanzadas del juego** | Post-MVP |
+
+**Reply rule:** **Responder** and **Ver respuestas** apply only to the single basic comment-reply level included in Version 1. Threaded replies inside community chats remain Post-MVP.
 
 ---
 
@@ -356,15 +357,26 @@ Use **Reportar** as the standard user-facing action. Do not alternate between **
 | Restrict user | **Restringir usuario** |
 | Suspend user | **Suspender usuario** |
 
+### Report Lifecycle Rule
+
+Reports use the following single lifecycle:
+
+1. **Pendiente** — internal value `pending`
+2. **En revisión** — internal value `in_review`
+3. **Resuelto** — internal value `resolved`
+4. **Desestimado** — internal value `dismissed`
+
+A report moves from **Pendiente** to **En revisión** and then ends as either **Resuelto** or **Desestimado**. Do not use **Abierto**, **Accionado**, or **Cerrado** as additional report statuses.
+
 ## Platform Roles
 
 | Role | Approved Spanish term |
 |---|---|
 | Public visitor | **Visitante** |
-| Authenticated user | **Usuario registrado** |
+| Registered User | **Usuario registrado** |
 | Moderator | **Moderador** |
-| Content administrator | **Administrador de contenido** |
-| System administrator | **Administrador del sistema** |
+| Editor | **Editor** |
+| Administrator | **Administrador** |
 
 ---
 
