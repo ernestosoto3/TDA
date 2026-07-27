@@ -52,10 +52,14 @@ Public visitors may browse public sports information whenever possible. Authenti
 1. Open TDA.
 2. Select **Create Account**.
 3. Enter the required account information.
-4. Accept the applicable terms and policies.
-5. Submit the registration form.
-6. Complete account verification when required.
-7. Continue to onboarding.
+4. Display links to the current Terms of Service and Privacy Policy.
+5. Require the user to confirm that they are at least 13 years old.
+6. Require affirmative acceptance of the current required policy versions through an unchecked control.
+7. Record each policy acceptance before completing registration.
+8. Reject registration when an acceptance is missing or references an outdated required policy version.
+9. Submit the registration form.
+10. Complete account verification when required.
+11. Continue to onboarding.
 
 **Completion point:** The account is created and the user enters onboarding.
 
@@ -556,6 +560,8 @@ If the request is not cancelled before processing begins:
 4. Retained public content displays the author as **Deleted User**.
 5. The deletion request becomes `completed`.
 6. Cancellation is no longer available.
+
+Privacy, retention, account deletion, and policy acceptance must follow [`privacy_retention_and_terms.md`](privacy_retention_and_terms.md). Account access is blocked immediately after a verified deletion request, while permanent Clerk deletion and approved internal-data processing occur 30 days later.
 
 ### States
 

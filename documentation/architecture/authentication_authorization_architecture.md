@@ -161,6 +161,11 @@ flowchart TD
 - Duplicate-email and invalid-password errors are handled through Clerk and presented with user-friendly Spanish messages.
 - The initial public role is always Registered User.
 - Staff access is granted only after registration through an authorized administrative process.
+- Registration must display links to the current Terms of Service and Privacy Policy.
+- The user must confirm that they meet the minimum-age requirement.
+- Registration requires affirmative acceptance of every required current policy version through an unchecked control.
+- The NestJS API must record the applicable policy acceptances before registration is considered complete.
+- Missing or outdated required policy acceptance prevents registration from completing.
 
 ---
 
@@ -605,6 +610,8 @@ flowchart TD
 11. If Clerk deletion or internal processing fails, the request remains incomplete, the failure is recorded in `audit_events`, and processing must be retried or escalated.
 
 Deleting the internal database record alone does not constitute completed account deletion. The corresponding Clerk account must be explicitly and permanently deleted at the scheduled execution time.
+
+Privacy, retention, account deletion, and policy acceptance must follow [`privacy_retention_and_terms.md`](../product/privacy_retention_and_terms.md). That document is authoritative for retention periods, approved exceptions, policy-version tracking, and user-facing disclosures.
 
 ## Immediate actions
 

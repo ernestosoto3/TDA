@@ -507,6 +507,8 @@ Before allowing a staff action, the backend must verify:
 - Records retained for security, fraud prevention, legal obligations, moderation review, or auditing must use restricted access and contain only the minimum necessary identifying information.
 - The system must record the request, identity verification, lifecycle status, cancellation or completion date, and responsible process without retaining unnecessary deleted data.
 
+Privacy, retention, account deletion, and policy acceptance must follow [`privacy_retention_and_terms.md`](privacy_retention_and_terms.md). Administrators may authorize documented retention exceptions but may not bypass the approved deletion process or alter published policy versions.
+
 ---
 
 # Prohibited Role Combinations and Conflicts
