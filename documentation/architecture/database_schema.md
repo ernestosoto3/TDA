@@ -1589,8 +1589,35 @@ The three previously open MVP decisions are now confirmed. The following table r
 | Athlete roster history | Store only `current_team_id` | Add `athlete_team_assignments` later if historical rosters are required |
 | Game schedule history | Keep one authoritative scheduled timestamp | Add `game_schedule_revisions` later if change history must be audited |
 | Media model | Store one URL per required media field | Add a reusable `media_assets` table later for variants, ownership, captions, and moderation |
+| Automated moderation | Excluded from the MVP; Version 1 uses reports, manual review, staff actions, escalations, and audit events | Defer provider signals, automated assessments, moderation jobs, rules-engine versions, and related retention requirements to the dedicated Post-MVP moderation milestone |
 | Audit history | Store immutable administrative and security events in the append-only `audit_events` table | Implemented as required persistence |
 | Time-zone display | Store UTC `TIMESTAMPTZ`; convert in the client | Add venue-local time-zone identifiers if schedule display requires them |
+
+### Post-MVP Automated Moderation Persistence
+
+The Version 1 schema does not include automated-moderation jobs, provider responses, classification results, confidence scores, or rules-engine decisions. The current `reports`, `report_actions`, `moderation_escalations`, `user_warnings`, content-status fields, and `audit_events` tables support the approved manual moderation process.
+
+The dedicated Post-MVP moderation milestone must evaluate separate entities for:
+
+- Moderation jobs and queue-processing state
+- Normalized provider signals
+- Automated assessments and recommendations
+- Rules-engine versions and evaluated policy rules
+- Human-review assignments and overrides
+- Provider attempts, failures, and retry history
+- Appeals linked to automated or staff decisions
+
+A proposed moderation job lifecycle is:
+
+`queued` → `processing` → `completed` or `failed`
+
+A proposed assessment lifecycle is:
+
+`pending_review` → `confirmed`, `overridden`, `dismissed`, or `escalated`
+
+These names are architectural proposals and must not be added as PostgreSQL enums or tables until the Post-MVP design is approved.
+
+Future moderation records must define retention, access restrictions, deletion behavior, provider-data minimization, and audit requirements before implementation. Raw provider responses must not be retained by default when normalized minimum evidence is sufficient.
 
 ### Confirmed implementation decisions
 

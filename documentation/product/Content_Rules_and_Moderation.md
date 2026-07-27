@@ -195,17 +195,66 @@ Publishing, moderation, report resolution, escalation, protected-information acc
 
 ---
 
-## 8. Post-MVP Moderation Proposal
+## 8. Post-MVP Automated Moderation Architecture
 
-The following capabilities are excluded from Version 1 and may be researched for a future fan-contribution release:
+### Status and Target
 
-- User-submitted posts or articles.
-- User-uploaded images or videos.
-- AI or NLP topic classification.
-- Automated keyword or policy screening.
-- Computer-vision media screening.
-- Automatic approval or rejection.
-- Editorial queues for fan submissions.
-- Automated risk scoring or moderation recommendations.
+Automated moderation is excluded from Version 1. The MVP uses user reports, manual review, staff actions, escalation records, and append-only audit events.
 
-These capabilities require separate product approval, service selection, data-model changes, privacy review, accuracy testing, moderation procedures, and implementation issues before they may be added.
+Automated moderation is formally deferred to a dedicated Post-MVP moderation milestone after the Version 1 launch. It must not be implemented until the product, privacy, security, moderation, and architecture owners approve its scope.
+
+No moderation provider, NLP model, media-safety service, confidence threshold, or automatic enforcement policy has been selected.
+
+### Proposed Architecture
+
+A future automated-moderation pipeline may use the following flow:
+
+1. The user submits eligible content.
+2. The backend performs the existing synchronous validation, authorization, rate-limiting, and spam-prevention checks.
+3. An approved background queue submits eligible content to one or more moderation-provider adapters.
+4. Text or media services return normalized policy categories, confidence scores, and provider metadata.
+5. A TDA-owned rules engine evaluates the signals against approved thresholds and policy rules.
+6. The system creates a moderation assessment and, when required, places the content in a human-review queue.
+7. An authorized Moderator or Administrator reviews the content, context, automated signals, and applicable policy.
+8. The final action and its actor, reason, result, and supporting evidence are preserved in the moderation and audit history.
+
+The provider adapters must prevent external provider-specific responses from becoming the application’s permanent internal contract.
+
+### Human Review and Enforcement
+
+Automated signals must be treated as decision support unless a separately approved policy authorizes a limited automatic action.
+
+The initial Post-MVP implementation must not automatically suspend users, permanently delete content, issue permanent penalties, or close appeals solely from an automated score.
+
+Authorized staff must remain able to review, override, escalate, and audit automated recommendations. Users must have access to the applicable appeal or review process when an automated signal materially affects their content or account.
+
+### Future Technical Requirements
+
+Before implementation, the Post-MVP moderation milestone must define and approve:
+
+- Supported content types
+- Selected text and media moderation providers
+- Provider fallback and outage behavior
+- Queue and retry architecture
+- Rules-engine ownership and versioning
+- Policy categories and confidence thresholds
+- Human-review requirements
+- Allowed automatic actions, if any
+- Database entities and retention periods
+- API and administrative-dashboard contracts
+- Privacy and security controls
+- Accuracy, bias, and false-positive testing
+- Monitoring, cost limits, and operational ownership
+- User notice and appeal requirements
+
+Possible future capabilities include:
+
+- AI or NLP topic and policy classification
+- Automated keyword or policy screening
+- Computer-vision media screening
+- Risk scoring and prioritization
+- Moderator recommendations
+- Review-queue prioritization
+- User-submitted post, article, image, or video review
+
+These requirements are an architecture proposal, not an approved provider selection or Version 1 implementation commitment.

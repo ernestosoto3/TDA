@@ -35,6 +35,7 @@ Search
 Possible Future Additions
 ├── Redis
 ├── BullMQ
+├── Automated moderation services
 └── AWS
 ```
 
@@ -270,6 +271,24 @@ BullMQ may be added for background and scheduled jobs such as:
 
 BullMQ requires Redis, so Redis would need to be added before BullMQ.
 
+### Automated Moderation Services
+
+Automated moderation is not part of Version 1. The MVP uses user reports, manual staff review, moderation actions, escalations, and audit records.
+
+A dedicated Post-MVP moderation milestone may introduce:
+
+- Text and media moderation-provider adapters
+- Redis and BullMQ or another approved queue system
+- A TDA-owned rules engine
+- Normalized moderation signals and confidence scores
+- Human-review queue prioritization
+- Provider fallback, retry, and outage handling
+- Monitoring, cost controls, and accuracy evaluation
+
+No moderation provider, NLP model, media-safety service, or enforcement threshold has been selected.
+
+Provider selection requires product, privacy, security, moderation, and architecture approval. Automated signals must not create permanent enforcement actions without the separately approved human-review and appeal requirements documented in `Content_Rules_and_Moderation.md`.
+
 ### AWS
 
 AWS may be considered later if the application requires more advanced infrastructure, greater control, or additional scalability.
@@ -292,7 +311,7 @@ The selected technology stack is:
 - **Notifications:** Expo Notifications and Firebase Cloud Messaging
 - **Hosting:** Railway
 - **Search:** PostgreSQL Full-Text Search
-- **Possible future additions:** Redis, BullMQ, and AWS
+- **Possible future additions:** Redis, BullMQ, automated moderation services, and AWS
 
 This stack provides a strong starting point for the application while keeping the architecture organized, scalable, and flexible.
 

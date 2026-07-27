@@ -1037,6 +1037,10 @@ Only zero or one linked sport, league, or team is permitted.
 
 Allowed report resolutions include `no_violation`, `content_hidden`, `user_warned`, `community_muted`, `platform_suspension`, and `escalated`. A Moderator may not apply a platform-wide suspension; the backend must reject that action even if submitted by the client.
 
+All Version 1 moderation endpoints support manual, report-based moderation. The API does not expose automated classifications, provider scores, AI recommendations, automated enforcement decisions, or moderation-job endpoints.
+
+Those contracts are deferred to the dedicated Post-MVP moderation milestone. Any future automated-moderation API must define provider-independent assessment schemas, human-review and override behavior, failure handling, retention controls, audit requirements, and appeal behavior before approval.
+
 ### Admin Users and Roles
 
 | Method and route | Parameters or body | Auth | Success |
