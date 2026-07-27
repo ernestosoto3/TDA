@@ -73,6 +73,8 @@ The following enums should be created through Drizzle `pgEnum` definitions.
 | `report_action_type` | `assignment`, `review`, `warning`, `hide`, `restore`, `mute`, `escalate`, `resolve`, `dismiss`, `reopen` |
 | `escalation_status` | `open`, `reviewing`, `resolved`, `cancelled` |
 | `audit_result` | `succeeded`, `denied`, `failed` |
+| `policy_type` | `terms_of_service`, `privacy_policy` |
+| `policy_status` | `draft`, `published`, `superseded`, `withdrawn` |
 
 A public visitor is not represented by a database user record. Every non-deleted row in `users` represents an authenticated user. A soft-deleted row may remain as an anonymized reference so authored content and moderation evidence can be retained. Elevated platform permissions are assigned through `user_roles`.
 
@@ -768,6 +770,82 @@ Audit events are append-only. Ordinary application and staff operations may inse
 
 Audit events must cover publishing and editing official content, sports-data changes, moderation actions, report resolution and escalation, warnings, protected-information access, deletion-request processing, role changes, and scope changes.
 
+### 4.31 `policy_versions`
+
+Stores each version of the Terms of Service and Privacy Policy presented to users. Published policy content and version identifiers are immutable. A new database record must be created whenever a published policy changes.
+
+| Field | Type | Nullable | Description |
+|---|---|---:|---|
+| `id` | `uuid` | No | Primary key |
+| `policy_type` | `policy_type` | No | Identifies whether the record represents the Terms of Service or Privacy Policy |
+| `version` | `varchar(50)` | No | Human-readable version identifier |
+| `title` | `varchar(255)` | No | User-facing policy title |
+| `document_url` | `text` | No | Public location of the published policy document |
+| `content_hash` | `varchar(64)` | No | SHA-256 hash used to verify the exact published content |
+| `status` | `policy_status` | No | Lifecycle status; defaults to `draft` |
+| `requires_acceptance` | `boolean` | No | Whether users must accept this version; defaults to `true` |
+| `created_by_user_id` | `uuid` | Yes | Administrator who created the policy-version record |
+| `published_at` | `timestamptz` | Yes | Date and time the policy was published |
+| `effective_at` | `timestamptz` | Yes | Date and time the policy became or will become effective |
+| `superseded_at` | `timestamptz` | Yes | Date and time the version stopped being current |
+| `created_at` | `timestamptz` | No | Record creation time; defaults to the current timestamp |
+
+#### Constraints
+
+- Primary key on `id`.
+- Foreign key from `created_by_user_id` to `users.id`.
+- Unique constraint on (`policy_type`, `version`).
+- `content_hash` must contain exactly 64 characters.
+- A `published` policy must have both `published_at` and `effective_at`.
+- A `superseded` policy must have `superseded_at`.
+- Only one published, required, and non-superseded version may be current for each `policy_type`.
+- Published policy content, version identifiers, document locations, and content hashes must not be modified. Policy corrections require a new version.
+
+#### Lifecycle and Retention
+
+Policy versions follow:
+
+`draft` → `published` → `superseded`
+
+A policy may be marked `withdrawn` before publication or when removal is required. Published and superseded versions must be retained while their acceptance records or approved legal, audit, or security requirements depend on them. They must not be physically deleted through ordinary administrative operations.
+
+---
+
+### 4.32 `policy_acceptances`
+
+Stores evidence that a registered user affirmatively accepted a specific policy version. Acceptance records are append-only and must identify the exact policy version accepted.
+
+| Field | Type | Nullable | Description |
+|---|---|---:|---|
+| `id` | `uuid` | No | Primary key |
+| `user_id` | `uuid` | No | User who accepted the policy |
+| `policy_version_id` | `uuid` | No | Exact policy version accepted by the user |
+| `acceptance_source` | `varchar(50)` | No | Source of acceptance, such as registration or required reacceptance |
+| `application_version` | `varchar(50)` | Yes | Mobile or administrative application version used during acceptance |
+| `security_evidence` | `jsonb` | Yes | Approved minimal security evidence associated with the acceptance |
+| `accepted_at` | `timestamptz` | No | Date and time of affirmative acceptance; defaults to the current timestamp |
+| `created_at` | `timestamptz` | No | Record creation time; defaults to the current timestamp |
+
+#### Constraints
+
+- Primary key on `id`.
+- Foreign key from `user_id` to `users.id`.
+- Foreign key from `policy_version_id` to `policy_versions.id`.
+- Unique constraint on (`user_id`, `policy_version_id`).
+- An acceptance may reference only a published policy version.
+- The same user may not record more than one acceptance for the same policy version.
+- Acceptance records are immutable after creation.
+- Registration must not be completed unless the user has accepted every required current policy version.
+- Validation that the referenced policy version is published must be enforced by the NestJS service or a database trigger because a normal check constraint cannot inspect another table.
+
+#### Lifecycle and Retention
+
+Policy acceptances do not have an editable lifecycle. Once recorded, an acceptance is immutable.
+
+Acceptance records must be retained only for the period required by the approved privacy, retention, legal, audit, and security requirements. When an account is permanently processed for deletion, these records must be deleted or anonymized unless a documented retention exception applies. Any retained evidence must be limited to the minimum information necessary.
+
+
+
 ## 5. Relationship Summary
 
 ### One-to-One
@@ -812,6 +890,9 @@ Audit events must cover publishing and editing official content, sports-data cha
 | `users` | `notifications` | One user receives many notifications |
 | `users` | `reports` | One user may submit many reports |
 | `users` | `reports` | One authorized Moderator, Editor, or Administrator may resolve many reports |
+| `users` | `policy_versions` | One Administrator may create multiple policy-version records |
+| `users` | `policy_acceptances` | One user may accept multiple policy versions |
+| `policy_versions` | `policy_acceptances` | One policy version may receive many user acceptances |
 
 ### Many-to-Many
 
@@ -857,6 +938,9 @@ Audit events must cover publishing and editing official content, sports-data cha
 | Sports, leagues, and teams to `editor_entity_scopes` | `ON DELETE RESTRICT`; archive the entity or revoke the scope |
 | Reports to `user_warnings`, `report_actions`, and `moderation_escalations` | `ON DELETE RESTRICT` to preserve moderation history |
 | Users to scheduled posts through `scheduled_by_user_id` | `ON DELETE RESTRICT`; the approved deletion flow retains the anonymized user row |
+| Users to `policy_versions.created_by_user_id` | `ON DELETE SET NULL` to preserve policy-version history |
+| Users to `policy_acceptances` | `ON DELETE RESTRICT`; the normal account-deletion process retains an anonymized user row, while any purge must follow the approved retention policy |
+| `policy_versions` to `policy_acceptances` | `ON DELETE RESTRICT`; a policy version with acceptance evidence must not be deleted |
 
 The MVP should avoid hard deletion of sports, leagues, teams, athletes, communities, posts, comments, messages, and reported users while dependent records exist. Lifecycle state changes are preferred. User deletion is now defined as immediate soft deletion followed by personal-data anonymization after 30 days; authored posts, comments, and messages remain linked to the retained user row and are displayed under **Deleted User**.
 
@@ -902,6 +986,8 @@ The MVP should avoid hard deletion of sports, leagues, teams, athletes, communit
 | `editor_entity_scopes` | `assigned_at`, `revoked_at` |
 | `account_deletion_requests` | `status`, `requested_at`, `identity_verified_at`, `scheduled_for`, `completed_at`, `cancelled_at` |
 | `audit_events` | `occurred_at` |
+| `policy_versions` | `status`, `published_at`, `effective_at`, `superseded_at`, `created_at` |
+| `policy_acceptances` | `accepted_at`, `created_at` |
 
 `updated_at` should be maintained in application code or through a PostgreSQL trigger. Drizzle does not automatically update this field unless the application explicitly sets it. A scheduled cleanup job must anonymize soft-deleted users once `deleted_at` is at least 30 days old.
 
@@ -933,6 +1019,9 @@ PostgreSQL automatically indexes primary keys and unique constraints. Additional
 - `moderation_escalations(status, created_at ASC)`.
 - `audit_events(actor_user_id, occurred_at DESC)`.
 - `audit_events(target_type, target_id, occurred_at DESC)`.
+- Unique composite index on `policy_versions(policy_type, version)`.
+- Partial unique index on `policy_versions(policy_type)` where `status = 'published'`, `requires_acceptance = true`, and `superseded_at IS NULL`.
+- `policy_versions(policy_type, status, effective_at DESC)` for retrieving current policies.
 
 ### Foreign-key and relationship indexes
 
@@ -952,6 +1041,10 @@ PostgreSQL automatically indexes primary keys and unique constraints. Additional
 - `messages(community_id, sent_at DESC)`.
 - `notifications(user_id, is_read, created_at DESC)`.
 - `reports(status, created_at ASC)`.
+- `policy_versions(created_by_user_id)` where `created_by_user_id IS NOT NULL`.
+- Unique composite index on `policy_acceptances(user_id, policy_version_id)`.
+- `policy_acceptances(user_id, accepted_at DESC)`.
+- `policy_acceptances(policy_version_id, accepted_at DESC)`.
 
 ### Schedule and feed indexes
 
@@ -1069,6 +1162,9 @@ erDiagram
     USERS ||--o{ REPORTS : resolves
     USERS ||--o{ USER_BLOCKS : blocks
     USERS ||--o{ USER_MUTES : mutes
+    USERS o|--o{ POLICY_VERSIONS : creates
+    USERS ||--o{ POLICY_ACCEPTANCES : accepts
+    POLICY_VERSIONS ||--o{ POLICY_ACCEPTANCES : receives
 
     SPORTS ||--o{ LEAGUES : contains
     LEAGUES ||--o{ LEAGUE_TEAMS : includes
@@ -1413,6 +1509,24 @@ erDiagram
         jsonb metadata
         timestamptz occurred_at
     }
+    POLICY_VERSIONS {
+        uuid id PK
+        policy_type policy_type
+        varchar version
+        policy_status status
+        boolean requires_acceptance
+        uuid created_by_user_id FK
+        timestamptz effective_at
+}
+
+    POLICY_ACCEPTANCES {
+        uuid id PK
+        uuid user_id FK
+        uuid policy_version_id FK
+        varchar acceptance_source
+        varchar application_version
+        timestamptz accepted_at
+}
 ```
 
 ## 11. Drizzle ORM Implementation Guidance
