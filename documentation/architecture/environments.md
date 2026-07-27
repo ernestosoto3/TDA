@@ -17,7 +17,7 @@ Each environment must use isolated configuration, databases, credentials, storag
 | Environment | Purpose | Data | Access |
 | --- | --- | --- | --- |
 | Local | Build features and run tests without affecting shared systems | Local or fictional seed data | Individual contributors |
-| Pull-request validation | Run the currently available formatting, linting, type-checking, and testing checks; build validation becomes mandatory after application initialization | Temporary or mocked test data | Automated workflow |
+| Pull-request validation | Run formatting, linting, type-checking, and testing checks; build and OpenAPI contract validation become mandatory after the corresponding application workspaces are initialized | Temporary or mocked test data | Automated workflow |
 | Staging | Test complete user flows before release | Stable fictional data | Project team and approved testers |
 | Production | Serve real users | Real, approved data | Public users and authorized administrators |
 
@@ -213,6 +213,8 @@ An external error-monitoring provider must be selected before public production 
 - Treat any committed secret as compromised even if the commit is later deleted.
 
 ## Deployment Process
+
+After the NestJS API is initialized, pull-request validation must also generate and validate the committed OpenAPI specification. A deployment cannot proceed when the generated specification is outdated, invalid, or contains an unapproved breaking change to `/api/v1`.
 
 ```text
 Pull request

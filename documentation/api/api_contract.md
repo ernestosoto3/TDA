@@ -1238,27 +1238,125 @@ Clear requirements reduce ambiguity, rework, and inconsistent implementation acr
 
 ---
 
-## OpenAPI Implementation Requirements
+## OpenAPI Contract and Automated Validation
 
-This Markdown document is the documented human-readable contract pending final team approval. During implementation, the backend should generate or maintain an OpenAPI 3 specification containing:
+### Milestone 0 Status
 
-- Every route and method in this document
+This Markdown document is the approved human-readable API design for the MVP. The executable OpenAPI specification and automated contract checks will be introduced when the NestJS API is initialized during Milestone 1.
+
+Milestone 0 does not require an empty or manually maintained OpenAPI file because no controllers, DTOs, or API workspace currently exist from which to generate and verify it.
+
+### Contract Ownership
+
+During implementation, TDA will maintain two synchronized representations of the API contract:
+
+- `documentation/api/api_contract.md` defines the approved product behavior, endpoint requirements, authorization rules, and response expectations.
+- `documentation/api/openapi.json` will be the generated, machine-readable OpenAPI 3 specification for the implemented HTTP API.
+
+The NestJS controllers, DTOs, validation rules, and OpenAPI decorators must generate an OpenAPI specification consistent with this approved contract. A pull request must not introduce an undocumented endpoint or silently change approved behavior.
+
+When an intentional API change is required, the Markdown contract, implementation, DTOs, tests, and generated OpenAPI specification must be updated together.
+
+### Generation Requirements
+
+When `apps/api` is initialized, the API implementation must:
+
+- Install and configure `@nestjs/swagger`.
+- Use `DocumentBuilder` and `SwaggerModule.createDocument()` to generate the OpenAPI document.
+- Generate the specification from the same NestJS modules, controllers, DTOs, and validation rules used by the running API.
+- Write the generated artifact to:
+
+```text
+documentation/api/openapi.json
+```
+
+- Provide a deterministic generation command:
+
+```text
+pnpm openapi:generate
+```
+
+- Produce the same output when run repeatedly without source changes.
+- Avoid environment-specific server URLs, secrets, credentials, or private infrastructure information in the committed specification.
+
+### Required OpenAPI Content
+
+The generated OpenAPI specification must include:
+
+- Every implemented REST route and HTTP method
+- Stable and unique operation identifiers
 - Path and query parameter schemas
 - Request-body schemas
-- Success and error response schemas
-- Bearer authentication requirements
+- Success-response schemas
+- Standard error-response schemas
+- Bearer-authentication requirements
 - Role and scope descriptions
 - Enum values
 - Pagination metadata
-- Examples
+- Relevant examples
+- Operation tags organized by API domain
+- Deprecation metadata when an operation is being retired
 
-Required automated contract checks:
+Every protected operation must declare the appropriate bearer-authentication security requirement. Public operations must be explicitly documented as public.
 
-- OpenAPI document validates successfully.
-- Every implemented controller operation appears in OpenAPI.
-- Every protected operation declares its security requirement.
-- Request and response DTOs match the shared contract schemas.
-- Breaking changes to `/api/v1` fail pull-request validation unless explicitly approved.
+Real-time WebSocket events remain documented in the Real-Time Contract section unless an approved AsyncAPI specification is introduced later.
+
+### Required Commands
+
+After the NestJS API is initialized, the repository must provide:
+
+```text
+pnpm openapi:generate
+pnpm openapi:lint
+pnpm openapi:check
+```
+
+These commands will have the following responsibilities:
+
+| Command | Responsibility |
+|---|---|
+| `pnpm openapi:generate` | Generate `documentation/api/openapi.json` from the NestJS implementation |
+| `pnpm openapi:lint` | Validate the generated specification against OpenAPI structure and the approved linting rules |
+| `pnpm openapi:check` | Generate the specification, confirm the committed artifact is current, run linting, and execute the configured contract checks |
+
+### Pull-Request Contract Checks
+
+After the API workspace is initialized, `.github/workflows/pull-request-checks.yml` must run:
+
+```text
+pnpm openapi:check
+```
+
+The contract check must fail when:
+
+- The generated OpenAPI document is invalid.
+- The committed OpenAPI artifact differs from freshly generated output.
+- An implemented controller operation is absent from OpenAPI.
+- A protected operation does not declare its security requirement.
+- Required request, response, parameter, or error schemas are missing.
+- Duplicate or unstable operation identifiers are detected.
+- A prohibited breaking change is introduced to `/api/v1`.
+
+### Breaking-Change Policy
+
+The following changes to `/api/v1` are considered breaking unless explicitly reviewed and approved:
+
+- Removing an operation
+- Removing or renaming a request or response field
+- Making an optional request field required
+- Changing a field to an incompatible type or format
+- Removing an accepted enum value
+- Removing a documented success response
+- Changing authentication or authorization requirements incompatibly
+- Making an existing validation rule more restrictive without an approved migration plan
+
+An approved breaking change must include a migration plan. When compatibility cannot be preserved, the change must be introduced through a new API version rather than silently changing `/api/v1`.
+
+### Milestone 1 Activation
+
+The OpenAPI artifact, generation script, validation dependency, package scripts, and CI command must be added in the same implementation work that initializes the NestJS API.
+
+Until then, the existing pull-request workflow continues running formatting, linting, type checking, and tests without an OpenAPI command that cannot yet execute.
 
 ---
 

@@ -175,6 +175,8 @@ Pull requests into `main` automatically run:
 - ESLint
 - Type checking
 - Tests
+- Build validation after the application workspaces are initialized
+- OpenAPI generation, freshness validation, linting, and breaking-change checks after the NestJS API is initialized
 
 The automated checks are configured in:
 
@@ -183,6 +185,8 @@ The automated checks are configured in:
 ```
 
 A pull request must not be merged when a required check fails.
+
+The OpenAPI checks are activated during API implementation because the placeholder repository does not yet contain the NestJS API, controllers, DTOs, generation script, or generated specification. Once activated, `pnpm openapi:check` must be included in the automated pull-request workflow and the repository-level `pnpm check` command.
 
 ## Testing Strategy
 
