@@ -2,7 +2,7 @@
 
 ## Overview
 
-TDA will use three deployable environments:
+TDA will use three environment tiers: one local development tier and two hosted deployment environments:
 
 - **Local:** Individual development on a contributor's computer.
 - **Staging:** Internal validation in infrastructure that resembles production.

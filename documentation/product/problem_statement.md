@@ -97,4 +97,4 @@ TDA solves the problem of scattered and difficult-to-find Puerto Rico sports inf
 The app is needed because local sports fans currently do not have one centralized platform where they can easily follow teams, check scores, view schedules, read updates, and stay connected with the local sports community.
 
 By focusing on Puerto Rico sports first, TDA can provide a better experience for local fans and help increase the visibility of local leagues, athletes, and sports content.
-```
+

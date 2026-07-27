@@ -467,4 +467,4 @@ Notifications are usually general news alerts or daily updates. The platform doe
 - Local sports coverage is still weak in many major sports apps.
 - Social media pages are useful for local sports, but they are hard to search and organize.
 - A strong sports platform should make scores, schedules, teams, players, news, and notifications easy to access.
-```
+

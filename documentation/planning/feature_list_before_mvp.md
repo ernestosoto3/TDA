@@ -283,4 +283,4 @@ These features are valuable, but they may require more development time, better 
 The first version of the app should focus on the core sports experience: helping users quickly find scores, schedules, teams, and updates.
 
 More advanced features like live scoring, rankings, and athlete profiles can be added later. Community is included by the approved MVP navigation.
-```
+

@@ -297,4 +297,4 @@ The selected technology stack is:
 This stack provides a strong starting point for the application while keeping the architecture organized, scalable, and flexible.
 
 Changes may be made later if testing, development requirements, application growth, or infrastructure needs justify using different technologies.
-````
+
