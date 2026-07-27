@@ -606,6 +606,8 @@ In the tables below, `Paginated<T>` means the standard collection response conta
 
 | Method and route | Parameters or body | Auth | Success |
 |---|---|---|---|
+| `GET /policies/current` | None | Public | `200` → current required policy versions and public document locations |
+| `POST /policy-acceptances` | `{ policyVersionId, acceptanceSource, applicationVersion }` | User | `201` → recorded policy acceptance |
 | `POST /webhooks/clerk` | Signed Clerk event | System | `204`; synchronizes creation, identity changes, or deletion state |
 | `GET /users/me` | None | User | `200` → `User` including own private account fields |
 | `PATCH /users/me` | `{ username?, firstName?, lastName?, profilePhotoUrl? }` | Owner | `200` → updated `User` |
@@ -621,6 +623,12 @@ Creating a deletion request immediately revokes active sessions, changes the int
 During that grace period, the owner may reauthenticate only to view or cancel the deletion request. Cancellation is no longer allowed once anonymization or Clerk-account deletion begins. If the request is not cancelled, the system anonymizes the approved identity fields after 30 days, permanently deletes the Clerk user, and retains approved authored content, moderation evidence, and audit records under **Deleted User**.
 
 Credential, email verification, password, MFA, and ordinary session operations remain Clerk responsibilities.
+
+Privacy, retention, account deletion, and policy acceptance must follow [`privacy_retention_and_terms.md`](../product/privacy_retention_and_terms.md).
+
+Registration must identify the current Terms of Service and Privacy Policy versions accepted by the user. A missing or outdated required acceptance returns `422 Unprocessable Entity`.
+
+A policy-acceptance request identifies the specific policy version being accepted. The backend records the user, policy version, acceptance timestamp, acceptance source, application version, and any approved security evidence.
 
 ### User Preferences and Devices
 
