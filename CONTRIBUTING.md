@@ -161,11 +161,13 @@ pnpm test
 pnpm build
 ```
 
-The current `pnpm check` command validates formatting, linting, type checking, and the temporary test command. Build validation is not yet part of `pnpm check` or the pull-request workflow because the application source projects have not been initialized.
+The current `pnpm check` command validates formatting, linting, type checking, and the temporary test command. Build validation is temporarily deferred because the application source projects have not been initialized.
 
-Once application development begins, every application must define a real `build` script. `pnpm build` must then be added to the automated validation process. A successful build is mandatory before the first deployment or release.
+**Target milestone:** Milestone 1 — Technical Foundation.
 
-Some commands may become available only after the applications are initialized.
+During Milestone 1, immediately after `apps/mobile`, `apps/api`, and `apps/admin` receive executable application projects, each application must define a real `build` script. The repository-level `pnpm check` command and pull-request workflow must then require `pnpm build`.
+
+This deferral ends before the first implementation pull request that can produce an application build is merged. A successful build is mandatory before the first staging deployment, production deployment, or release.
 
 Documentation-only changes do not require application validation unless they affect commands, configuration, or code examples.
 
