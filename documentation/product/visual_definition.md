@@ -60,8 +60,8 @@ Possible references include:
 
 - **Instagram:** Feed structure and the “Descubre” and “Favoritos” selector
 - **Apple Music:** Search categories and image-based tiles
-- **ESPN or FotMob:** Scores, game previews, and box scores
-- **Reddit or Discord:** Public communities and reactions
+- **ESPN or FotMob:** Schedules, final scores, game previews, and basic game statistics
+- **Reddit or Discord:** Public-community organization and discussion layouts
 - **Sports publications:** Headlines, photography, and editorial layouts
 
 ## Summary

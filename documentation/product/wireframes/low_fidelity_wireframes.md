@@ -8,7 +8,24 @@ The wireframes are not intended to represent the final design. Their purpose is 
 
 The screen descriptions and navigation terminology in this document follow the approved TDA Spanish Product Glossary.
 
-> **Visual implementation note:** Eight PNG wireframes currently exist and may continue to display earlier terminology or Post-MVP elements. Their visual corrections, along with the creation of the Página del equipo PNG, will be completed in a later design task.
+> **Visual implementation status:** The eight original wireframes were revised to match the approved Version 1 scope and Spanish terminology. A ninth principal wireframe, Página del equipo, was added. The final set contains nine principal wireframes and three supporting interaction states.
+
+## Final Wireframe Set
+
+| # | Wireframe | File | Type |
+|---|---|---|---|
+| 1 | Inicio | `01-feed-home.png` | Principal |
+| 1A | Selector Descubre/Favoritos | `01a-feed-filter-menu.png` | Supporting state |
+| 2 | Notificaciones | `02-notifications.png` | Principal |
+| 3 | Detalles del juego — Final | `03-game-detail-final.png` | Principal |
+| 3A | Detalles del juego — Programado | `03a-game-detail-scheduled.png` | Supporting state |
+| 4 | Mis comunidades | `04-community-my-communities.png` | Principal |
+| 4A | Explorar comunidades | `04a-community-explore.png` | Supporting state |
+| 5 | Chat de la comunidad | `05-community-chat.png` | Principal |
+| 6 | Buscar — Explorar | `06-search-explore.png` | Principal |
+| 7 | Búsquedas recientes | `07-search-recent.png` | Principal |
+| 8 | Perfil y configuración | `08-profile-settings.png` | Principal |
+| 9 | Página del equipo | `09-team-page.png` | Principal |
 
 ---
 
@@ -43,6 +60,12 @@ It should include:
 
 ![Inicio wireframe](./images/01-feed-home.png)
 
+### Supporting State — Selector Descubre/Favoritos
+
+The selector allows users to switch between the general **Descubre** feed and content related to their **Favoritos**.
+
+![Selector Descubre/Favoritos](./images/01a-feed-filter-menu.png)
+
 ---
 
 ## Notificaciones
@@ -64,7 +87,7 @@ It may include:
 
 ## Detalles del juego
 
-Selecting a finished game from **Inicio** should open the **Detalles del juego** screen.
+Selecting a scheduled or completed game from Inicio or Página del equipo should open the Detalles del juego screen.
 
 The MVP screen may include:
 
@@ -86,11 +109,19 @@ The following elements are not included in the approved MVP:
 * Game and video highlights
 * Live or in-progress scoring
 
-![Detalles del juego wireframe](./images/03-game-detail.png)
+### Final Game
+
+![Detalles del juego — Final](./images/03-game-detail-final.png)
+
+### Supporting State — Scheduled Game
+
+The scheduled state displays verified date, time, venue, teams, and the **Programado** status without presenting live information.
+
+![Detalles del juego — Programado](./images/03a-game-detail-scheduled.png)
 
 ---
 
-## Comunidades
+## Comunidades — Mis comunidades
 
 The **Comunidades** tab should display public communities related to Puerto Rico sports.
 
@@ -104,7 +135,13 @@ Each community may display:
 * Most recent message
 * Related sport, league, or team
 
-![Comunidades wireframe](./images/04-community-list.png)
+![Mis comunidades](./images/04-community-my-communities.png)
+
+### Supporting State — Explorar comunidades
+
+The **Explorar comunidades** state allows users to search for public communities and join communities they have not joined.
+
+![Explorar comunidades](./images/04a-community-explore.png)
 
 ---
 
@@ -159,21 +196,17 @@ The approved search-field placeholder is:
 
 ---
 
-## Buscar — Actividad
+## Buscar — Búsquedas recientes
 
-When the user selects the search field, the screen may display:
+When the user selects the search field, the screen displays only the user’s recent searches and an option to clear the search history.
 
-* Búsquedas recientes
-* Trending teams
-* Trending athletes
-* Featured leagues
-* Current sports topics
+Popular and trending searches are reserved for a future release.
 
 ### Post-MVP Considerations
 
 **Búsquedas populares** are not included in the approved MVP and may be considered for a future release.
 
-![Buscar — Actividad wireframe](./images/07-search-recent-popular.png)
+![Búsquedas recientes](./images/07-search-recent.png)
 
 ---
 
@@ -228,27 +261,31 @@ The MVP screen should include:
 * Publicaciones relacionadas
 * Access to the team’s related community
 
-### Documented Low-Fidelity Structure
+![Página del equipo](./images/09-team-page.png)
 
-```text
-┌─────────────────────────────────┐
-│ ← Página del equipo             │
-├─────────────────────────────────┤
-│ [Logo] Nombre del equipo        │
-│ Liga · Récord                   │
-│ [Añadir a Favoritos]            │
-├─────────────────────────────────┤
-│ Próximos juegos                 │
-│ [Tarjeta de juego]              │
-├─────────────────────────────────┤
-│ Juegos anteriores               │
-│ [Resultado final]               │
-├─────────────────────────────────┤
-│ Plantilla                       │
-│ [Atletas y estadísticas básicas]│
-├─────────────────────────────────┤
-│ Noticias                        │
-│ Publicaciones relacionadas      │
-├─────────────────────────────────┤
-│ Comunidad del equipo            │
-└─────────────────────────────────┘
+---
+
+## Navigation Map
+
+```mermaid
+flowchart TD
+    Nav["Navegación principal"] --> Inicio
+    Nav --> Comunidades
+    Nav --> Buscar
+    Nav --> Perfil
+
+    Inicio --> Notificaciones
+    Inicio --> Juego["Detalles del juego"]
+    Inicio --> Equipo["Página del equipo"]
+
+    Comunidades --> MisComunidades["Mis comunidades"]
+    Comunidades --> Explorar["Explorar comunidades"]
+    MisComunidades --> Chat["Chat de la comunidad"]
+    Explorar --> Chat
+
+    Buscar --> Recientes["Búsquedas recientes"]
+    Buscar --> Resultados["Resultados de búsqueda"]
+    Resultados --> Equipo
+
+    Equipo --> Juego
+    Equipo --> Favoritos["Añadir o quitar de Favoritos"]

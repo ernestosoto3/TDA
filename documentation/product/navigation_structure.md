@@ -2,41 +2,53 @@
 
 ## Four-Tab Order
 
-1. Home
-2. Community
-3. Search
-4. User & Settings
+The mobile application uses four primary tabs in this order:
+
+1. **Inicio**
+2. **Comunidades**
+3. **Buscar**
+4. **Perfil**
+
+Notifications are accessed through the bell icon in the **Inicio** header and do not require a separate tab.
 
 ## Navigation Map
 
 ```mermaid
 flowchart TD
-    Navigation["Bottom Navigation"]
+    Navigation["Navegación inferior"]
 
-    Navigation --> Home["Home"]
-    Navigation --> Community["Community"]
-    Navigation --> Search["Search"]
-    Navigation --> UserSettings["User & Settings"]
+    Navigation --> Home["Inicio"]
+    Navigation --> Community["Comunidades"]
+    Navigation --> Search["Buscar"]
+    Navigation --> Profile["Perfil"]
 
-    Home --> Following["Favoritos"]
     Home --> Discover["Descubre"]
-    Home --> Notifications["Notifications"]
-    Home --> GameSummary["Game Summary"]
-    Home --> Article["Article"]
-    Home --> EntityProfile["Entity Profile"]
+    Home --> Favorites["Favoritos"]
+    Home --> Notifications["Notificaciones"]
+    Home --> GameDetails["Detalles del juego"]
+    Home --> Article["Artículo"]
+    Home --> TeamPage["Página del equipo"]
 
-    Community --> CommunitySearch["Community Search"]
-    Community --> CommunityChat["Community Chat"]
+    Community --> MyCommunities["Mis comunidades"]
+    Community --> ExploreCommunities["Explorar comunidades"]
+    MyCommunities --> CommunityChat["Chat de la comunidad"]
+    ExploreCommunities --> JoinCommunity["Unirse a la comunidad"]
+    JoinCommunity --> CommunityChat
 
-    Search --> SearchResults["Search Results"]
-    SearchResults --> EntityProfile
-    Search --> SportProfile["Sport Profile"]
+    Search --> RecentSearches["Búsquedas recientes"]
+    Search --> SearchResults["Resultados de búsqueda"]
+    SearchResults --> TeamPage
+    SearchResults --> GameDetails
+    SearchResults --> Article
+    SearchResults --> CommunityChat
 
-    UserSettings --> Settings["Settings"]
-    UserSettings --> EntityProfile
+    Profile --> Settings["Configuración"]
+    Profile --> FavoriteEntities["Entidades favoritas"]
+    FavoriteEntities --> TeamPage
 
-    Article --> EntityProfile
-    EntityProfile --> GameSummary
+    Article --> TeamPage
+    TeamPage --> GameDetails
+    TeamPage --> FavoriteAction["Añadir o quitar de Favoritos"]
 ```
 
 ---
@@ -45,33 +57,130 @@ flowchart TD
 
 ## Purpose
 
-The Home tab is where users will find most of the platform’s content, especially vertically scrollable posts and articles. Video content is Post-MVP and must not appear in the Version 1 navigation or implementation.
+The Home tab is the primary destination for posts, articles, scheduled games, and verified final results.
 
-Users will also see scores for their favorite teams and results from the leagues they follow. Notifications will be accessible through a bell icon in the header. These notifications may include updates about teams, leagues, and players.
+Video content is Post-MVP and must not appear in the Version 1 navigation or interface. Version 1 also excludes live scoring and partially updated game results.
 
-The Home tab will include two sub-tabs:
+Users can access notifications through the bell icon in the header. Notifications may include:
 
-- **Favoritos:** Content related to the entities the user follows.
-- **Descubre:** Broader content that is not limited to the entities the user follows.
+- Final results
+- Schedule changes
+- Breaking news
+- Selected community activity
 
-When users are viewing one sub-tab, they will not see content from the other sub-tab.
+The Home tab contains two content states:
+
+- **Descubre:** Displays broader content that is not limited to the user’s favorite entities.
+- **Favoritos:** Displays content associated with the user’s favorite sports, leagues, teams, and athletes.
+
+The `01a-feed-filter-menu.png` wireframe documents the interaction used to switch between **Descubre** and **Favoritos**.
 
 ## Sub-Pages Accessible from Home
 
-- **Notifications:** Selecting the bell icon in the header will open the Notifications sub-page.
+- **Notifications:** Selecting the bell icon opens the Notifications sub-page.
 
-- **Game Summary:** Selecting a game score from the score carousel will open the Game Summary sub-page. Users can view the game summary, a written recap, and basic game statistics. Advanced box scores and video highlights are **Post-MVP**.
+- **Game Details:** Selecting a scheduled game or verified final result opens the Game Details sub-page. This page may display the teams, date, time, venue, written recap, and basic game statistics when available. Advanced box scores and video highlights are Post-MVP.
 
-- **Article:** Selecting an article, such as a post displaying “Ver más...,” will open the Article sub-page. It may include a headline or title, subheading, byline, main text, and conclusion when available.
+- **Article:** Selecting an article or post displaying an action such as **Ver más...** opens the Article sub-page. The page may include a headline, subheading, byline, main text, and conclusion when available.
 
-- **Entity Profile:** Selecting an entity profile will open the corresponding Entity Profile sub-page. This may include a team, league, sport, player, athlete, author, or another entity. Users may select the entity that published the post or an entity mentioned within it.
+- **Team Page:** Selecting a team name, logo, or team-related search result opens the corresponding Team Page.
 
 ## Header Actions
 
-The Home header will display:
+The Home header displays:
 
 - The TDA logo in the center.
-- A bell icon on the right for opening the Notifications sub-page.
+- A bell icon on the right for opening Notifications.
+
+---
+
+# Notifications
+
+## Purpose
+
+The Notifications sub-page allows users to review approved Version 1 updates without adding a fifth navigation tab.
+
+## Notification Categories
+
+Version 1 may display notifications for:
+
+- Final results
+- Schedule changes
+- Breaking news
+- Selected community activity
+
+Version 1 does not include notifications for:
+
+- Live-score updates
+- Comment replies
+- Message reactions
+- Saved publications
+- Advanced statistics
+
+## Navigation Behavior
+
+Selecting a notification opens the related Version 1 destination when available, such as:
+
+- Game Details
+- Article
+- Community Chat
+- Team Page
+
+The back button returns the user to Home.
+
+---
+
+# Game Details
+
+## Purpose
+
+The Game Details sub-page presents information about a scheduled or completed game.
+
+The final and scheduled states are documented separately in:
+
+- `03-game-detail-final.png`
+- `03a-game-detail-scheduled.png`
+
+## Scheduled Game State
+
+A scheduled game may display:
+
+- League
+- Date and time
+- Venue
+- Team names and logos
+- **Programado**, **Pospuesto**, or **Cancelado** status, when applicable
+
+It must not display live or partially updated scoring.
+
+## Final Game State
+
+A completed game may display:
+
+- League
+- Date and venue
+- Team names and logos
+- Verified final score
+- **Final** status
+- Written game recap
+- Basic game statistics
+
+Version 1 does not include:
+
+- Live scoreboards
+- Video highlights
+- Advanced player statistics
+- Detailed box scores
+
+## Navigation Behavior
+
+Game Details may be opened from:
+
+- Home
+- Search Results
+- Team Page
+
+Selecting a team from Game Details may open the corresponding Team Page.
 
 ---
 
@@ -79,35 +188,48 @@ The Home header will display:
 
 ## Purpose
 
-The purpose of the Community tab is to promote conversations between fans. This feature will also help distinguish TDA from other sports apps by providing fans with a platform where they can communicate.
+The Community tab provides public discussion spaces where fans can talk about Puerto Rico sports.
 
-Users can join or leave any community at any time. Within a Community Chat, they can discuss Puerto Rico sports as long as they follow the community guidelines. Community-message reactions and threaded replies are Post-MVP and must not appear in the Version 1 interface.
+Users may join or leave a community at any time. Within Community Chat, users may send public text messages, view pinned administrator announcements, and report inappropriate messages.
 
-In the future, users may be allowed to share GIFs or images provided by the platform. Direct image and video uploads will not be allowed for safety and storage reasons.
+Community-message reactions, threaded replies, private messages, and user-uploaded media are Post-MVP and must not appear in the Version 1 interface.
 
-The primary purpose of this tab is to let users chat with other fans.
+The Community tab contains two states:
+
+- **Mis comunidades:** Displays communities the user has already joined.
+- **Explorar:** Allows users to search for and join other public communities.
 
 ## Sub-Pages Accessible from Community
 
-- **Community Search:** Selecting the magnifying-glass icon in the top-right corner will open the Community Search sub-page. This search will only display communities that users can join.
+- **Community Chat:** Selecting a community from **Mis comunidades** opens its Community Chat.
 
-- **Community Chat:** Selecting a pinned Community Chat or a Community Chat from the main list will open that Community Chat sub-page.
+- **Explore Communities:** Selecting **Explorar** displays public communities available to join.
+
+- **Community Chat after joining:** Selecting **Unirse** adds the community to the user’s communities and allows the user to open its Community Chat.
 
 ## Community Tab Elements
 
-- **Chat Editing:** A three-dot icon in the top-left corner will allow users to edit their Community Chats. Users can delete a Community Chat, which will also cause them to leave that community, or pin a Community Chat to the top.
+- A **Buscar comunidades** field.
+- A selector for **Mis comunidades** and **Explorar**.
+- An **Abrir** action for joined communities.
+- An **Unirse** action for communities the user has not joined.
+- Community names and optional member or active-member counts.
 
-- **Pinned Community Chats:** Similar to the iMessage app, pinned Community Chats will appear as circles at the top of the screen. A circular dashed outline with a plus sign will allow users to add a Community Chat to this section. Selecting a pinned Community Chat will open its Community Chat sub-page.
+## Community Chat Elements
 
-- **Community Chat List:** Community Chats will appear in a stacked list below the pinned Community Chats. Selecting one will open its Community Chat sub-page.
+Community Chat may include:
+
+- Community name and identifying image
+- Public text messages
+- Pinned administrator announcements
+- Text input
+- Message-reporting controls
+- **Unirse a la comunidad** when the user has not joined
+- **Salir de la comunidad** when the user is already a member
 
 ## Header Actions
 
-The Community header will display:
-
-- A three-dot icon on the left for editing Community Chats.
-- The TDA logo in the center.
-- A magnifying-glass icon on the right for opening the Community Search sub-page.
+The Community header displays the TDA logo in the center. Back navigation appears when the user opens a Community Chat or another nested Community screen.
 
 ---
 
@@ -115,22 +237,103 @@ The Community header will display:
 
 ## Purpose
 
-The purpose of the Search tab is to let users search for sports, leagues, teams, players, and athletes.
+The Search tab allows users to search for:
 
-## Sub-Pages Accessible from Search
+- Sports
+- Leagues
+- Teams
+- Athletes
+- Games
+- News
+- Communities
 
-- **Entity Profile:** Selecting a sport, league, team, player, or athlete from the search results will open the corresponding Entity Profile sub-page.
+The approved search placeholder is:
 
-- **Sport Profile:** Selecting one of the sport squares will open the corresponding Sport Profile sub-page.
+**Buscar deportes, ligas, equipos, atletas, juegos, noticias o comunidades**
 
-## Search Tab Elements
+## Search States
 
-- A search input that users can select to type and perform a search.
-- Squares representing different sports.
+### Explore
+
+The initial Search screen allows users to explore the approved Version 1 sports and leagues:
+
+- Baloncesto — BSN
+- Béisbol — LBPRC
+- Voleibol femenino — LVSF
+- Voleibol masculino — LVSM
+
+### Recent Searches
+
+When the user selects the search field, the screen may display:
+
+- **Búsquedas recientes**
+- An option to **Borrar todo**
+
+Popular, numbered, ranked, and trending searches are Post-MVP.
+
+## Search Results Navigation
+
+Selecting a supported result opens the appropriate destination:
+
+- Team result → Team Page
+- Game result → Game Details
+- News or article result → Article
+- Community result → Community Chat or the appropriate joining state
+
+Other supported sports, league, or athlete results may open their corresponding information page when that page is implemented and documented.
 
 ## Header Actions
 
-The Search header will display the TDA logo in the center. For now, it will not include icons on the left or right.
+The Search header displays the TDA logo in the center. It does not require additional icons on the left or right.
+
+---
+
+# Team Page
+
+## Purpose
+
+The Team Page provides the essential Version 1 information for a selected team.
+
+It may be opened from:
+
+- Home
+- Search Results
+- Game Details
+- Favorite entities in Profile
+- A team reference within an article
+
+## Team Page Elements
+
+The Team Page may display:
+
+- Team logo
+- Team name
+- Sport and league
+- Basic team information
+- **Añadir a Favoritos** or **Quitar de Favoritos**
+- **Próximos juegos**
+- **Juegos anteriores**
+- Team roster or basic athlete information
+- Basic player statistics
+- Related news and articles
+
+## Team Page Actions
+
+- Selecting **Añadir a Favoritos** adds the team to the user’s favorites.
+- Selecting **Quitar de Favoritos** removes the team from the user’s favorites.
+- Selecting an upcoming or previous game opens Game Details.
+- Selecting related news or an article opens the Article sub-page.
+
+## Version 1 Exclusions
+
+The Team Page must not include:
+
+- Live scoring
+- League standings or rankings
+- Advanced player statistics
+- Complete scouting profiles
+- Video highlights
+- Social follower counts
 
 ---
 
@@ -138,36 +341,41 @@ The Search header will display the TDA logo in the center. For now, it will not 
 
 ## Purpose
 
-The purpose of the User & Settings tab is to let users view or edit their account information and adjust their settings.
+The User & Settings area is represented by the **Perfil** tab in the mobile interface.
 
-This tab will also display the user’s favorite teams and allow the user to remove teams they no longer want in their favorites.
+This tab allows users to review or edit their profile, manage favorite entities, view their communities, and access account settings.
 
-## Sub-Pages Accessible from User & Settings
+## Profile Options
 
-- **Settings:** Selecting the gear icon in the top-right corner will open the Settings sub-page. The available settings will be added later.
+Version 1 may include:
 
-- **Entity Profile:** Selecting a favorite team, followed author, or followed sports page will open the corresponding Entity Profile sub-page.
+- **Editar perfil**
+- **Equipos favoritos**
+- **Ligas favoritas**
+- **Mis comunidades**
+- **Información de la cuenta**
+- **Notificaciones**
+- **Privacidad**
+- **Seguridad**
+- **Idioma**
 
-## User & Settings Tab Elements
+Saved publications and a separate content-preferences system are not included in Version 1. Content personalization is based on the user’s favorite sports, leagues, teams, and athletes.
 
-- **Profile Information:** Below the header, users will see their profile picture, username, and screen name. The username and screen name will be stacked next to the profile picture.
+## Sub-Pages Accessible from Profile
 
-- **Profile Editing:** A pencil icon next to the username and screen name will allow users to change their screen name and profile picture. Changes to the username, email address, or password will be handled through the Settings sub-page.
+- **Edit Profile:** Allows users to change supported profile information.
 
-- **Favorite Teams:** The user’s favorite teams will appear below the profile information in either a stacked layout or a carousel. Selecting a favorite team will open its Entity Profile sub-page.
+- **Favorite Entities:** Allows users to view or remove favorite sports, leagues, teams, and athletes.
 
-- **Followed Authors and Sports Pages:** Followed authors and sports pages will appear below the favorite teams. Selecting one will open its Entity Profile sub-page.
+- **Team Page:** Selecting a favorite team opens its Team Page.
 
-- **Removing Favorites:** The Favorite Teams and Followed Authors and Sports Pages sections will each have a three-dot icon next to the section title. This icon will allow users to remove teams, authors, or sports pages from their favorites.
+- **My Communities:** Selecting a joined community opens its Community Chat.
 
-- **Contact Us:** A “Contact Us” button, or something similar, will appear at the bottom. Selecting it will open an email addressed to TDA’s contact email.
+- **Settings:** Selecting an account or configuration option opens the corresponding settings sub-page.
 
 ## Header Actions
 
-The User & Settings header will display:
-
-- The TDA logo in the center.
-- A gear icon on the right for opening the Settings sub-page.
+The Profile header displays the TDA logo in the center. Nested settings pages display a back button on the left.
 
 ---
 
@@ -175,47 +383,57 @@ The User & Settings header will display:
 
 ## Nested-Screen Behavior
 
-The header will remain visible on every tab and sub-page. When users open a sub-page, a back button will appear on the left side of the header.
+The header remains visible on each principal tab and sub-page. When users open a sub-page, a back button appears on the left side of the header.
 
-The back button will return users through their navigation path in reverse. For example:
+The back button returns users through their navigation path in reverse.
 
-**Home → Article → Entity Profile**
+For example:
 
-Selecting the back button from the Entity Profile sub-page will return the user to the Article sub-page. Selecting it again will return the user to Home.
+**Buscar → Resultados de búsqueda → Página del equipo → Detalles del juego**
 
-If users open only one sub-page from a tab, the back button will return them directly to that tab.
+- The first selection of the back button returns the user to Team Page.
+- The second selection returns the user to Search Results.
+- The third selection returns the user to Search.
 
-When navigating between tabs and sub-pages, the previous position and state should be preserved instead of refreshed.
+If users open only one sub-page from a tab, the back button returns them directly to that tab.
+
+When navigating between tabs and sub-pages, the previous position and state should be preserved whenever practical.
 
 ## Bottom-Navigation Visibility
 
-The bottom navigation will remain visible until the user begins scrolling. It may disappear after the user scrolls twice instead of disappearing immediately.
+The bottom navigation provides access to:
 
-When the user scrolls back up, the bottom navigation will reappear.
+- Inicio
+- Comunidades
+- Buscar
+- Perfil
+
+The active tab is visually identified in red.
+
+The bottom navigation remains available on principal screens. Its behavior on nested screens should remain consistent across the application.
 
 ## Back-Navigation Behavior
 
-When users return from a single sub-page, the original tab should appear in the same state and position as before, without refreshing.
+When users return from a sub-page, the original tab should appear in its previous state and position without unnecessarily refreshing its content.
 
-For a nested navigation path, the back button should move back one sub-page at a time. For example:
-
-**Home → Entity Profile → Game Summary**
-
-- The first selection of the back button returns the user to the Entity Profile sub-page.
-- The second selection returns the user to Home.
-
-This behavior should apply regardless of how many sub-pages the user opens.
+For nested navigation paths, the back button moves back one sub-page at a time.
 
 ## Notifications
 
-Notifications will open through the bell icon in the Home header.
+Notifications open through the bell icon in the Home header.
 
-Notifications do not require a fifth tab because they are accessible directly from the Home header.
+Notifications do not require a fifth tab.
 
 ## Terminology
 
-- **Tab:** One of the four primary navigation destinations: Home, Community, Search, or User & Settings.
-- **Sub-tab:** A content section within a tab, such as Favoritos or Descubre.
-- **Sub-page:** Any dedicated page that is not one of the four main tabs.
-- **Entity Profile:** A sub-page belonging to a sport, league, team, player, athlete, author, or another entity.
-- **Community Chat:** The conversation area belonging to a community.
+- **Tab:** One of the four primary navigation destinations: Inicio, Comunidades, Buscar, or Perfil.
+- **State:** An alternate presentation of a screen, such as Descubre/Favoritos, scheduled/final Game Details, or Mis comunidades/Explorar.
+- **Sub-page:** A dedicated page that is not one of the four primary tabs.
+- **Team Page:** The dedicated page containing information about a selected team.
+- **Entity page:** A page belonging to a supported sport, league, team, or athlete.
+- **Community Chat:** The public conversation area belonging to a community.
+- **Game Details:** The scheduled or completed game page containing verified information and, when available, a written recap and basic game statistics.
+
+---
+
+**Final navigation status:** The Navigation Structure reflects the nine principal Version 1 wireframes and three supporting interaction states. It includes the Team Page and excludes live scoring, video highlights, advanced box scores, message reactions, threaded replies, popular searches, and saved publications.

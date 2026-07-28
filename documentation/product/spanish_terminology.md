@@ -515,51 +515,30 @@ Internal code and API values may remain in English. The product must display the
 
 ---
 
-# 18. Existing Mobile Wireframe Review
+# 18. Final Mobile Wireframe Review
 
-Eight mobile wireframes were reviewed against this glossary. The table below records the required product-copy corrections. It does not require rewriting user-generated messages shown inside community conversations.
+Nine principal wireframes and three supporting interaction states were reviewed against this glossary. All required Version 1 terminology and scope corrections were applied.
 
-| Wireframe | Reviewed text or element | Approved replacement or action | Review result |
-|---|---|---|---|
-| `01-feed-home` | **Para ti** | **Descubre**. The other selector option should be **Favoritos**. | Change required |
-| `01-feed-home` | **Final** | Keep **Final**. | Approved |
-| `01-feed-home` | **Resultados** | Acceptable. Use **Resultados finales** only when the section contains exclusively completed games and additional precision is needed. | Acceptable |
-| `02-notifications` | **Partido esta noche** | **Juego esta noche** | Change required |
-| `02-notifications` | **Partido finalizado** | **Juego finalizado** | Change required |
-| `02-notifications` | **Resultado: Criollos 81 - 78 Capitanes** | **Resultado final: Criollos 81 - 78 Capitanes** | Change required |
-| `02-notifications` | **Notificaciones** | Keep **Notificaciones**. | Approved |
-| `03-game-detail` | **Feed** | **Inicio** | Change required |
-| `03-game-detail` | **Highlights** | **Jugadas destacadas** if retained in a future release. Video highlights are not part of the Version 1 scope. | Remove from Version 1 or relabel for future use |
-| `03-game-detail` | **Box Score** | **Estadísticas del juego** if retained in a future release. Detailed box scores are not part of the Version 1 scope. | Remove from Version 1 or relabel for future use |
-| `03-game-detail` | **Final** | Keep **Final**. | Approved |
-| `04-community-list` | **Grupos públicos de deportes en Puerto Rico** | **Comunidades públicas de deportes en Puerto Rico** | Change required |
-| `04-community-list` | **234 activos**, **156 activos**, etc. | **234 miembros activos**, **156 miembros activos**, etc. | Change recommended for clarity |
-| `04-community-list` | **Comunidades** | Keep **Comunidades**. | Approved |
-| `05-community-chat` | **Siguiendo** | Use **Salir de la comunidad** for a joined community and **Unirse a la comunidad** for a community the user has not joined. | Change required |
-| `05-community-chat` | **Anuncio** with a pinned indicator | **Anuncio fijado** | Change recommended |
-| `05-community-chat` | Emoji message reactions | Remove from the Version 1 wireframe. Community message reactions are not included in Version 1. | Scope correction required |
-| `05-community-chat` | **Escribe un mensaje…** | Keep **Escribe un mensaje…**. | Approved |
-| `06-search-explore` | **Buscar equipos, jugadores, ligas…** | **Buscar deportes, ligas, equipos, atletas, juegos, noticias o comunidades** | Change required |
-| `06-search-explore` | **Explorar** | Keep **Explorar**. | Approved |
-| `07-search-recent-popular` | **Buscar equipos, jugadores, ligas…** | **Buscar deportes, ligas, equipos, atletas, juegos, noticias o comunidades** | Change required |
-| `07-search-recent-popular` | **Recientes** | **Búsquedas recientes** | Change required |
-| `07-search-recent-popular` | **Populares** | **Búsquedas populares** if the feature is retained for a future release. | Relabel or defer with the feature |
-| `08-profile-settings` | **Ligas seguidas** | **Ligas favoritas** | Change required |
-| `08-profile-settings` | **Posts guardados** | **Publicaciones guardadas** if retained in a future release. Saved posts are not part of the Version 1 scope. | Remove from Version 1 or relabel for future use |
-| `08-profile-settings` | **Información de cuenta** | **Información de la cuenta** | Change required |
-| `08-profile-settings` | **Preferencias de contenido** | **Administrar Favoritos**, or remove this separate option. Version 1 content is determined by the user's favorite sports, leagues, teams, and athletes rather than a separate content-preferences system. | Change required |
-| `08-profile-settings` | **Equipos favoritos**, **Mis comunidades**, **Configuración**, **Notificaciones**, **Privacidad**, **Seguridad**, and **Idioma** | Keep these terms. | Approved |
+| Wireframe | Verified correction | Review result |
+|---|---|---|
+| `01-feed-home` | Uses **Descubre**, **Favoritos**, **Inicio**, and approved game statuses. | Completed |
+| `01a-feed-filter-menu` | Uses **Descubre** and **Favoritos**. | Completed |
+| `02-notifications` | Uses **Juego**, **Resultado final**, **Cambio de horario**, and approved notification terminology. | Completed |
+| `03-game-detail-final` | Uses **Inicio**, **Resumen del juego**, and **Estadísticas del juego**. Highlights and advanced box scores were removed. | Completed |
+| `03a-game-detail-scheduled` | Uses **Programado** without live or in-progress scoring. | Completed |
+| `04-community-my-communities` | Uses **Comunidades**, **Mis comunidades**, and **miembros activos**. | Completed |
+| `04a-community-explore` | Uses **Explorar**, **Buscar comunidades**, and the approved joining action. | Completed |
+| `05-community-chat` | Uses approved membership and announcement terminology. Message reactions and threaded replies were removed. | Completed |
+| `06-search-explore` | Uses the approved search placeholder and **atletas**. | Completed |
+| `07-search-recent` | Uses **Búsquedas recientes**. Popular and trending searches were removed. | Completed |
+| `08-profile-settings` | Uses **Ligas favoritas** and **Información de la cuenta**. Saved publications and the separate content-preferences option were removed. | Completed |
+| `09-team-page` | Uses **Página del equipo**, **Añadir a Favoritos**, **Próximos juegos**, **Juegos anteriores**, and approved team terminology. | Completed |
 
 ## Wireframe Review Summary
 
-The main inconsistencies found were:
+The final Version 1 wireframes use the approved Spanish terminology and exclude live scoring, message reactions, threaded community replies, popular searches, saved publications, video highlights, and advanced box scores.
 
-- English labels remaining in the Spanish interface: **Feed**, **Highlights**, and **Box Score**.
-- Terms already rejected by the approved product decisions: **Para ti**, **Siguiendo**, and **Grupos**.
-- Inconsistent terminology for sports entities and actions: **jugadores**, **partido**, and **Ligas seguidas**.
-- Ambiguous shortened headings: **Recientes**, **Populares**, and counts such as **234 activos**.
-- **Preferencias de contenido** suggests a separate personalization system; Version 1 content should instead be controlled through the user's **Favoritos**.
-- Elements shown in the wireframes but excluded from Version 1: video highlights, detailed box scores, community message reactions, saved posts, and popular searches.
+**Wireframe terminology review status:** Complete
 
 ---
 
