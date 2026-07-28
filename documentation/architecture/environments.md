@@ -17,7 +17,7 @@ Each environment must use isolated configuration, databases, credentials, storag
 | Environment | Purpose | Data | Access |
 | --- | --- | --- | --- |
 | Local | Build features and run tests without affecting shared systems | Local or fictional seed data | Individual contributors |
-| Pull-request validation | Run formatting, linting, type-checking, and testing checks; build and OpenAPI contract validation become mandatory after the corresponding application workspaces are initialized | Temporary or mocked test data | Automated workflow |
+| Pull-request validation | Run formatting, linting, type-checking, and testing checks; build and OpenAPI validation are deferred to Milestone 1 — Technical Foundation and become mandatory immediately after the corresponding application workspaces are initialized | Temporary or mocked test data | Automated workflow |
 | Staging | Test complete user flows before release | Stable fictional data | Project team and approved testers |
 | Production | Serve real users | Real, approved data | Public users and authorized administrators |
 
@@ -154,7 +154,7 @@ Version 1 uses manual, administrator-managed sports-data entry. Hidden endpoints
 - Staging deploys approved development changes.
 - Production deploys only from the approved stable branch.
 
-Build validation is deferred only while the repository contains placeholder application projects. Each application must define a real build script after initialization, and the automated workflow must require a successful build before the first deployment or release.
+Build validation is temporarily deferred to Milestone 1 — Technical Foundation because the repository currently contains placeholder application projects. Immediately after each application workspace is initialized, it must define a real build script, and `pnpm build` must be added to both `pnpm check` and the pull-request workflow. This must be completed before the first buildable implementation pull request is merged and before any staging or production deployment.
 
 A production deployment requires successful formatting, linting, type checking, tests, build, migration review, and staging verification.
 

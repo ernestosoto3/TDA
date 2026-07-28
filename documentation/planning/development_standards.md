@@ -175,7 +175,7 @@ Pull requests into `main` automatically run:
 - ESLint
 - Type checking
 - Tests
-- Build validation after the application workspaces are initialized
+- Build validation, temporarily deferred to Milestone 1 — Technical Foundation; it becomes mandatory immediately after the application workspaces are initialized
 - OpenAPI generation, freshness validation, linting, and breaking-change checks after the NestJS API is initialized
 
 The automated checks are configured in:
@@ -187,6 +187,8 @@ The automated checks are configured in:
 A pull request must not be merged when a required check fails.
 
 The OpenAPI checks are activated during API implementation because the placeholder repository does not yet contain the NestJS API, controllers, DTOs, generation script, or generated specification. Once activated, `pnpm openapi:check` must be included in the automated pull-request workflow and the repository-level `pnpm check` command.
+
+Build validation has the same Milestone 1 activation requirement. Each executable application workspace must define a real `build` script, and `pnpm build` must be added to both the repository-level `pnpm check` command and the pull-request workflow before the first buildable implementation pull request is merged.
 
 ## Testing Strategy
 
