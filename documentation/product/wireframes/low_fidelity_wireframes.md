@@ -1,4 +1,3 @@
-
 # Low-Fidelity Wireframes and Navigation Map
 
 ## Overview
@@ -7,26 +6,30 @@ These low-fidelity wireframes define the initial structure and navigation flow f
 
 The wireframes are not intended to represent the final design. Their purpose is to establish the main screen layouts, content organization, and how users will move through the application before high-fidelity design and development begin.
 
+The screen descriptions and navigation terminology in this document follow the approved TDA Spanish Product Glossary.
+
+> **Visual implementation note:** Eight PNG wireframes currently exist and may continue to display earlier terminology or Post-MVP elements. Their visual corrections, along with the creation of the Página del equipo PNG, will be completed in a later design task.
+
 ---
 
 ## Main App Tabs
 
-The main bottom navigation should contain four icon-only tabs:
+The main bottom navigation should contain four icon-only tabs with the following approved user-facing labels:
 
-* **Feed:** Home icon
-* **Community:** Three-person icon
-* **Search:** Magnifying-glass icon
-* **Profile:** Person icon
+* **Inicio:** Home icon
+* **Comunidades:** Three-person icon
+* **Buscar:** Magnifying-glass icon
+* **Perfil:** Person icon
 
-The previously proposed Sports tab should be replaced by the Community tab.
+The previously proposed Sports tab should be replaced by the **Comunidades** tab.
 
-Notifications should be accessed through the bell icon in the Feed header instead of appearing as a main navigation tab.
+**Notificaciones** should be accessed through the bell icon in the **Inicio** header instead of appearing as a main navigation tab.
 
 ---
 
-## Feed
+## Inicio
 
-The Feed should act as the main screen of the application.
+**Inicio** should act as the main screen of the application.
 
 It should include:
 
@@ -34,264 +37,218 @@ It should include:
 * Upcoming game information
 * Notification bell
 * **Descubre** and **Favoritos** selector
-* Sports news and posts
+* Sports news and publications
 * Access to game details
 * Access to team pages
 
-![Feed wireframe](./images/01-feed-home.png)
+![Inicio wireframe](./images/01-feed-home.png)
 
 ---
 
-## Notifications
+## Notificaciones
 
-The Notifications screen should be opened by selecting the bell icon in the Feed header.
+The **Notificaciones** screen should be opened by selecting the bell icon in the **Inicio** header.
 
 It may include:
 
 * Upcoming game reminders
-* Final-score updates
+* Final-result updates
+* Schedule changes
 * Sports news
 * Community activity
 * Previous notifications
 
-![Notifications wireframe](./images/02-notifications.png)
+![Notificaciones wireframe](./images/02-notifications.png)
 
 ---
 
-## Game Detail
+## Detalles del juego
 
-Selecting a finished game from the Feed should open the Game Detail screen.
+Selecting a finished game from **Inicio** should open the **Detalles del juego** screen.
 
-It may include:
+The MVP screen may include:
 
 * League information
 * Date and location
 * Team names and logos
 * Final score
-* Written recap
+* Written game recap
 * Basic game statistics
-* Advanced box score — **Post-MVP**
-* Game and video highlights — **Post-MVP**
+* Related publications or articles
 
 Only final scores should be displayed. Partial or live scores should not be shown.
 
-![Game detail wireframe](./images/03-game-detail.png)
+### Post-MVP Considerations
+
+The following elements are not included in the approved MVP:
+
+* Advanced game statistics or detailed box scores
+* Game and video highlights
+* Live or in-progress scoring
+
+![Detalles del juego wireframe](./images/03-game-detail.png)
 
 ---
 
-## Community
+## Comunidades
 
-The Community tab should display public group chats related to Puerto Rico sports.
+The **Comunidades** tab should display public communities related to Puerto Rico sports.
 
 Each community may display:
 
 * Community name
 * Community image or abbreviation
 * Member count
-* Active-user count
+* Active-member count
 * Recent activity
 * Most recent message
 * Related sport, league, or team
 
-![Community list wireframe](./images/04-community-list.png)
+![Comunidades wireframe](./images/04-community-list.png)
 
 ---
 
-## Community Chat
+## Chat de la comunidad
 
 Selecting a public community should open its group-chat screen.
 
-The screen may include:
+The MVP screen may include:
 
 * Community name and image
-* Member and active-user counts
-* Follow or join button
+* Member and active-member counts
+* **Unirse a la comunidad** or **Salir de la comunidad** button
 * Pinned announcements
 * Public messages
-* Replies -> This feature is excluded from the approved MVP and is retained only for future planning.
-* Reactions -> This feature is excluded from the approved MVP and is retained only for future planning.
 * Message input
 * Reporting and moderation options
 
-No emojis should be used as interface icons. Reactions may eventually use a consistent custom reaction system.
+### Post-MVP Considerations
 
-![Community chat wireframe](./images/05-community-chat.png)
+The following elements are not included in the approved MVP:
+
+* Threaded replies inside community chats
+* Community message reactions
+
+No emojis should be used as interface icons or as replacements for interface labels.
+
+![Chat de la comunidad wireframe](./images/05-community-chat.png)
 
 ---
 
-## Search Explore
+## Buscar — Explorar
 
-The Search tab should allow users to discover content throughout the application.
+The **Buscar** tab should allow users to discover content throughout the application.
 
 Users should be able to search for:
 
-* Teams
-* Players
-* Leagues
 * Sports
+* Leagues
+* Teams
+* Athletes
 * Games
-* News
+* News and publications
 * Communities
 
-The default Search screen may include image-based categories for the main sports and leagues.
+The default **Buscar** screen may include image-based categories for the main sports and leagues.
 
-![Search explore wireframe](./images/06-search-explore.png)
+The approved search-field placeholder is:
+
+**Buscar deportes, ligas, equipos, atletas, juegos, noticias o comunidades**
+
+![Buscar — Explorar wireframe](./images/06-search-explore.png)
 
 ---
 
-## Search Activity
+## Buscar — Actividad
 
 When the user selects the search field, the screen may display:
 
-* Recent searches
-* Popular searches -> This feature is excluded from the approved MVP and is retained only for future planning.
+* Búsquedas recientes
 * Trending teams
 * Trending athletes
-* Popular leagues
+* Featured leagues
 * Current sports topics
 
-![Search activity wireframe](./images/07-search-recent-popular.png)
+### Post-MVP Considerations
+
+**Búsquedas populares** are not included in the approved MVP and may be considered for a future release.
+
+![Buscar — Actividad wireframe](./images/07-search-recent-popular.png)
 
 ---
 
-## Profile and Settings
+## Perfil y configuración
 
-The Profile tab should contain the user’s account information and application settings.
+The **Perfil** tab should contain the user’s profile information and application settings.
 
-It may include:
+The MVP screen may include:
 
 * Profile picture
 * Name and username
 * Edit-profile button
 * Favorite teams
-* Followed leagues
-* Saved posts -> This feature is excluded from the approved MVP and is retained only for future planning.
+* Favorite leagues
+* Favorite sports
+* Favorite athletes
 * Community memberships
 * Account information
-* Notification settings
+* Notification preferences
 * Privacy
 * Security
 * Language
-* Content preferences
+* **Administrar Favoritos**
 
-![Profile and settings wireframe](./images/08-profile-settings.png)
+Version 1 content personalization should be managed through the user’s Favorites. A separate content-preferences system should not be included.
+
+### Post-MVP Considerations
+
+The following element is not included in the approved MVP:
+
+* Saved publications
+
+![Perfil y configuración wireframe](./images/08-profile-settings.png)
 
 ---
 
-## Team Page
+## Página del equipo
 
-A dedicated Team Page wireframe still needs to be created.
+The **Página del equipo** should provide centralized information about a selected team.
 
-The Team Page may include:
+The MVP screen should include:
 
 * Team name and logo
 * League
+* **Añadir a Favoritos** or **Quitar de Favoritos**
 * Team record
-* Upcoming schedule
-* Previous results
-* Roster
-* Basic player statistics
-* Advanced player statistics — **Post-MVP**
+* Próximos juegos
+* Juegos anteriores
+* Team roster
+* Basic athlete statistics
 * Team news
-* Related posts
-* Link to the team’s community
+* Publicaciones relacionadas
+* Access to the team’s related community
 
+### Documented Low-Fidelity Structure
 
----
-
-## Navigation Map
-
-```mermaid
-flowchart TD
-    A[Open TDA] --> B[Feed]
-
-    B --> C[Notifications]
-    B --> D[Game Detail]
-    B --> E[Post or News Detail]
-    B --> F[Team Page]
-
-    A --> G[Community]
-    G --> H[Community Chat]
-    H --> I[Community Information]
-
-    A --> J[Search]
-    J --> K[Search Results]
-    K --> F
-    K --> D
-    K --> H
-    K --> E
-
-    A --> L[Profile]
-    L --> M[Edit Profile]
-    L --> N[Favorite Teams]
-    L --> O[Followed Leagues]
-    L --> P["Saved Posts (Post-MVP)"]
-    L --> Q[My Communities]
-    L --> R[Settings]
-```
-
----
-
-## Main User Flows
-
-### Feed to Notifications
-
-`Feed → Bell icon → Notifications`
-
-### Feed to Game Details
-
-`Feed → Select final score → Game Detail`
-
-### Feed to Team Page
-
-`Feed → Select team name or logo → Team Page`
-
-### Search to Team Page
-
-`Search → Enter team name → Select result → Team Page`
-
-### Search to Game Details
-
-`Search → Find game → Select result → Game Detail`
-
-### Search to Community
-
-`Search → Find community → Select result → Community Chat`
-
-### Community Navigation
-
-`Community → Select public group → Community Chat`
-
-### Profile Navigation
-
-`Profile → Select account or setting option → Selected page`
-
----
-
-## Current Wireframe Status
-
-The current wireframes cover:
-
-* Feed
-* Notifications
-* Game details
-* Community list
-* Community chat
-* Search exploration
-* Search activity
-* Profile and settings
-
-The Team Page still needs to be added to fully complete the planned main-screen wireframes.
-
----
-
-## Final Direction
-
-These wireframes should be used as the initial structural reference for TDA.
-
-The layouts may change during testing and high-fidelity design, but the main navigation should remain focused on:
-
-* Feed
-* Community
-* Search
-* Profile
+```text
+┌─────────────────────────────────┐
+│ ← Página del equipo             │
+├─────────────────────────────────┤
+│ [Logo] Nombre del equipo        │
+│ Liga · Récord                   │
+│ [Añadir a Favoritos]            │
+├─────────────────────────────────┤
+│ Próximos juegos                 │
+│ [Tarjeta de juego]              │
+├─────────────────────────────────┤
+│ Juegos anteriores               │
+│ [Resultado final]               │
+├─────────────────────────────────┤
+│ Plantilla                       │
+│ [Atletas y estadísticas básicas]│
+├─────────────────────────────────┤
+│ Noticias                        │
+│ Publicaciones relacionadas      │
+├─────────────────────────────────┤
+│ Comunidad del equipo            │
+└─────────────────────────────────┘
