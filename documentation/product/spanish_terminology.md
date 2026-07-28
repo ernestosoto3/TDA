@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the approved Spanish terminology for the TDA Version 1 mobile application, administrative interface, API documentation, notifications, and product documentation.
+This document defines the standardized Spanish terminology proposed for the TDA Version 1 mobile application, administrative interface, API documentation, notifications, and product documentation.
 
 **Approval status:** Approved
 
@@ -516,7 +516,7 @@ Internal code and API values may remain in English. The product must display the
 
 Eight mobile wireframes were reviewed against this glossary. The table below records the required product-copy corrections. It does not require rewriting user-generated messages shown inside community conversations.
 
-| Wireframe | Current text | Approved replacement or action | Review result |
+| Wireframe | Reviewed text or element | Approved replacement or action | Review result |
 |---|---|---|---|
 | `01-feed-home` | **Para ti** | **Descubre**. The other selector option should be **Favoritos**. | Change required |
 | `01-feed-home` | **Final** | Keep **Final**. | Approved |
@@ -558,24 +558,11 @@ The main inconsistencies found were:
 - **Preferencias de contenido** suggests a separate personalization system; Version 1 content should instead be controlled through the user's **Favoritos**.
 - Elements shown in the wireframes but excluded from Version 1: video highlights, detailed box scores, community message reactions, saved posts, and popular searches.
 
-## Visual Correction Status
-
-The review of the eight existing mobile wireframes is complete.
-
-The following visual work is formally deferred:
-
-- Apply the terminology and MVP-scope corrections listed above to the eight existing PNG wireframes.
-- Create the Team Page PNG wireframe.
-
-**Reason:** The current Milestone 0 work is limited to correcting and aligning the product documentation. The PNG revisions require a separate visual-design task and do not block documentation approval.
-
-**Target milestone:** Milestone 1.
-
 ---
 
 # 19. Confirmed Product Decisions
 
-The following terminology decisions are approved for Version 1:
+The following terminology decisions are proposed for Version 1 and pending final team approval:
 
 1. Use **Favoritos** instead of **Siguiendo**.
 2. Use **Descubre** instead of **Descubrir** or **Para ti**.
@@ -589,12 +576,12 @@ The following terminology decisions are approved for Version 1:
 
 ---
 
-# Implementation Criteria
+# Approval Criteria
 
-This glossary is considered fully applied when:
+This glossary is ready for team approval when:
 
-- The approved terms are used consistently in the mobile application and administrative interface.
+- The approved terms are accepted for the mobile application and administrative interface.
 - The terminology is applied consistently to product documentation and notification templates.
+- The currently supplied wireframes have been reviewed using the checklist in this document.
 - New interface copy uses the approved empty, loading, and error messages.
-- The deferred wireframe PNG corrections are completed during Milestone 1 according to Section 18.
 - Future localization work uses these Spanish terms as the Version 1 source language.

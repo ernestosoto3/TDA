@@ -45,7 +45,7 @@ flowchart TD
 
 ## Purpose
 
-The Home tab is where users will find most of the platform’s content, especially vertically scrollable content such as posts, articles, videos (**Post-MVP concept:** This feature is excluded from the approved MVP and is retained only for future planning.), and similar content.
+The Home tab is where users will find most of the platform’s content, especially vertically scrollable posts and articles. Video content is Post-MVP and must not appear in the Version 1 navigation or implementation.
 
 Users will also see scores for their favorite teams and results from the leagues they follow. Notifications will be accessible through a bell icon in the header. These notifications may include updates about teams, leagues, and players.
 
@@ -81,7 +81,7 @@ The Home header will display:
 
 The purpose of the Community tab is to promote conversations between fans. This feature will also help distinguish TDA from other sports apps by providing fans with a platform where they can communicate.
 
-Users can join or leave any community at any time. Within a Community Chat, they can discuss whether they like or dislike a team, as long as they follow the guidelines, and react to messages.
+Users can join or leave any community at any time. Within a Community Chat, they can discuss Puerto Rico sports as long as they follow the community guidelines. Community-message reactions and threaded replies are Post-MVP and must not appear in the Version 1 interface.
 
 In the future, users may be allowed to share GIFs or images provided by the platform. Direct image and video uploads will not be allowed for safety and storage reasons.
 
