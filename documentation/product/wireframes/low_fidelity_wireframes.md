@@ -8,7 +8,7 @@ The wireframes are not intended to represent the final design. Their purpose is 
 
 The screen descriptions and navigation terminology in this document follow the approved TDA Spanish Product Glossary.
 
-> **Visual implementation status:** The eight original wireframes were revised to match the approved Version 1 scope and Spanish terminology. A ninth principal wireframe, Página del equipo, was added. The final set contains nine principal wireframes and three supporting interaction states.
+> **Visual implementation status:** The eight original wireframes were revised to match the approved Version 1 scope and Spanish terminology. A ninth principal wireframe, Página del equipo, was added. The final set contains nine principal wireframes, three supporting interaction states, and one continuation view.
 
 ## Final Wireframe Set
 
@@ -26,6 +26,7 @@ The screen descriptions and navigation terminology in this document follow the a
 | 7 | Búsquedas recientes | `07-search-recent.png` | Principal |
 | 8 | Perfil y configuración | `08-profile-settings.png` | Principal |
 | 9 | Página del equipo | `09-team-page.png` | Principal |
+| 9A | Contenido adicional de la página del equipo | `09a-team-detail-content.png` | Continuation view |
 
 ---
 
@@ -263,6 +264,12 @@ The MVP screen should include:
 
 ![Página del equipo](./images/09-team-page.png)
 
+### Continuation View — Contenido adicional
+
+This continuation view displays the team roster, basic athlete statistics, related news and publications, and access to the team’s related community.
+
+![Contenido adicional de la página del equipo](./images/09a-team-detail-content.png)
+
 ---
 
 ## Navigation Map
@@ -289,3 +296,7 @@ flowchart TD
 
     Equipo --> Juego
     Equipo --> Favoritos["Añadir o quitar de Favoritos"]
+
+```
+
+**Final wireframe set:** Nine principal wireframes, three supporting interaction states, and one continuation view.
