@@ -514,7 +514,7 @@ Legend: **Yes** = clearly supported; **Partial** = visible or available inconsis
 | FIBA GDAP | Verified for supported FIBA games | Live polling guidance supports approximately 5–10 seconds | Canonical FIBA live feed |
 | Licensed BSN/Sportradar feed | Likely strong; package must be verified | Contract-dependent | Canonical BSN live feed after approval |
 | BSN public website/app | Live data visible | Unknown and unsupported for third-party automation | Human verification only unless BSN authorizes an endpoint |
-| Doble A official site | Current results and broadcasts visible; structured live API not verified | Unknown | Schedule/results ingestion and manual live updates |
+| Doble A official site | Current results and broadcasts visible; structured live API not verified | Unknown | Schedule verification and verified final-result entry only for Version 1 |
 | FPV/DataFPV | Live statistics visible; public API not verified | Unknown | Use after direct agreement; otherwise manual verification |
 | Meta Graph API | Announcement timing only | Minutes or longer; not deterministic | Postponements and correction alerts |
 
@@ -563,36 +563,36 @@ Medium to high and currently unknown. FIBA and Sportradar require product discus
 
 ---
 
-### Option B — Authorized Official-Website Ingestion for the MVP
+### Option B — Future Authorized Official-Website Ingestion
 
 #### Description
 
-Obtain written authorization from Doble A and FPV to ingest specific official pages or files. Use `requests` and BeautifulSoup for static content, approved XHR/JSON endpoints where explicitly permitted, and Playwright only as a fallback. Keep BSN out of automated scraping unless BSN provides written approval. Use manual live updates.
+After Version 1, TDA may obtain written authorization from a league or federation to ingest specific official pages, files, exports, or endpoints. Static-content tools or browser automation may only be used when the data owner explicitly authorizes the exact access method, frequency, storage, and redistribution model.
+
+This option is not part of the Version 1 implementation and does not authorize live-score collection or public live-score behavior.
 
 #### Advantages
 
-- Lower initial cash cost
-- Faster proof of concept for domestic leagues
+- Lower direct licensing cost when authorization is granted
 - Uses official sources
-- Can demonstrate the normalized database and admin workflow before purchasing feeds
+- May support structured schedule and final-result imports
+- Can complement the normalized database and administrative workflow
 
 #### Disadvantages
 
-- Written authorization is still required
+- Written authorization is required
 - HTML, CSS, PDF, and file formats can change
-- Live performance may be limited
-- Higher maintenance burden
-- Historical formats may be inconsistent
-- No provider SLA
-- Browser automation consumes more resources and is more fragile
+- Higher engineering and maintenance burden
+- No guaranteed provider service level
+- Browser automation is comparatively fragile
 
 #### Cost profile
 
-Low direct licensing cost if permission is granted, but medium to high engineering and maintenance cost.
+Low direct licensing cost may be possible when permission is granted, but engineering and maintenance costs may remain medium to high.
 
 #### Overall assessment
 
-**Acceptable for an MVP only with written authorization and a manual fallback.** It should not be treated as the long-term live-data architecture.
+**Post-MVP option only.** It may be evaluated after written authorization is received and must not be treated as the Version 1 ingestion strategy or as approval for live scoring.
 
 ---
 
@@ -613,7 +613,7 @@ Enter schedules, teams, standings, and final results through an admin panel whil
 
 - Labor-intensive
 - Not scalable for many competitions
-- Slow live updates
+- Final results may be published more slowly because staff verification is required
 - Higher risk of manual errors without review controls
 
 #### Overall assessment
@@ -740,17 +740,17 @@ The admin workflow is required because some local data is unavailable through li
 ### Required admin functions
 
 - Create and edit leagues, seasons, stages, sections, teams, athletes, and venues
-- Import schedules and rosters from CSV
-- Create, postpone, reschedule, suspend, cancel, and finalize games
-- Enter scores by quarter, period, inning, or set
-- Record live game status and clock/inning/set when authorized data is unavailable
-- Enter or correct standings
-- Add roster changes and transactions
+- Import schedules and rosters from authorized CSV files
+- Create, postpone, reschedule, cancel, and finalize games
+- Enter and verify final scores after games conclude
+- Enter or correct standings when that Post-MVP capability is introduced
 - Attach a source URL, document, screenshot reference, or official communication
 - Mark a record as provisional, verified, disputed, corrected, or final
-- Compare automated data against the manual correction
+- Compare an imported value against a manual correction
 - Roll back an incorrect change
 - View a complete audit log
+
+The internal database may retain `in_progress` as an operational state, but Version 1 public screens and API responses must expose schedules and verified final results only. Staff must not publish partial scores, game clocks, innings, sets, or continuously updating live-score information in Version 1.
 
 ### Approval controls
 
@@ -775,7 +775,7 @@ The admin workflow is required because some local data is unavailable through li
 Use the admin workflow when:
 
 - A provider is unavailable.
-- A live record exceeds its freshness threshold.
+- A scheduled game or final result has not been verified within the documented operational review window.
 - Two official sources disagree.
 - A game is postponed or relocated without a structured update.
 - A league issues a correction after the initial final result.
@@ -908,7 +908,7 @@ Adopt a two-stage strategy: **manual-first administration for Version 1** and a 
 - Keep a **manual administrative workflow** as a permanent operational safety net.
 - Do not use hidden endpoints or browser scraping in production unless the data owner grants written authorization for the exact use, frequency, storage, and redistribution model.
 
-This approach provides the best balance of Puerto Rico coverage, data authority, live capability, maintainability, and legal safety.
+This approach provides the best balance of Puerto Rico coverage, data authority, future integration capability, maintainability, and legal safety.
 
 ---
 
