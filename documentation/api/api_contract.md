@@ -40,8 +40,10 @@ The database schema, this API contract, and the roles-and-permissions document u
 - **Backend:** NestJS
 - **Authentication provider:** Clerk
 - **Primary database:** PostgreSQL with Drizzle ORM
-- **Approval status:** Pending team review
-
+- **Approval status:** Approved
+- **Approved by:** @ernestosoto3 and @Victor1514-soft
+- **Approval date:** 2026-07-24
+- **Approval record:** GitHub issue #20
 ---
 
 ## API Design Conventions

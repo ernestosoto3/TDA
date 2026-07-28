@@ -2,9 +2,12 @@
 
 ## Purpose
 
-This document defines the standardized Spanish terminology proposed for the TDA Version 1 mobile application, administrative interface, API documentation, notifications, and product documentation.
+This document defines the approved standardized Spanish terminology for the TDA Version 1 mobile application, administrative interface, API documentation, notifications, and product documentation.
 
-**Approval status:** Approved
+**Approval status:** Approved  
+**Approved by:** @ernestosoto3 and @Victor1514-soft  
+**Approval date:** 2026-07-24  
+**Approval record:** GitHub issue #22
 
 The goal is to ensure that the same feature, action, status, or interface element is always described with the same term. This glossary standardizes product language only; it does not change the approved MVP scope.
 
@@ -562,7 +565,7 @@ The main inconsistencies found were:
 
 # 19. Confirmed Product Decisions
 
-The following terminology decisions are proposed for Version 1 and pending final team approval:
+The following terminology decisions are approved for Version 1:
 
 1. Use **Favoritos** instead of **Siguiendo**.
 2. Use **Descubre** instead of **Descubrir** or **Para ti**.
@@ -576,12 +579,17 @@ The following terminology decisions are proposed for Version 1 and pending final
 
 ---
 
-# Approval Criteria
+# Approval Record
 
-This glossary is ready for team approval when:
+The glossary was reviewed and approved for use in the Version 1 mobile application, administrative interface, API documentation, notifications, and product documentation.
 
-- The approved terms are accepted for the mobile application and administrative interface.
-- The terminology is applied consistently to product documentation and notification templates.
-- The currently supplied wireframes have been reviewed using the checklist in this document.
-- New interface copy uses the approved empty, loading, and error messages.
-- Future localization work uses these Spanish terms as the Version 1 source language.
+- [x] The standardized terms were accepted for the mobile application and administrative interface.
+- [x] The terminology was reviewed against the product documentation.
+- [x] The supplied wireframes were reviewed using the terminology checklist.
+- [x] Version 1 interface copy must use the approved empty, loading, and error messages.
+- [x] Future localization work must use these Spanish terms as the Version 1 source language.
+
+**Approval status:** Approved  
+**Approved by:** @ernestosoto3 and @Victor1514-soft  
+**Approval date:** 2026-07-24  
+**Approval record:** GitHub issue #22

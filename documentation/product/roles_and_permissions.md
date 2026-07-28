@@ -18,7 +18,11 @@ It covers the following permission areas:
 - Prohibited role combinations
 - Permission enforcement and auditing
 
-**Status:** Proposed for team approval
+**Status:** Approved
+
+**Approved by:** @ernestosoto3 and @Victor1514-soft  
+**Approval date:** 2026-07-24  
+**Approval record:** GitHub issue #19
 
 **Parent Issue:** [Documentation] Milestone 0 — Project Planning and Architecture
 
@@ -584,14 +588,17 @@ Audit records must not be modified or deleted through normal staff controls.
 
 ---
 
-# Approval
+# Approval Record
 
-This document becomes the approved roles-and-permissions model after the following reviews are completed:
+The following reviews were completed:
 
-- [ ] Product owner confirms that the roles match the MVP scope and user flows.
-- [ ] Technical lead confirms that every permission can be enforced and tested in the backend.
-- [ ] Moderation owner confirms the report, mute, suspension, and appeal boundaries.
-- [ ] Privacy or project owner confirms the account-deletion and data-retention rules.
-- [ ] The team records its approval in the issue or pull request.
+- [x] Product review confirmed that the roles match the MVP scope and user flows.
+- [x] Technical review confirmed that the permissions can be enforced and tested by the backend.
+- [x] Moderation review confirmed the report, mute, suspension, and appeal boundaries.
+- [x] Privacy and project review confirmed the account-deletion and data-retention rules.
+- [x] Team approval was recorded in GitHub issue #19.
 
-**Approval status:** Pending team review.
+**Approval status:** Approved  
+**Approved by:** @ernestosoto3 and @Victor1514-soft  
+**Approval date:** 2026-07-24  
+**Approval record:** GitHub issue #19

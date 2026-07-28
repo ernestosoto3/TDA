@@ -2,6 +2,9 @@
 
 **Research date:** July 23, 2026  
 **Decision status:** Approved for Version 1 planning  
+**Approved by:** @ernestosoto3 and @Victor1514-soft  
+**Approval date:** 2026-07-24  
+**Approval record:** GitHub issue #21
 **Scope:** Research covering current MVP requirements and possible future sports-data capabilities. Version 1 requires scheduled games and verified final scores; live scores, standings, advanced statistics, and historical expansion remain Post-MVP unless separately approved.
 
 ---
@@ -879,13 +882,12 @@ Scale: 1 = poor/high difficulty, 5 = excellent/low difficulty.
 - [x] A manual administrative fallback is defined.
 - [x] A recommended provider and combined-data strategy is documented.
 - [ ] Provider representatives have confirmed commercial terms and redistribution rights.
-- [ ] The team has formally approved the final sports-data strategy.
-
+- [x] The team formally approved the Version 1 sports-data strategy in GitHub issue #21.
 ---
 
-## 17. Decisions Required from the Team
+## 17. Approved Team Decision
 
-The team approves the following planning decision:
+The team approved the following planning decision:
 
 ```text
 Selected future strategy: Option A — Licensed and Authorized Hybrid Ingestion
@@ -894,7 +896,9 @@ Unauthorized production scraping: Not approved
 Hidden endpoints without owner authorization: Not approved
 Automated live-data ingestion in Version 1: Not included
 ```
-
+**Approved by:** @ernestosoto3 and @Victor1514-soft  
+**Approval date:** 2026-07-24  
+**Approval record:** GitHub issue #21
 ---
 
 ## 18. Final Recommendation
