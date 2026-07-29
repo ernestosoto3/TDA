@@ -199,15 +199,16 @@ pnpm build
 pnpm lint
 pnpm test
 pnpm typecheck
+pnpm check
 ```
 
-Application-specific commands will be documented after the mobile application, API, and Admin Dashboard are initialized.
+Application-specific commands are being documented because the mobile application, API, and Admin Dashboard are initialized.
 
 ## Contributing
 
 Review [CONTRIBUTING.md](CONTRIBUTING.md) before creating a branch, committing changes, or submitting a pull request.
 
-## Future Tech Stack
+## Tech Stack
 
 The selected technology stack is:
 
@@ -230,4 +231,4 @@ The selected technology stack is:
 
 ## Current Status
 
-TDA is currently in the product-planning and architecture phase. The team is defining the product’s goals and scope, establishing baseline requirements, organizing the repository and documentation, researching technical decisions, and evaluating ideas before beginning feature development.
+TDA has completed its initial product-planning and architecture phase. The monorepo, mobile application, backend API, Admin Dashboard placeholder, and shared packages have been initialized. The team is now establishing the technical foundation required for feature development.
