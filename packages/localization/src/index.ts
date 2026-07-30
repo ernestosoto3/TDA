@@ -1,8 +1,8 @@
 export const navigationLabels = {
   home: 'Inicio',
-  community: 'Comunidad',
+  communities: 'Comunidades',
   search: 'Buscar',
-  userAndSettings: 'Usuario y configuración',
+  profile: 'Perfil',
 } as const;
 
 export const gameStatusLabels = {
