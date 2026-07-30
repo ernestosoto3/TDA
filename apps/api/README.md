@@ -1,98 +1,155 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# TDA API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS API for the TDA sports platform.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## API conventions
 
-## Description
+- Base path: `/api/v1`
+- Default local URL: `http://localhost:3000/api/v1`
+- Default request-body limit: `1mb`
+- Supported request formats: JSON and URL-encoded forms
+- Request validation removes unknown properties and rejects invalid data types.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Health endpoint
 
-## Project setup
-
-```bash
-$ pnpm install
+```http
+GET /api/v1/health
 ```
 
-## Compile and run the project
+Successful response:
 
-```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+```json
+{
+  "status": "ok",
+  "service": "tda-api"
+}
 ```
 
-## Run tests
+## Environment configuration
+
+Copy the root environment template before starting the API:
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+cp .env.example .env
 ```
 
-## Deployment
+The API foundation uses these variables:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+| Variable         | Default                                          | Description                                                  |
+| ---------------- | ------------------------------------------------ | ------------------------------------------------------------ |
+| `NODE_ENV`       | `development`                                    | Runtime environment: `development`, `test`, or `production`. |
+| `API_PORT`       | `3000`                                           | Port used by the API server.                                 |
+| `API_PREFIX`     | `api`                                            | Global API route prefix.                                     |
+| `API_VERSION`    | `1`                                              | Global API version.                                          |
+| `API_BODY_LIMIT` | `1mb`                                            | Maximum JSON and URL-encoded request-body size.              |
+| `CORS_ORIGINS`   | Local development origins                        | Comma-separated browser origins allowed by CORS.             |
+| `LOG_LEVEL`      | `debug` outside production; `info` in production | Minimum structured-log level.                                |
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+See the root `.env.example` for database, authentication, storage, mobile, and notification variables.
+
+## CORS behavior
+
+In development and test environments, the default permitted origins are:
+
+```text
+http://localhost:3000
+http://localhost:8081
+```
+
+`CORS_ORIGINS` accepts a comma-separated list:
+
+```env
+CORS_ORIGINS=https://app.example.com,https://admin.example.com
+```
+
+Production requires at least one explicit origin. The API will fail during startup if production CORS configuration is missing.
+
+## Request-body limits
+
+`API_BODY_LIMIT` controls the maximum size of JSON and URL-encoded request bodies.
+
+Example:
+
+```env
+API_BODY_LIMIT=1mb
+```
+
+Requests exceeding the configured limit return HTTP `413` using the standard API error format.
+
+## Request identifiers
+
+Every request receives an `X-Request-ID` response header.
+
+The API generates an identifier for every request in this format:
+
+```text
+req_0123456789abcdef0123456789abcdef
+```
+
+The same identifier is included in structured logs and API error responses so a request can be traced across the application.
+
+## Error responses
+
+API errors use a consistent response structure:
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "The request contains invalid fields.",
+    "details": [
+      {
+        "field": "name",
+        "issue": "name must be a string"
+      }
+    ],
+    "requestId": "req_0123456789abcdef0123456789abcdef"
+  }
+}
+```
+
+The `details` field is included only when additional error information is available.
+
+Unexpected internal errors are logged, but implementation details and stack traces are not returned to clients.
+
+## Logging and security
+
+The API produces structured logs through Pino. Logs include the request identifier and redact configured sensitive headers and fields.
+
+Security headers are applied through Helmet. HTTP Strict Transport Security is enabled in production and disabled in development and test environments.
+
+Do not commit secrets or populated `.env` files.
+
+## Local commands
+
+Run these commands from the repository root.
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+# Install workspace dependencies
+pnpm install
+
+# Start the API in watch mode
+pnpm --filter @tda/api dev
+
+# Run linting
+pnpm --filter @tda/api lint
+
+# Run TypeScript checking
+pnpm --filter @tda/api typecheck
+
+# Run unit tests
+pnpm --filter @tda/api test
+
+# Run E2E tests
+pnpm --filter @tda/api test:e2e
+
+# Create a production build
+pnpm --filter @tda/api build
+
+# Run the compiled production build
+pnpm --filter @tda/api start:prod
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Graceful shutdown
 
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+The API enables NestJS shutdown hooks. When the process receives a supported termination signal, NestJS closes registered application resources before the process exits.
