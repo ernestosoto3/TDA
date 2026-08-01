@@ -190,7 +190,6 @@ pnpm --version
 
 Never commit `.env`, credentials, tokens, private keys, or other secrets.
 
-
 ## PostgreSQL Setup
 
 TDA uses separate PostgreSQL databases for local development and automated testing.

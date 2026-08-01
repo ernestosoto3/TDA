@@ -15,8 +15,7 @@ import { HealthModule } from './health/health.module';
     LoggerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const configuration =
-          configService.getOrThrow<AppConfiguration>('app');
+        const configuration = configService.getOrThrow<AppConfiguration>('app');
 
         return {
           pinoHttp: createPinoHttpOptions(configuration),

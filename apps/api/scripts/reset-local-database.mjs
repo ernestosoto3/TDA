@@ -15,34 +15,24 @@ const environment = process.env.NODE_ENV ?? 'development';
 const databaseUrl = process.env.DATABASE_URL;
 
 if (environment === 'staging' || environment === 'production') {
-  throw new Error(
-    'Database reset refused: this command cannot run in staging or production.',
-  );
+  throw new Error('Database reset refused: this command cannot run in staging or production.');
 }
 
 if (!databaseUrl) {
-  throw new Error(
-    'Database reset failed: DATABASE_URL is missing from the root .env file.',
-  );
+  throw new Error('Database reset failed: DATABASE_URL is missing from the root .env file.');
 }
 
 const parsedUrl = new URL(databaseUrl);
-const databaseName = decodeURIComponent(
-  parsedUrl.pathname.replace(/^\/+/, ''),
-);
+const databaseName = decodeURIComponent(parsedUrl.pathname.replace(/^\/+/, ''));
 
 const allowedHosts = new Set(['localhost', '127.0.0.1', '::1']);
 
 if (!allowedHosts.has(parsedUrl.hostname)) {
-  throw new Error(
-    'Database reset refused: DATABASE_URL must point to a local PostgreSQL server.',
-  );
+  throw new Error('Database reset refused: DATABASE_URL must point to a local PostgreSQL server.');
 }
 
 if (databaseName !== 'tda_local') {
-  throw new Error(
-    `Database reset refused: expected "tda_local" but received "${databaseName}".`,
-  );
+  throw new Error(`Database reset refused: expected "tda_local" but received "${databaseName}".`);
 }
 
 const client = new Client({
@@ -53,9 +43,7 @@ const client = new Client({
 try {
   await client.connect();
 
-  const result = await client.query(
-    'SELECT current_database() AS database_name',
-  );
+  const result = await client.query('SELECT current_database() AS database_name');
 
   const connectedDatabase = result.rows[0]?.database_name;
 

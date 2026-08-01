@@ -16,8 +16,7 @@ async function bootstrap(): Promise<void> {
   app.enableShutdownHooks();
 
   const configService = app.get(ConfigService);
-  const configuration =
-    configService.getOrThrow<AppConfiguration>('app');
+  const configuration = configService.getOrThrow<AppConfiguration>('app');
 
   await app.listen(configuration.port);
 }
