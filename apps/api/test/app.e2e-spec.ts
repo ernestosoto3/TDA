@@ -5,6 +5,7 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 import { configureApp } from './../src/configure-app';
+import { DatabaseService } from '../src/database/database.service';
 
 class ValidationTestDto {
   @IsString()
@@ -38,7 +39,13 @@ describe('AppController (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
       controllers: [ValidationTestController],
-    }).compile();
+    })
+      .overrideProvider(DatabaseService)
+      .useValue({
+        onModuleInit: jest.fn(),
+        onApplicationShutdown: jest.fn(),
+      })
+      .compile();
 
     app = moduleFixture.createNestApplication();
     configureApp(app);
@@ -104,6 +111,6 @@ describe('AppController (e2e)', () => {
   });
 
   afterEach(async () => {
-    await app.close();
+    await app?.close();
   });
 });
