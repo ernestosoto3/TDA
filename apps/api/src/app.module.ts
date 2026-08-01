@@ -6,7 +6,7 @@ import { AppService } from './app.service';
 import { ApiConfigModule } from './config/config.module';
 import type { AppConfiguration } from './config/environment.validation';
 import { createPinoHttpOptions } from './config/logger.config';
-import { DatabaseModule } from './databases/database.module';
+import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
 
 @Module({
