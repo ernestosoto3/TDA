@@ -1,11 +1,16 @@
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { applicationConfig } from '@tda/config';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
 
-  await app.listen(process.env.PORT ?? applicationConfig.api.defaultPort);
+  app.enableShutdownHooks();
+
+  const port = configService.getOrThrow<number>('API_PORT');
+
+  await app.listen(port);
 }
 
 void bootstrap();
