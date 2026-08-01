@@ -150,6 +150,7 @@ Project documentation is maintained on the `documentation` branch.
 - Git
 - Node.js 22 or later
 - pnpm 11 or later
+- PostgreSQL
 
 Confirm the installed versions:
 
@@ -188,6 +189,132 @@ pnpm --version
 5. Replace the placeholders with the appropriate local values.
 
 Never commit `.env`, credentials, tokens, private keys, or other secrets.
+
+
+## PostgreSQL Setup
+
+TDA uses separate PostgreSQL databases for local development and automated testing.
+
+### 1. Open PostgreSQL
+
+Connect using an administrator account:
+
+```bash
+psql -U postgres -d postgres
+```
+
+### 2. Create the application role
+
+Replace the placeholder with a private local password:
+
+```sql
+CREATE ROLE tda_app WITH LOGIN PASSWORD 'your_local_password';
+```
+
+### 3. Create the local and test databases
+
+```sql
+CREATE DATABASE tda_local OWNER tda_app;
+CREATE DATABASE tda_test OWNER tda_app;
+```
+
+The databases must remain separate:
+
+- `tda_local` is used during normal local development.
+- `tda_test` is used when `NODE_ENV=test`.
+
+### 4. Configure the private environment file
+
+Copy `.env.example` to `.env` and replace the password placeholders with the local `tda_app` password:
+
+```env
+DATABASE_URL=postgresql://tda_app:your_local_password@localhost:5432/tda_local
+TEST_DATABASE_URL=postgresql://tda_app:your_local_password@localhost:5432/tda_test
+DATABASE_SSL_MODE=disable
+DATABASE_POOL_MAX=10
+DATABASE_CONNECTION_TIMEOUT_MS=5000
+DATABASE_IDLE_TIMEOUT_MS=30000
+```
+
+The `.env` file is private and must never be committed.
+
+### 5. Configure staging
+
+Staging credentials must be configured through the deployment platform and must not be stored in the repository.
+
+The staging environment must provide:
+
+```env
+NODE_ENV=staging
+DATABASE_URL=postgresql://user:password@staging-host:5432/staging_database
+DATABASE_SSL_MODE=verify-full
+DATABASE_POOL_MAX=10
+DATABASE_CONNECTION_TIMEOUT_MS=5000
+DATABASE_IDLE_TIMEOUT_MS=30000
+```
+
+The values shown above are placeholders. Real staging credentials must be stored as private deployment variables.
+
+`TEST_DATABASE_URL` is not required in staging.
+
+### 6. Verify the PostgreSQL connection
+
+Start the API:
+
+```bash
+pnpm --filter @tda/api dev
+```
+
+A successful startup displays a message similar to:
+
+```text
+Connected to PostgreSQL database "tda_local"
+```
+
+Stop the API with `Ctrl + C`.
+
+The API validates its environment variables before starting. Startup fails with a clear error when:
+
+- A required database URL is missing or invalid.
+- Local and test URLs point to the same database.
+- `TEST_DATABASE_URL` is missing during development or testing.
+- SSL is disabled in staging or production.
+- A numeric pool setting is outside its accepted range.
+- PostgreSQL cannot be reached.
+
+### 7. Local and test isolation
+
+TDA selects its database according to `NODE_ENV`:
+
+- `development` uses `DATABASE_URL`.
+- `test` uses `TEST_DATABASE_URL`.
+- `staging` and `production` use `DATABASE_URL`.
+
+The environment validator prevents `DATABASE_URL` and `TEST_DATABASE_URL` from pointing to the same database.
+
+Run the API environment validation tests with:
+
+```bash
+pnpm --filter @tda/api test -- env.validation.spec.ts --runInBand
+```
+
+### 8. Reset the local database
+
+Reset the `tda_local` database with:
+
+```bash
+pnpm --filter @tda/api db:reset:local
+```
+
+This command removes the objects stored in the local `public` schema and creates a clean schema.
+
+For safety, the reset command refuses to run when:
+
+- `NODE_ENV` is `staging` or `production`.
+- The database host is not local.
+- `DATABASE_URL` does not point to `tda_local`.
+
+The command must never be used with staging or production credentials.
 
 ## Development
 
