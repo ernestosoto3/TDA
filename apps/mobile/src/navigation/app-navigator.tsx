@@ -1,6 +1,6 @@
-import { navigationLabels } from '@tda/localization';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Home, Search, UserRound, UsersRound } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 
 import { CommunitiesScreen } from '../screens/communities-screen';
 import { HomeScreen } from '../screens/home-screen';
@@ -12,6 +12,8 @@ import type { RootTabParamList } from './types';
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 export function AppNavigator() {
+  const { t } = useTranslation();
+
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -33,8 +35,8 @@ export function AppNavigator() {
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarLabel: navigationLabels.home,
-          tabBarAccessibilityLabel: navigationLabels.home,
+          tabBarLabel: t('navigation.home'),
+          tabBarAccessibilityLabel: t('navigation.home'),
           tabBarIcon: ({ color, size }) => <Home color={color} size={size} strokeWidth={2} />,
         }}
       />
@@ -42,8 +44,8 @@ export function AppNavigator() {
         name="Communities"
         component={CommunitiesScreen}
         options={{
-          tabBarLabel: navigationLabels.communities,
-          tabBarAccessibilityLabel: navigationLabels.communities,
+          tabBarLabel: t('navigation.communities'),
+          tabBarAccessibilityLabel: t('navigation.communities'),
           tabBarIcon: ({ color, size }) => <UsersRound color={color} size={size} strokeWidth={2} />,
         }}
       />
@@ -51,8 +53,8 @@ export function AppNavigator() {
         name="Search"
         component={SearchScreen}
         options={{
-          tabBarLabel: navigationLabels.search,
-          tabBarAccessibilityLabel: navigationLabels.search,
+          tabBarLabel: t('navigation.search'),
+          tabBarAccessibilityLabel: t('navigation.search'),
           tabBarIcon: ({ color, size }) => <Search color={color} size={size} strokeWidth={2} />,
         }}
       />
@@ -60,8 +62,8 @@ export function AppNavigator() {
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarLabel: navigationLabels.profile,
-          tabBarAccessibilityLabel: navigationLabels.profile,
+          tabBarLabel: t('navigation.profile'),
+          tabBarAccessibilityLabel: t('navigation.profile'),
           tabBarIcon: ({ color, size }) => <UserRound color={color} size={size} strokeWidth={2} />,
         }}
       />

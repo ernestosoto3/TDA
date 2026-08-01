@@ -1,12 +1,11 @@
-import { navigationLabels } from '@tda/localization';
+import { useTranslation } from 'react-i18next';
 
 import { ScreenLayout } from '../components/screen-layout';
 
 export function SearchScreen() {
+  const { t } = useTranslation();
+
   return (
-    <ScreenLayout
-      title={navigationLabels.search}
-      description="Busca equipos, ligas, atletas, partidos y publicaciones."
-    />
+    <ScreenLayout title={t('navigation.search')} description={t('screens.search.description')} />
   );
 }

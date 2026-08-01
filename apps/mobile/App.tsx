@@ -5,6 +5,7 @@ import { Inter_700Bold } from '@expo-google-fonts/inter/700Bold';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
+import './src/localization/i18n';
 
 import { AppNavigator } from './src/navigation/app-navigator';
 import { navigationTheme } from './src/theme/theme';
