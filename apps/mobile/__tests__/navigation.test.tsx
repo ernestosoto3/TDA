@@ -42,9 +42,9 @@ describe('mobile navigation shell', () => {
 
   it.each([
     ['Comunidades', 'Explora y participa en comunidades deportivas.'],
-    ['Buscar', 'Busca equipos, ligas, atletas, partidos y publicaciones.'],
+    ['Buscar', 'Busca equipos, ligas, atletas, juegos y publicaciones.'],
     ['Perfil', 'Administra tu perfil, favoritos y configuración.'],
-    ['Inicio', 'Aquí encontrarás noticias, partidos y resultados deportivos.'],
+    ['Inicio', 'Aquí encontrarás noticias, juegos y resultados deportivos.'],
   ])('navigates to %s', async (tabLabel, screenDescription) => {
     await render(<App />);
     const user = userEvent.setup();
