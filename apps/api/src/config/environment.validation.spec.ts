@@ -1,12 +1,24 @@
 import { AppConfiguration, validateEnvironment } from './environment.validation';
 
-function getAppConfiguration(environment: Record<string, unknown>): AppConfiguration {
-  return validateEnvironment(environment).app;
+const validDatabaseEnvironment = {
+  DATABASE_URL: 'postgresql://tda_app:password@localhost:5432/tda_local',
+  TEST_DATABASE_URL: 'postgresql://tda_app:password@localhost:5432/tda_test',
+  DATABASE_SSL_MODE: 'disable',
+  DATABASE_POOL_MAX: '10',
+  DATABASE_CONNECTION_TIMEOUT_MS: '5000',
+  DATABASE_IDLE_TIMEOUT_MS: '30000',
+};
+
+function getAppConfiguration(environment: Record<string, unknown> = {}): AppConfiguration {
+  return validateEnvironment({
+    ...validDatabaseEnvironment,
+    ...environment,
+  }).app;
 }
 
 describe('validateEnvironment', () => {
   it('applies development defaults', () => {
-    const configuration = getAppConfiguration({});
+    const configuration = getAppConfiguration();
 
     expect(configuration).toEqual({
       environment: 'development',
@@ -44,7 +56,9 @@ describe('validateEnvironment', () => {
   it('requires explicit CORS origins in production', () => {
     expect(() =>
       validateEnvironment({
+        ...validDatabaseEnvironment,
         NODE_ENV: 'production',
+        DATABASE_SSL_MODE: 'verify-full',
         CORS_ORIGINS: '',
       }),
     ).toThrow('Environment validation failed');
@@ -53,6 +67,7 @@ describe('validateEnvironment', () => {
   it('uses info logging by default in production', () => {
     const configuration = getAppConfiguration({
       NODE_ENV: 'production',
+      DATABASE_SSL_MODE: 'verify-full',
       CORS_ORIGINS: 'https://tda.example.com',
     });
 
@@ -62,6 +77,7 @@ describe('validateEnvironment', () => {
   it('rejects an invalid port', () => {
     expect(() =>
       validateEnvironment({
+        ...validDatabaseEnvironment,
         API_PORT: 'invalid',
       }),
     ).toThrow('Environment validation failed');
@@ -70,6 +86,7 @@ describe('validateEnvironment', () => {
   it('rejects an invalid API version', () => {
     expect(() =>
       validateEnvironment({
+        ...validDatabaseEnvironment,
         API_VERSION: 'version-one',
       }),
     ).toThrow('Environment validation failed');
@@ -78,6 +95,7 @@ describe('validateEnvironment', () => {
   it('rejects an invalid body limit', () => {
     expect(() =>
       validateEnvironment({
+        ...validDatabaseEnvironment,
         API_BODY_LIMIT: 'unlimited',
       }),
     ).toThrow('Environment validation failed');

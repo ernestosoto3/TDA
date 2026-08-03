@@ -1,6 +1,7 @@
 import Joi from 'joi';
+import { validateEnvironment as validateDatabaseEnvironment } from './env.validation';
 
-export const nodeEnvironments = ['development', 'test', 'production'] as const;
+export const nodeEnvironments = ['development', 'test', 'staging', 'production'] as const;
 
 export const logLevels = ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'] as const;
 
@@ -71,7 +72,9 @@ function parseCorsOrigins(corsOrigins: string | undefined): string[] {
 }
 
 export function validateEnvironment(configuration: Record<string, unknown>): ValidatedEnvironment {
-  const result = environmentSchema.validate(configuration, {
+  const databaseConfiguration = validateDatabaseEnvironment(configuration);
+
+  const result = environmentSchema.validate(databaseConfiguration, {
     abortEarly: false,
     allowUnknown: true,
     convert: true,
@@ -85,10 +88,11 @@ export function validateEnvironment(configuration: Record<string, unknown>): Val
 
   const values = result.value;
 
-  const defaultLogLevel: LogLevel = values.NODE_ENV === 'production' ? 'info' : 'debug';
+  const defaultLogLevel: LogLevel =
+    values.NODE_ENV === 'production' || values.NODE_ENV === 'staging' ? 'info' : 'debug';
 
   return {
-    ...configuration,
+    ...databaseConfiguration,
     app: {
       environment: values.NODE_ENV,
       port: values.API_PORT,
