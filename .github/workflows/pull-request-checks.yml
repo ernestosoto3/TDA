@@ -37,6 +37,14 @@ jobs:
         run: pnpm check
 
       - name: Run API E2E tests
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://tda_app:test_password@localhost:5432/tda_local
+          TEST_DATABASE_URL: postgresql://tda_app:test_password@localhost:5432/tda_test
+          DATABASE_SSL_MODE: disable
+          DATABASE_POOL_MAX: '10'
+          DATABASE_CONNECTION_TIMEOUT_MS: '5000'
+          DATABASE_IDLE_TIMEOUT_MS: '30000'
         run: pnpm --filter @tda/api test:e2e --runInBand
 
       - name: Build applications
