@@ -13,6 +13,7 @@ async function bootstrap(): Promise<void> {
 
   app.useLogger(app.get(Logger));
   configureApp(app);
+  app.enableShutdownHooks();
 
   const configService = app.get(ConfigService);
   const configuration = configService.getOrThrow<AppConfiguration>('app');
