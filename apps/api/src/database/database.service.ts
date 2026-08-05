@@ -59,6 +59,9 @@ export class DatabaseService implements OnApplicationBootstrap, OnApplicationShu
     }
   }
 
+  async checkHealth(): Promise<void> {
+    await this.pool.query('SELECT 1');
+  }
   async onApplicationShutdown(): Promise<void> {
     await this.pool.end();
     this.logger.log('PostgreSQL connection pool closed');

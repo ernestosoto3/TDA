@@ -19,6 +19,14 @@ const databaseUrlSchema = z
     }
   }, 'must be a complete PostgreSQL URL');
 
+const optionalEnvironmentValue = z.preprocess((value) => {
+  if (typeof value === 'string' && value.trim() === '') {
+    return undefined;
+  }
+
+  return value;
+}, z.string().trim().min(1).optional());
+
 const environmentSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'staging', 'production']).default('development'),
@@ -35,10 +43,22 @@ const environmentSchema = z
     DATABASE_CONNECTION_TIMEOUT_MS: z.coerce.number().int().min(100).max(60000).default(5000),
 
     DATABASE_IDLE_TIMEOUT_MS: z.coerce.number().int().min(1000).max(600000).default(30000),
+
+    CLOUDFLARE_R2_ACCOUNT_ID: optionalEnvironmentValue,
+    CLOUDFLARE_R2_ACCESS_KEY_ID: optionalEnvironmentValue,
+    CLOUDFLARE_R2_SECRET_ACCESS_KEY: optionalEnvironmentValue,
+    CLOUDFLARE_R2_BUCKET_NAME: optionalEnvironmentValue,
   })
   .passthrough();
 
 export type EnvironmentVariables = z.infer<typeof environmentSchema>;
+
+const r2EnvironmentVariables = [
+  'CLOUDFLARE_R2_ACCOUNT_ID',
+  'CLOUDFLARE_R2_ACCESS_KEY_ID',
+  'CLOUDFLARE_R2_SECRET_ACCESS_KEY',
+  'CLOUDFLARE_R2_BUCKET_NAME',
+] as const;
 
 function getDatabaseName(connectionString: string): string {
   const url = new URL(connectionString);
@@ -82,6 +102,19 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
     if (developmentDatabase === testDatabase) {
       additionalErrors.push('DATABASE_URL and TEST_DATABASE_URL must use different databases.');
     }
+  }
+
+  const configuredR2Variables = r2EnvironmentVariables.filter(
+    (variable) => validated[variable] !== undefined,
+  );
+
+  if (
+    configuredR2Variables.length > 0 &&
+    configuredR2Variables.length < r2EnvironmentVariables.length
+  ) {
+    additionalErrors.push(
+      'Cloudflare R2 configuration must provide all four CLOUDFLARE_R2 variables or leave all four empty.',
+    );
   }
 
   if (additionalErrors.length > 0) {

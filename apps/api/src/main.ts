@@ -4,6 +4,7 @@ import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import type { AppConfiguration } from './config/environment.validation';
 import { configureApp } from './configure-app';
+import { setupOpenApi } from './openapi/openapi.config';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, {
@@ -12,8 +13,9 @@ async function bootstrap(): Promise<void> {
   });
 
   app.useLogger(app.get(Logger));
+
   configureApp(app);
-  app.enableShutdownHooks();
+  setupOpenApi(app);
 
   const configService = app.get(ConfigService);
   const configuration = configService.getOrThrow<AppConfiguration>('app');

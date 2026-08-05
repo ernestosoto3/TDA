@@ -33,16 +33,22 @@ function expectPayloadTooLargeResponse(response: request.Response): void {
 }
 
 describe('AppController (e2e)', () => {
+  const checkDatabaseHealth = jest.fn<Promise<void>, []>();
+
   let app: INestApplication<App>;
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+    checkDatabaseHealth.mockResolvedValue();
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
       controllers: [ValidationTestController],
     })
       .overrideProvider(DatabaseService)
       .useValue({
-        onModuleInit: jest.fn(),
+        checkHealth: checkDatabaseHealth,
+        onApplicationBootstrap: jest.fn(),
         onApplicationShutdown: jest.fn(),
       })
       .compile();
@@ -108,6 +114,47 @@ describe('AppController (e2e)', () => {
       .expect(413);
 
     expectPayloadTooLargeResponse(response);
+  });
+
+  it('/api/v1/health/live (GET) returns liveness', async () => {
+    const response = await request(app.getHttpServer()).get('/api/v1/health/live').expect(200);
+
+    expect(response.body).toEqual({
+      status: 'ok',
+      service: 'tda-api',
+    });
+
+    expect(checkDatabaseHealth).not.toHaveBeenCalled();
+  });
+
+  it('/api/v1/health/ready (GET) returns readiness when PostgreSQL is available', async () => {
+    const response = await request(app.getHttpServer()).get('/api/v1/health/ready').expect(200);
+
+    expect(response.body).toEqual({
+      status: 'ok',
+      service: 'tda-api',
+      checks: {
+        postgresql: 'up',
+      },
+    });
+
+    expect(checkDatabaseHealth).toHaveBeenCalledTimes(1);
+  });
+
+  it('/api/v1/health/ready (GET) returns 503 when PostgreSQL is unavailable', async () => {
+    checkDatabaseHealth.mockRejectedValueOnce(new Error('PostgreSQL unavailable'));
+
+    const response = await request(app.getHttpServer()).get('/api/v1/health/ready').expect(503);
+
+    expect(response.body).toEqual({
+      status: 'error',
+      service: 'tda-api',
+      checks: {
+        postgresql: 'down',
+      },
+    });
+
+    expect(checkDatabaseHealth).toHaveBeenCalledTimes(1);
   });
 
   afterEach(async () => {

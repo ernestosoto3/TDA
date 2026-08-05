@@ -12,7 +12,9 @@
     "lint": "pnpm --recursive run lint",
     "typecheck": "pnpm --recursive run typecheck",
     "test": "pnpm --recursive run test",
-    "check": "pnpm build:packages && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test"
+    "openapi:generate": "pnpm --filter @tda/api openapi:generate",
+    "openapi:check": "pnpm --filter @tda/api openapi:check",
+    "check": "pnpm build:packages && pnpm format:check && pnpm lint && pnpm typecheck && pnpm openapi:check && pnpm test"
   },
   "engines": {
     "node": ">=22",

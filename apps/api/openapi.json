@@ -1,0 +1,106 @@
+{
+  "components": {
+    "schemas": {
+      "LivenessResponseDto": {
+        "properties": {
+          "service": { "enum": ["tda-api"], "example": "tda-api", "type": "string" },
+          "status": { "enum": ["ok"], "example": "ok", "type": "string" }
+        },
+        "required": ["status", "service"],
+        "type": "object"
+      },
+      "ReadinessChecksDto": {
+        "properties": {
+          "postgresql": {
+            "description": "PostgreSQL connectivity status.",
+            "enum": ["up", "down"],
+            "example": "up",
+            "type": "string"
+          },
+          "r2": {
+            "description": "Cloudflare R2 connectivity status. Omitted when R2 is not configured.",
+            "enum": ["up", "down"],
+            "example": "up",
+            "type": "string"
+          }
+        },
+        "required": ["postgresql"],
+        "type": "object"
+      },
+      "ReadinessResponseDto": {
+        "properties": {
+          "checks": { "$ref": "#/components/schemas/ReadinessChecksDto" },
+          "service": { "enum": ["tda-api"], "example": "tda-api", "type": "string" },
+          "status": { "enum": ["ok", "error"], "example": "ok", "type": "string" }
+        },
+        "required": ["status", "service", "checks"],
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "contact": {},
+    "description": "Versioned REST API for the TDA Puerto Rico sports platform.",
+    "title": "TDA API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1": {
+      "get": {
+        "operationId": "AppController_getHello_v1",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["App"]
+      }
+    },
+    "/api/v1/health/live": {
+      "get": {
+        "description": "Confirms that the API process is running. It does not check external dependencies.",
+        "operationId": "HealthController_checkLiveness_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LivenessResponseDto" }
+              }
+            },
+            "description": "The API process is running."
+          }
+        },
+        "summary": "Check API liveness",
+        "tags": ["Operational health"]
+      }
+    },
+    "/api/v1/health/ready": {
+      "get": {
+        "description": "Checks PostgreSQL and checks Cloudflare R2 only when R2 is configured.",
+        "operationId": "HealthController_checkReadiness_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ReadinessResponseDto" }
+              }
+            },
+            "description": "All required dependencies are available."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ReadinessResponseDto" }
+              }
+            },
+            "description": "A required or configured dependency is unavailable."
+          }
+        },
+        "summary": "Check API readiness",
+        "tags": ["Operational health"]
+      }
+    }
+  },
+  "servers": [],
+  "tags": []
+}
