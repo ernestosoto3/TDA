@@ -1244,50 +1244,126 @@ Clear requirements reduce ambiguity, rework, and inconsistent implementation acr
 
 ---
 
+## Operational Health Endpoints
+
+The NestJS REST API uses the global `/api` prefix and URI-based versioning. Version 1 endpoints use the `/api/v1` base path.
+
+These endpoints are operational infrastructure endpoints and do not represent implementation of the complete MVP API.
+
+### Liveness
+
+```http
+GET /api/v1/health/live
+```
+
+The liveness endpoint confirms that the API process is running. It does not check PostgreSQL, Cloudflare R2, or other external dependencies.
+
+A healthy process returns HTTP `200 OK`:
+
+```json
+{
+  "status": "ok",
+  "service": "tda-api"
+}
+```
+
+### Readiness
+
+```http
+GET /api/v1/health/ready
+```
+
+The readiness endpoint verifies that the dependencies required to serve requests are available.
+
+PostgreSQL is always checked. Cloudflare R2 is checked only when all required R2 configuration variables are available. When R2 is not configured, the `r2` field is omitted from the response.
+
+A ready API without R2 configured returns HTTP `200 OK`:
+
+```json
+{
+  "status": "ok",
+  "service": "tda-api",
+  "checks": {
+    "postgresql": "up"
+  }
+}
+```
+
+When R2 is configured and available, its status is included:
+
+```json
+{
+  "status": "ok",
+  "service": "tda-api",
+  "checks": {
+    "postgresql": "up",
+    "r2": "up"
+  }
+}
+```
+
+If PostgreSQL or a configured R2 dependency is unavailable, the endpoint returns HTTP `503 Service Unavailable` with `status` set to `error`.
+
+Example PostgreSQL failure:
+
+```json
+{
+  "status": "error",
+  "service": "tda-api",
+  "checks": {
+    "postgresql": "down"
+  }
+}
+```
+
+Operational responses expose only safe dependency statuses. They must not include credentials, connection strings, provider errors, stack traces, bucket identifiers, or private infrastructure details.
+
+---
+
 ## OpenAPI Contract and Automated Validation
 
-### Milestone 0 Status
+### Milestone 1 Status
 
-This Markdown document is the approved human-readable API design for the MVP. The executable OpenAPI specification and automated contract checks will be introduced when the NestJS API is initialized during Milestone 1.
+OpenAPI generation and automated validation were activated during Milestone 1 with the initial NestJS REST foundation.
 
-Milestone 0 does not require an empty or manually maintained OpenAPI file because no controllers, DTOs, or API workspace currently exist from which to generate and verify it.
+The generated specification currently represents the implemented API operations. The remaining endpoints described in this Markdown contract continue to define the approved MVP behavior and will be added to the generated specification as they are implemented.
+
+Swagger UI is available during API execution at:
+
+```text
+/api/v1/docs
+```
 
 ### Contract Ownership
 
-During implementation, TDA will maintain two synchronized representations of the API contract:
+TDA maintains two synchronized representations of the API contract:
 
 - `documentation/api/api_contract.md` defines the approved product behavior, endpoint requirements, authorization rules, and response expectations.
-- `documentation/api/openapi.json` will be the generated, machine-readable OpenAPI 3 specification for the implemented HTTP API.
+- `apps/api/openapi.json` is the generated, machine-readable OpenAPI specification for the implemented HTTP API.
 
-The NestJS controllers, DTOs, validation rules, and OpenAPI decorators must generate an OpenAPI specification consistent with this approved contract. A pull request must not introduce an undocumented endpoint or silently change approved behavior.
+NestJS controllers, DTOs, validation rules, and OpenAPI decorators generate the executable specification.
 
-When an intentional API change is required, the Markdown contract, implementation, DTOs, tests, and generated OpenAPI specification must be updated together.
+An implementation pull request must not introduce undocumented behavior or silently change an approved contract. When an intentional API change is required, the Markdown contract, implementation, DTOs, tests, and generated specification must be updated together when applicable.
 
 ### Generation Requirements
 
-When `apps/api` is initialized, the API implementation must:
+The API implementation:
 
-- Install and configure `@nestjs/swagger`.
-- Use `DocumentBuilder` and `SwaggerModule.createDocument()` to generate the OpenAPI document.
-- Generate the specification from the same NestJS modules, controllers, DTOs, and validation rules used by the running API.
-- Write the generated artifact to:
-
-```text
-documentation/api/openapi.json
-```
-
-- Provide a deterministic generation command:
+- Uses `@nestjs/swagger`.
+- Uses `DocumentBuilder` and `SwaggerModule.createDocument()`.
+- Generates the specification from the same NestJS modules, controllers, DTOs, and validation rules used by the running API.
+- Writes the generated artifact to:
 
 ```text
-pnpm openapi:generate
+apps/api/openapi.json
 ```
 
-- Produce the same output when run repeatedly without source changes.
-- Avoid environment-specific server URLs, secrets, credentials, or private infrastructure information in the committed specification.
+- Produces the same output when run repeatedly without source changes.
+- Excludes environment-specific server URLs, secrets, credentials, and private infrastructure information from the committed specification.
 
 ### Required OpenAPI Content
 
-The generated OpenAPI specification must include:
+As the MVP API is implemented, the generated OpenAPI specification must include:
 
 - Every implemented REST route and HTTP method
 - Stable and unique operation identifiers
@@ -1303,45 +1379,36 @@ The generated OpenAPI specification must include:
 - Operation tags organized by API domain
 - Deprecation metadata when an operation is being retired
 
-Every protected operation must declare the appropriate bearer-authentication security requirement. Public operations must be explicitly documented as public.
+Protected operations must declare the appropriate bearer-authentication requirement. Public operations must be documented as public.
 
 Real-time WebSocket events remain documented in the Real-Time Contract section unless an approved AsyncAPI specification is introduced later.
 
-### Required Commands
+### OpenAPI Commands
 
-After the NestJS API is initialized, the repository must provide:
-
-```text
-pnpm openapi:generate
-pnpm openapi:lint
-pnpm openapi:check
-```
-
-These commands will have the following responsibilities:
+The repository provides:
 
 | Command | Responsibility |
 |---|---|
-| `pnpm openapi:generate` | Generate `documentation/api/openapi.json` from the NestJS implementation |
-| `pnpm openapi:lint` | Validate the generated specification against OpenAPI structure and the approved linting rules |
-| `pnpm openapi:check` | Generate the specification, confirm the committed artifact is current, run linting, and execute the configured contract checks |
+| `pnpm openapi:generate` | Generate `apps/api/openapi.json` from the NestJS implementation |
+| `pnpm openapi:check` | Verify that the generated specification is valid, current, and deterministic |
 
-### Pull-Request Contract Checks
+The generated document must be committed whenever an implementation change modifies the API contract.
 
-After the API workspace is initialized, `.github/workflows/pull-request-checks.yml` must run:
+### Pull-Request Contract Check
+
+The pull-request workflow runs:
 
 ```text
 pnpm openapi:check
 ```
 
-The contract check must fail when:
+The check fails when:
 
 - The generated OpenAPI document is invalid.
-- The committed OpenAPI artifact differs from freshly generated output.
-- An implemented controller operation is absent from OpenAPI.
-- A protected operation does not declare its security requirement.
-- Required request, response, parameter, or error schemas are missing.
-- Duplicate or unstable operation identifiers are detected.
-- A prohibited breaking change is introduced to `/api/v1`.
+- The committed artifact differs from freshly generated output.
+- Repeated generation produces different output without source changes.
+
+Formatting, linting, type checking, unit tests, end-to-end tests, and builds remain separate repository checks.
 
 ### Breaking-Change Policy
 
@@ -1356,13 +1423,7 @@ The following changes to `/api/v1` are considered breaking unless explicitly rev
 - Changing authentication or authorization requirements incompatibly
 - Making an existing validation rule more restrictive without an approved migration plan
 
-An approved breaking change must include a migration plan. When compatibility cannot be preserved, the change must be introduced through a new API version rather than silently changing `/api/v1`.
-
-### Milestone 1 Activation
-
-The OpenAPI artifact, generation script, validation dependency, package scripts, and CI command must be added in the same implementation work that initializes the NestJS API.
-
-Until then, the existing pull-request workflow continues running formatting, linting, type checking, and tests without an OpenAPI command that cannot yet execute.
+An approved breaking change must include a migration plan. When compatibility cannot be preserved, the change must be introduced through a new API version instead of silently changing `/api/v1`.
 
 ---
 
