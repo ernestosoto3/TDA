@@ -1,23 +1,10 @@
 import { pgEnum } from 'drizzle-orm/pg-core';
 
-export const userStatusEnum = pgEnum('user_status', [
-  'active',
-  'suspended',
-  'soft_deleted',
-]);
+export const userStatusEnum = pgEnum('user_status', ['active', 'suspended', 'soft_deleted']);
 
-export const platformRoleEnum = pgEnum('platform_role', [
-  'moderator',
-  'editor',
-  'administrator',
-]);
+export const platformRoleEnum = pgEnum('platform_role', ['moderator', 'editor', 'administrator']);
 
-export const sportStatusEnum = pgEnum('sport_status', [
-  'draft',
-  'active',
-  'inactive',
-  'archived',
-]);
+export const sportStatusEnum = pgEnum('sport_status', ['draft', 'active', 'inactive', 'archived']);
 
 export const leagueStatusEnum = pgEnum('league_status', [
   'upcoming',
@@ -26,17 +13,9 @@ export const leagueStatusEnum = pgEnum('league_status', [
   'archived',
 ]);
 
-export const teamStatusEnum = pgEnum('team_status', [
-  'active',
-  'inactive',
-  'archived',
-]);
+export const teamStatusEnum = pgEnum('team_status', ['active', 'inactive', 'archived']);
 
-export const athleteStatusEnum = pgEnum('athlete_status', [
-  'active',
-  'inactive',
-  'archived',
-]);
+export const athleteStatusEnum = pgEnum('athlete_status', ['active', 'inactive', 'archived']);
 
 export const gameStatusEnum = pgEnum('game_status', [
   'scheduled',
@@ -46,11 +25,7 @@ export const gameStatusEnum = pgEnum('game_status', [
   'canceled',
 ]);
 
-export const scoreStatusEnum = pgEnum('score_status', [
-  'pending',
-  'updated',
-  'final',
-]);
+export const scoreStatusEnum = pgEnum('score_status', ['pending', 'updated', 'final']);
 
 export const scoreResultTypeEnum = pgEnum('score_result_type', [
   'home_win',
@@ -68,34 +43,15 @@ export const postStatusEnum = pgEnum('post_status', [
   'soft_deleted',
 ]);
 
-export const postContentTypeEnum = pgEnum('post_content_type', [
-  'post',
-  'article',
-]);
+export const postContentTypeEnum = pgEnum('post_content_type', ['post', 'article']);
 
-export const commentStatusEnum = pgEnum('comment_status', [
-  'active',
-  'hidden',
-  'soft_deleted',
-]);
+export const commentStatusEnum = pgEnum('comment_status', ['active', 'hidden', 'soft_deleted']);
 
-export const messageStatusEnum = pgEnum('message_status', [
-  'active',
-  'hidden',
-  'soft_deleted',
-]);
+export const messageStatusEnum = pgEnum('message_status', ['active', 'hidden', 'soft_deleted']);
 
-export const communityStatusEnum = pgEnum('community_status', [
-  'active',
-  'restricted',
-  'archived',
-]);
+export const communityStatusEnum = pgEnum('community_status', ['active', 'restricted', 'archived']);
 
-export const membershipRoleEnum = pgEnum('membership_role', [
-  'member',
-  'moderator',
-  'admin',
-]);
+export const membershipRoleEnum = pgEnum('membership_role', ['member', 'moderator', 'admin']);
 
 export const membershipStatusEnum = pgEnum('membership_status', [
   'active',
@@ -119,10 +75,7 @@ export const notificationTypeEnum = pgEnum('notification_type', [
 
 export const pushProviderEnum = pgEnum('push_provider', ['expo', 'fcm']);
 
-export const mobilePlatformEnum = pgEnum('mobile_platform', [
-  'ios',
-  'android',
-]);
+export const mobilePlatformEnum = pgEnum('mobile_platform', ['ios', 'android']);
 
 export const sourceTypeEnum = pgEnum('source_type', [
   'official_federation',
@@ -148,17 +101,14 @@ export const reportEntityTypeEnum = pgEnum('report_entity_type', [
 
 export const mediaTypeEnum = pgEnum('media_type', ['image', 'video']);
 
-export const deletionRequestStatusEnum = pgEnum(
-  'deletion_request_status',
-  [
-    'pending_verification',
-    'verified',
-    'scheduled',
-    'completed',
-    'cancelled',
-    'rejected',
-  ],
-);
+export const deletionRequestStatusEnum = pgEnum('deletion_request_status', [
+  'pending_verification',
+  'verified',
+  'scheduled',
+  'completed',
+  'cancelled',
+  'rejected',
+]);
 
 export const reportActionTypeEnum = pgEnum('report_action_type', [
   'assignment',
@@ -180,16 +130,9 @@ export const escalationStatusEnum = pgEnum('escalation_status', [
   'cancelled',
 ]);
 
-export const auditResultEnum = pgEnum('audit_result', [
-  'succeeded',
-  'denied',
-  'failed',
-]);
+export const auditResultEnum = pgEnum('audit_result', ['succeeded', 'denied', 'failed']);
 
-export const policyTypeEnum = pgEnum('policy_type', [
-  'terms_of_service',
-  'privacy_policy',
-]);
+export const policyTypeEnum = pgEnum('policy_type', ['terms_of_service', 'privacy_policy']);
 
 export const policyStatusEnum = pgEnum('policy_status', [
   'draft',
