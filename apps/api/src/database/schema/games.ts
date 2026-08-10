@@ -60,7 +60,5 @@ export const games = pgTable(
     index('games_status_scheduled_start_at_idx').on(games.status, games.scheduledStartAt),
 
     index('games_league_scheduled_start_at_idx').on(games.leagueId, games.scheduledStartAt),
-
-    index('games_league_away_team_idx').on(games.leagueId, games.awayTeamId),
   ],
 );

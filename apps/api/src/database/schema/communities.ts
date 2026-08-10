@@ -1,6 +1,6 @@
 import { uuid, varchar, text, timestamp, pgTable, check, index } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { citext } from './custom-types';
+import { citext, tsvector } from './custom-types';
 import { communityStatusEnum } from './enums';
 import { sports } from './sports';
 import { leagues } from './leagues';
@@ -23,6 +23,11 @@ export const communities = pgTable(
     archivedAt: timestamp('archived_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+    searchVector: tsvector('search_vector').generatedAlwaysAs(sql`
+      setweight(to_tsvector('simple', coalesce("name", '')), 'A') ||
+      setweight(to_tsvector('simple', coalesce("description", '')), 'B') ||
+      setweight(to_tsvector('simple', coalesce("guidelines", '')), 'C')
+    `),
   },
   (communities) => [
     check(
@@ -35,5 +40,7 @@ export const communities = pgTable(
     index('communities_linked_league_id_idx').on(communities.linkedLeagueId),
 
     index('communities_linked_team_id_idx').on(communities.linkedTeamId),
+
+    index('communities_search_vector_gin_idx').using('gin', communities.searchVector),
   ],
 );

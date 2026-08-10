@@ -1,5 +1,6 @@
 import { uuid, varchar, text, timestamp, pgTable, check, index } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
+import { tsvector } from './custom-types';
 import { users } from './users';
 import { postContentTypeEnum, postStatusEnum, mediaTypeEnum } from './enums';
 
@@ -26,6 +27,11 @@ export const posts = pgTable(
     scheduledByUserId: uuid('scheduled_by_user_id').references(() => users.id, {
       onDelete: 'restrict',
     }),
+    searchVector: tsvector('search_vector').generatedAlwaysAs(sql`
+      setweight(to_tsvector('simple', coalesce("title", '')), 'A') ||
+      setweight(to_tsvector('simple', coalesce("excerpt", '')), 'B') ||
+      setweight(to_tsvector('simple', coalesce("content", '')), 'C')
+    `),
   },
   (posts) => [
     check(
@@ -79,5 +85,7 @@ OR
     index('posts_published_feed_idx')
       .on(posts.publishedAt.desc())
       .where(sql`${posts.status} = 'published' AND ${posts.deletedAt} IS NULL`),
+
+    index('posts_search_vector_gin_idx').using('gin', posts.searchVector),
   ],
 );

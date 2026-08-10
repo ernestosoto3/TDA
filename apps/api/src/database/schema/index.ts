@@ -40,3 +40,4 @@ export * from './auditevents';
 export * from './policyversions';
 export * from './policyacceptances';
 export * from './relations';
+export * from './custom-types';

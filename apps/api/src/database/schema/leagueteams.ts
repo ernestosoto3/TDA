@@ -1,4 +1,4 @@
-import { uuid, timestamp, primaryKey, pgTable } from 'drizzle-orm/pg-core';
+import { uuid, timestamp, primaryKey, pgTable, index } from 'drizzle-orm/pg-core';
 import { leagues } from './leagues';
 import { teams } from './teams';
 
@@ -18,5 +18,7 @@ export const leagueTeams = pgTable(
     primaryKey({
       columns: [leagueTeams.leagueId, leagueTeams.teamId],
     }),
+
+    index('league_teams_team_id_idx').on(leagueTeams.teamId),
   ],
 );

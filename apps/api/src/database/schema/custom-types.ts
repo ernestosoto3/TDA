@@ -5,3 +5,9 @@ export const citext = customType<{ data: string }>({
     return 'citext';
   },
 });
+
+export const tsvector = customType<{ data: string }>({
+  dataType() {
+    return 'tsvector';
+  },
+});
