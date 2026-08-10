@@ -1,4 +1,4 @@
-import {uuid , text , timestamp , pgTable , check , uniqueIndex} from 'drizzle-orm/pg-core'
+import {uuid , text , timestamp , pgTable , check , uniqueIndex , index} from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 import { userRoles } from './userroles'
 import { sports } from './sports'
@@ -39,20 +39,50 @@ uniqueIndex('editor_entity_scopes_active_sport_unique_idx')
 editorEntityScopes.userRoleId,
 editorEntityScopes.sportId,
 )
-.where(sql`${editorEntityScopes.sportId} IS NOT NULL AND ${editorEntityScopes.revokedAt} IS NULL`),
+.where(
+sql`${editorEntityScopes.sportId} IS NOT NULL AND ${editorEntityScopes.revokedAt} IS NULL`
+),
 
 uniqueIndex('editor_entity_scopes_active_league_unique_idx')
 .on(
 editorEntityScopes.userRoleId,
 editorEntityScopes.leagueId,
 )
-.where(sql`${editorEntityScopes.leagueId} IS NOT NULL AND ${editorEntityScopes.revokedAt} IS NULL`),
+.where(
+sql`${editorEntityScopes.leagueId} IS NOT NULL AND ${editorEntityScopes.revokedAt} IS NULL`
+),
 
 uniqueIndex('editor_entity_scopes_active_team_unique_idx')
 .on(
 editorEntityScopes.userRoleId,
 editorEntityScopes.teamId,
 )
-.where(sql`${editorEntityScopes.teamId} IS NOT NULL AND ${editorEntityScopes.revokedAt} IS NULL`),
+.where(
+sql`${editorEntityScopes.teamId} IS NOT NULL AND ${editorEntityScopes.revokedAt} IS NULL`
+),
+
+index('editor_entity_scopes_user_role_id_idx').on(
+editorEntityScopes.userRoleId,
+),
+
+index('editor_entity_scopes_sport_id_idx').on(
+editorEntityScopes.sportId,
+),
+
+index('editor_entity_scopes_league_id_idx').on(
+editorEntityScopes.leagueId,
+),
+
+index('editor_entity_scopes_team_id_idx').on(
+editorEntityScopes.teamId,
+),
+
+index('editor_entity_scopes_assigned_by_user_id_idx').on(
+editorEntityScopes.assignedByUserId,
+),
+
+index('editor_entity_scopes_approved_by_user_id_idx').on(
+editorEntityScopes.approvedByUserId,
+),
 ],
 )

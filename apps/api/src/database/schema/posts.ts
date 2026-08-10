@@ -43,6 +43,11 @@ sql`${posts.status} <> 'scheduled' OR (${posts.scheduledFor} IS NOT NULL AND ${p
 ),
 
 check(
+'posts_scheduled_for_requires_scheduler_check',
+sql`${posts.scheduledFor} IS NULL OR ${posts.scheduledByUserId} IS NOT NULL`,
+),
+
+check(
 'posts_published_requires_published_at_check',
 sql`${posts.status} <> 'published' OR ${posts.publishedAt} IS NOT NULL`,
 ),
@@ -71,8 +76,15 @@ posts.status,
 posts.publishedAt.desc(),
 ),
 
+index('posts_status_published_at_idx').on(
+posts.status,
+posts.publishedAt.desc(),
+),
+
 index('posts_published_feed_idx').on(
 posts.publishedAt.desc(),
-).where(sql`${posts.status} = 'published' AND ${posts.deletedAt} IS NULL`),
+).where(
+sql`${posts.status} = 'published' AND ${posts.deletedAt} IS NULL`
+),
 ],
 )

@@ -34,6 +34,12 @@ postCommunities.pinnedAt.desc(),
 index('community_pinned_posts_idx').on(
 postCommunities.communityId,
 postCommunities.pinnedAt.desc(),
-).where(sql`${postCommunities.isPinned} = true`),
+).where(
+sql`${postCommunities.isPinned} = true`
+),
+
+index('post_communities_pinned_by_user_id_idx').on(
+postCommunities.pinnedByUserId,
+),
 ],
 )

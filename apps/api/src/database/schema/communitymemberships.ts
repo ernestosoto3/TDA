@@ -1,4 +1,4 @@
-import {uuid , timestamp , pgTable , primaryKey} from 'drizzle-orm/pg-core'
+import {uuid , timestamp , pgTable , primaryKey, index} from 'drizzle-orm/pg-core'
 import { users } from './users'
 import { communities } from './communities'
 import { membershipRoleEnum , membershipStatusEnum } from './enums'
@@ -20,5 +20,10 @@ communityMemberships.communityId,
 communityMemberships.userId,
 ]
 }),
+
+index('community_memberships_user_status_idx').on(
+communityMemberships.userId,
+communityMemberships.status,
+),
 ],
 )

@@ -1,4 +1,4 @@
-import {uuid , integer , jsonb , timestamp , pgTable, check} from 'drizzle-orm/pg-core'
+import {uuid , integer , jsonb , timestamp , pgTable, check , index} from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 import { games } from './games'
 import { teams } from './teams'
@@ -31,6 +31,10 @@ sql`${scores.awayScore} >= 0`,
 check(
 'scores_final_requires_result_type_check',
 sql`${scores.status} <> 'final' OR ${scores.resultType} IS NOT NULL`,
+),
+
+index('scores_winning_team_id_idx').on(
+scores.winningTeamId,
 ),
 ],
 )

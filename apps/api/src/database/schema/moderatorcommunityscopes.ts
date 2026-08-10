@@ -1,4 +1,4 @@
-import {uuid , text , timestamp , pgTable , check , uniqueIndex} from 'drizzle-orm/pg-core'
+import {uuid , text , timestamp , pgTable , check , uniqueIndex , index} from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 import { userRoles } from './userroles'
 import { communities } from './communities'
@@ -26,6 +26,24 @@ uniqueIndex('moderator_community_scopes_active_unique_idx')
 moderatorCommunityScopes.userRoleId,
 moderatorCommunityScopes.communityId,
 )
-.where(sql`${moderatorCommunityScopes.revokedAt} IS NULL`),
+.where(
+sql`${moderatorCommunityScopes.revokedAt} IS NULL`
+),
+
+index('moderator_community_scopes_user_role_id_idx').on(
+moderatorCommunityScopes.userRoleId,
+),
+
+index('moderator_community_scopes_community_id_idx').on(
+moderatorCommunityScopes.communityId,
+),
+
+index('moderator_community_scopes_assigned_by_user_id_idx').on(
+moderatorCommunityScopes.assignedByUserId,
+),
+
+index('moderator_community_scopes_approved_by_user_id_idx').on(
+moderatorCommunityScopes.approvedByUserId,
+),
 ],
 )

@@ -1,4 +1,4 @@
-import {uuid , text , timestamp , pgTable , check , foreignKey} from 'drizzle-orm/pg-core'
+import {uuid , text , timestamp , pgTable , check , foreignKey , index} from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 import { communities } from './communities'
 import { users } from './users'
@@ -31,5 +31,28 @@ communityMemberships.communityId,
 communityMemberships.userId,
 ]
 }),
+
+index('messages_community_sent_at_idx').on(
+messages.communityId,
+messages.sentAt.desc(),
+),
+
+index('messages_sender_user_id_idx').on(
+messages.senderUserId,
+),
+
+index('messages_membership_fk_idx').on(
+messages.communityId,
+messages.senderUserId,
+),
+
+index('messages_active_community_idx')
+.on(
+messages.communityId,
+messages.sentAt.desc(),
+)
+.where(
+sql`${messages.status} = 'active' AND ${messages.deletedAt} IS NULL`
+),
 ],
 )

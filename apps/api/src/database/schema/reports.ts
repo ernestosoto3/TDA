@@ -61,8 +61,32 @@ index('reports_reporter_user_idx').on(
 reports.reporterUserId,
 ),
 
+index('reports_reported_user_idx').on(
+reports.reportedUserId,
+),
+
+index('reports_reported_post_idx').on(
+reports.reportedPostId,
+),
+
+index('reports_reported_comment_idx').on(
+reports.reportedCommentId,
+),
+
+index('reports_reported_message_idx').on(
+reports.reportedMessageId,
+),
+
 index('reports_resolved_by_user_idx').on(
 reports.resolvedByUserId,
+),
+
+index('reports_open_queue_idx')
+.on(
+reports.createdAt,
+)
+.where(
+sql`${reports.status} IN ('pending','in_review')`
 ),
 ],
 )

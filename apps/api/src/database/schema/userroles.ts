@@ -41,11 +41,29 @@ uniqueIndex('user_roles_active_user_unique_idx')
 .on(
 userRoles.userId,
 )
-.where(sql`${userRoles.revokedAt} IS NULL`),
+.where(
+sql`${userRoles.revokedAt} IS NULL`
+),
 
 index('user_roles_role_user_idx').on(
 userRoles.role,
 userRoles.userId,
+),
+
+index('user_roles_user_id_idx').on(
+userRoles.userId,
+),
+
+index('user_roles_assigned_by_user_id_idx').on(
+userRoles.assignedByUserId,
+),
+
+index('user_roles_approved_by_user_id_idx').on(
+userRoles.approvedByUserId,
+),
+
+index('user_roles_revoked_by_user_id_idx').on(
+userRoles.revokedByUserId,
 ),
 ],
 )

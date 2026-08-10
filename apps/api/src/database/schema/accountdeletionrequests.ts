@@ -1,4 +1,4 @@
-import {uuid , text , timestamp , pgTable , check , uniqueIndex} from 'drizzle-orm/pg-core'
+import {uuid , text , timestamp , pgTable , check , uniqueIndex , index} from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 import { users } from './users'
 import { deletionRequestStatusEnum } from './enums'
@@ -33,6 +33,16 @@ uniqueIndex('account_deletion_requests_active_user_unique_idx')
 .on(
 accountDeletionRequests.userId,
 )
-.where(sql`${accountDeletionRequests.status} IN ('pending_verification','verified','scheduled')`),
+.where(
+sql`${accountDeletionRequests.status} IN ('pending_verification','verified','scheduled')`
+),
+
+index('account_deletion_requests_user_id_idx').on(
+accountDeletionRequests.userId,
+),
+
+index('account_deletion_requests_processed_by_user_id_idx').on(
+accountDeletionRequests.processedByUserId,
+),
 ],
 )
