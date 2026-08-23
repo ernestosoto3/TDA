@@ -80,4 +80,41 @@ describe('validateEnvironment', () => {
     expect(result.NODE_ENV).toBe('staging');
     expect(result.DATABASE_SSL_MODE).toBe('verify-full');
   });
+
+  it('accepts empty optional R2 configuration', () => {
+    const result = validateEnvironment({
+      ...validDevelopmentEnvironment,
+      CLOUDFLARE_R2_ACCOUNT_ID: '',
+      CLOUDFLARE_R2_ACCESS_KEY_ID: '',
+      CLOUDFLARE_R2_SECRET_ACCESS_KEY: '',
+      CLOUDFLARE_R2_BUCKET_NAME: '',
+    });
+
+    expect(result.CLOUDFLARE_R2_ACCOUNT_ID).toBeUndefined();
+    expect(result.CLOUDFLARE_R2_BUCKET_NAME).toBeUndefined();
+  });
+
+  it('accepts complete R2 configuration', () => {
+    const result = validateEnvironment({
+      ...validDevelopmentEnvironment,
+      CLOUDFLARE_R2_ACCOUNT_ID: 'account-id',
+      CLOUDFLARE_R2_ACCESS_KEY_ID: 'access-key',
+      CLOUDFLARE_R2_SECRET_ACCESS_KEY: 'secret-key',
+      CLOUDFLARE_R2_BUCKET_NAME: 'tda-media',
+    });
+
+    expect(result.CLOUDFLARE_R2_ACCOUNT_ID).toBe('account-id');
+    expect(result.CLOUDFLARE_R2_BUCKET_NAME).toBe('tda-media');
+  });
+
+  it('rejects partial R2 configuration', () => {
+    expect(() =>
+      validateEnvironment({
+        ...validDevelopmentEnvironment,
+        CLOUDFLARE_R2_ACCOUNT_ID: 'account-id',
+      }),
+    ).toThrow(
+      'Cloudflare R2 configuration must provide all four CLOUDFLARE_R2 variables or leave all four empty.',
+    );
+  });
 });

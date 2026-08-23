@@ -358,3 +358,90 @@ The selected technology stack is:
 ## Current Status
 
 TDA has completed its initial product-planning and architecture phase. The monorepo, mobile application, backend API, Admin Dashboard placeholder, and shared packages have been initialized. The team is now establishing the technical foundation required for feature development.
+
+## API Operational Endpoints
+
+The NestJS API uses the global `/api` prefix and URI-based versioning. Version 1 routes use the `/api/v1` prefix.
+
+Start the API locally:
+
+```bash
+pnpm --filter @tda/api dev
+```
+
+Unless `API_PORT` is changed, the API is available at `http://localhost:3000`.
+
+### Liveness
+
+```http
+GET /api/v1/health/live
+```
+
+The liveness endpoint confirms that the API process is running. It does not check PostgreSQL, Cloudflare R2, or other external dependencies.
+
+A healthy response returns HTTP `200`:
+
+```json
+{
+  "status": "ok",
+  "service": "tda-api"
+}
+```
+
+### Readiness
+
+```http
+GET /api/v1/health/ready
+```
+
+The readiness endpoint determines whether the API is prepared to serve requests.
+
+It checks:
+
+- PostgreSQL connectivity.
+- Cloudflare R2 connectivity when all required R2 variables are configured.
+
+The `r2` field is omitted when Cloudflare R2 is not configured. When R2 is fully configured, readiness includes its connectivity status as `up` or `down`.
+
+A ready response returns HTTP `200`:
+
+```json
+{
+  "status": "ok",
+  "service": "tda-api",
+  "checks": {
+    "postgresql": "up",
+    "r2": "up"
+  }
+}
+```
+
+If PostgreSQL or a configured Cloudflare R2 dependency is unavailable, the endpoint returns HTTP `503` with `status` set to `error`.
+
+### Swagger Documentation
+
+Interactive Swagger documentation is available while the API is running:
+
+```text
+http://localhost:3000/api/v1/docs
+```
+
+The generated OpenAPI document is committed at:
+
+```text
+apps/api/openapi.json
+```
+
+Generate the document after changing controllers, routes, DTOs, or Swagger metadata:
+
+```bash
+pnpm openapi:generate
+```
+
+Verify that the committed document is valid, current, and deterministic:
+
+```bash
+pnpm openapi:check
+```
+
+The root `pnpm check` command performs this validation automatically, including in pull-request CI.
