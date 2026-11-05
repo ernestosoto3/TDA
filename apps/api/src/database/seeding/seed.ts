@@ -9,4 +9,4 @@ async function createContext() {
   await app.close();
 }
 
-createContext();
+void createContext();
